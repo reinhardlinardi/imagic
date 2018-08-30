@@ -39,28 +39,13 @@ public class HistogramActivity extends AppCompatActivity {
             case PICK_IMAGE_REQUEST:
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = data.getData();
-
-                    // method 1
+                    
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                         iv.setImageBitmap(bitmap);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-                    // method 2
-
-                    //try {
-                    //    InputStream imageStream = getContentResolver().openInputStream(selectedImage);
-                    //    Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
-                    //    imageStream.close(;
-                    //   iv.setImageBitmap(yourSelectedImage);
-                    //} catch (FileNotFoundException e) {
-                    //    e.printStackTrace();
-                    //}
-
-                    // method 3
-                    // iv.setImageURI(selectedImage);
                 }
                 break;
         }
