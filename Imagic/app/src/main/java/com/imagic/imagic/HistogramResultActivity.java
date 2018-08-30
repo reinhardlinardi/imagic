@@ -48,7 +48,7 @@ public class HistogramResultActivity extends AppCompatActivity {
         imageHeight = imageBitmap.getHeight();
         imageWidth = imageBitmap.getWidth();
         countColorValues();
-//        Log.v("COBA", "pixel(0,0)=" + Color.red(imageBitmap.getPixel(0,0)));
+        Log.v("COBA", "pixel(0,0)=" + redValuesCount[0]);
     }
 
     private void initializeColorValuesCount() {
@@ -68,7 +68,7 @@ public class HistogramResultActivity extends AppCompatActivity {
     private void countColorValues() {
         for(int row = 0; row < imageHeight; row++) {
             for (int col = 0; col < imageWidth; col++) {
-                int pixel = imageBitmap.getPixel(row, col);
+                int pixel = imageBitmap.getPixel(col, row);
                 int red = Color.red(pixel);
                 int blue = Color.blue(pixel);
                 int green = Color.green(pixel);
@@ -80,5 +80,9 @@ public class HistogramResultActivity extends AppCompatActivity {
                 grayscaleValuesCount[grayscale]++;
             }
         }
+    }
+
+    private void plotArrayToHistogram() {
+
     }
 }
