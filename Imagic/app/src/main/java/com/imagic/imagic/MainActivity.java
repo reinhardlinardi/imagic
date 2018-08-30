@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         MainMenuAdapter adapter = new MainMenuAdapter(this, options);
-        ListView mainMenu = (ListView) findViewById(R.id.mainMenuListView);
+        ListView mainMenu = findViewById(R.id.mainMenuListView);
         mainMenu.setAdapter(adapter);
     }
 }
