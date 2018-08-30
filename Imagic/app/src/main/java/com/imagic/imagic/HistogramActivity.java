@@ -27,7 +27,7 @@ public class HistogramActivity extends AppCompatActivity {
     private final static int ALL_PERMISSIONS_RESULT = 101;
     private ImageView iv;
     File file;
-    Uri uri;
+    Uri imageUri;
     private Context context;
     private Activity activity;
     private Bitmap imageBitmap;
@@ -40,6 +40,7 @@ public class HistogramActivity extends AppCompatActivity {
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        context = this;
         activity = HistogramActivity.this;
         iv = (ImageView) findViewById(R.id.iv);
         imageBitmap = null;
@@ -49,10 +50,10 @@ public class HistogramActivity extends AppCompatActivity {
         if(imageBitmap.equals(null)){
             Toast.makeText(activity, "No image selected/uploaded", Toast.LENGTH_SHORT).show();
         } else {
-            Log.v("COBA", "pixel(0,0)=" + Color.red(imageBitmap.getPixel(0,0)));
-//            Intent intent = new Intent(context, HistogramResultActivity.class);
-//            intent.putExtra("BitmapImage", imageBitmap);
-//            startActivity(intent);
+//            Log.v("COBA", "pixel(0,0)=" + Color.red(imageBitmap.getPixel(0,0)));
+            Intent intent = new Intent(context, HistogramResultActivity.class);
+            intent.putExtra("imageUri", imageUri);
+            startActivity(intent);
         }
     }
 
@@ -83,8 +84,8 @@ public class HistogramActivity extends AppCompatActivity {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 
         file = new File(Environment.getExternalStorageDirectory(), String.valueOf(System.currentTimeMillis()) + ".jpg");
-        uri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file);
-        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+        imageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file);
+        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
 
         startActivityForResult(intent, CAMERA_TAKE_REQUEST);
     }
@@ -107,6 +108,7 @@ public class HistogramActivity extends AppCompatActivity {
 
         try {
             if(!selectedImage.equals(Uri.parse(""))) {
+                imageUri = selectedImage;
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                 imageBitmap = bitmap;
                 iv.setImageBitmap(bitmap);
