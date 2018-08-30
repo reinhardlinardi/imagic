@@ -4,6 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HistogramActivity">
+    tools:context=".HistogramActivity"
+    android:layout_margin="16dp">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom">
+
+        <ImageView
+            android:id="@+id/iv"
+            android:layout_width="match_parent"
+            android:layout_height="330dp" />
+        <Button
+            android:id="@+id/button_open_gallery"
+            android:layout_below="@id/iv"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/secondary_color_button"
+            android:layout_margin="4dp"
+            android:text="@string/choose_photo_label"/>
+        <Button
+            android:id="@+id/button_open_camera"
+            android:layout_below="@id/button_open_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/secondary_color_button"
+            android:text="@string/take_photo_label"/>
+        <Button
+            android:id="@+id/button_generate_histogram"
+            android:layout_below="@id/button_open_camera"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/accent_color_button"
+            android:layout_margin="4dp"
+            android:text="@string/generate_histogram_label"
+            android:textColor="#FFFFFF"/>
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
