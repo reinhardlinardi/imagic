@@ -25,7 +25,6 @@ public class MainMenuAdapter extends ArrayAdapter {
         LayoutInflater inflater = context.getLayoutInflater();
         View optionView = inflater.inflate(R.layout.listview_mainmenu_option, null, true);
 
-        LinearLayout optionButton = (LinearLayout) optionView.findViewById(R.id.menu);
         final TextView optionTitleTextView = (TextView) optionView.findViewById(R.id.mainMenuOptionTitleTextView);
         TextView optionDescriptionTextView = (TextView) optionView.findViewById(R.id.mainMenuOptionDescriptionTextView);
 

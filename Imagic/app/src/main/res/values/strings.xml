@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Imagic</string>
+    <string name="title_activity_histogram">Histogram</string>
 </resources>
