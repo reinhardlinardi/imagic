@@ -26,8 +26,8 @@ public class HistogramActivity extends AppCompatActivity {
     private static final int CAMERA_TAKE_REQUEST = 200;
     private final static int ALL_PERMISSIONS_RESULT = 101;
     private ImageView iv;
-    File file;
-    Uri imageUri;
+    private File file;
+    private Uri imageUri;
     private Context context;
     private Activity activity;
     private Bitmap imageBitmap;
