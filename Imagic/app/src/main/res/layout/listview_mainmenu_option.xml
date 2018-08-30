@@ -22,16 +22,17 @@
             android:paddingTop="10dp"
             android:text="Option Test"
             android:textColor="@android:color/black"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/mainMenuOptionDescriptionTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Description Test"
             android:paddingBottom="10dp"
-            android:paddingLeft="20dp"/>
+            android:paddingLeft="20dp"
+            android:text="Description Test"
+            android:textSize="12sp" />
 
     </LinearLayout>
 </LinearLayout>
