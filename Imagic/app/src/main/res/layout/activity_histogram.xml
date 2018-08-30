@@ -25,7 +25,7 @@
             android:background="@drawable/secondary_color_button"
             android:layout_margin="4dp"
             android:text="@string/choose_photo_label"
-            android:onClick="pick"/>
+            android:onClick="pickImage"/>
         <Button
             android:id="@+id/button_open_camera"
             android:layout_below="@id/button_open_gallery"
@@ -34,6 +34,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/secondary_color_button"
             android:text="@string/take_photo_label"/>
+            <!--android:onClick="takePicture"/>-->
         <Button
             android:id="@+id/button_generate_histogram"
             android:layout_below="@id/button_open_camera"
@@ -42,6 +43,7 @@
             android:background="@drawable/accent_color_button"
             android:layout_margin="4dp"
             android:text="@string/generate_histogram_label"
-            android:textColor="#FFFFFF"/>
+            android:textColor="#FFFFFF"
+            android:onClick="generateHistogram"/>
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Imagic</string>
-    <string name="title_activity_histogram">Histogram</string>
+    <string name="title_activity_histogram">Choose Image</string>
+    <string name="title_activity_histogram_result">Result</string>
     <string name="choose_photo_label">Choose Photo from Gallery</string>
     <string name="take_photo_label">Take a Picture</string>
     <string name="generate_histogram_label">Generate Histogram</string>
