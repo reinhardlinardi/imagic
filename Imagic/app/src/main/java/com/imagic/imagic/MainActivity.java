@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
     // Main menu options
-    private final ArrayList<MainMenuOption> options = new ArrayList<>(Arrays.asList(
+    private static final ArrayList<MainMenuOption> options = new ArrayList<>(Arrays.asList(
         new MainMenuOption("Histogram", "Show RGB and Grayscale histogram from an image")
     ));
 
@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MainMenuAdapter adapter = new MainMenuAdapter(this, options);
+        MainMenuAdapter adapter = new MainMenuAdapter(this, MainActivity.options);
         ListView mainMenu = findViewById(R.id.mainMenuListView);
         mainMenu.setAdapter(adapter);
     }
