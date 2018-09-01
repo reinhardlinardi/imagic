@@ -33,6 +33,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="backgroundAssetType" value="COLOR" />
+                                      <entry key="backgroundColor" value="9303a6" />
                                       <entry key="backgroundLayerName" value="ic_launcher_background" />
                                       <entry key="foregroundImage" value="$USER_HOME$/Pictures/magic-wand.svg" />
                                       <entry key="foregroundLayerName" value="ic_launcher_foreground" />
