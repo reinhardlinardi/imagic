@@ -5,4 +5,11 @@
     <string name="choose_photo_label">Choose Photo from Gallery</string>
     <string name="take_photo_label">Take a Picture</string>
     <string name="generate_histogram_label">Generate Histogram</string>
+    <string name="welcome_message">
+        Welcome to Imagic!\n
+        \n
+        Select or capture an image\n
+        using the buttons below\n
+        to start feel the magic!
+    </string>
 </resources>
