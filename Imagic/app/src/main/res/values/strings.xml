@@ -9,4 +9,5 @@
     <string name="welcome_image_description">Imagic Icon</string>
     <string name="select_image_button_text">Select Image</string>
     <string name="capture_image_button_text">Capture Image</string>
+    <string name="menu_activity_title">Magic Spell</string>
 </resources>

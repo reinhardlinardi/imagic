@@ -1,27 +1,24 @@
 package com.imagic.imagic;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
     // Intent request codes
     private static final int SELECT_IMAGE_REQUEST_CODE = 0;
     private static final int CAPTURE_IMAGE_REQUEST_CODE = 1;
+
+    // Error messages
+    private static final String REQUEST_ERROR_MSG = "Failed to get selected or captured image.\nPlease try again later.";
 
     // Selected or captured image URI
     private static Uri imageURI;
@@ -75,19 +72,13 @@ public class MainActivity extends AppCompatActivity {
     // Select or capture image result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
-            case SELECT_IMAGE_REQUEST_CODE:
-                if(resultCode == RESULT_OK) {
-                    MainActivity.imageURI = data.getData();
-                }
-                break;
-            case CAPTURE_IMAGE_REQUEST_CODE:
-                if(resultCode == RESULT_OK) {
-                    Log.d("ImageURI", MainActivity.imageURI.toString());
-                }
-                break;
-            default:
-                break;
+        if(resultCode == RESULT_OK) {
+            if(requestCode == SELECT_IMAGE_REQUEST_CODE) MainActivity.imageURI = data.getData();
+
+            Intent intent = new Intent(this, MenuActivity.class);
+            intent.putExtra("image", imageURI.toString());
+            startActivity(intent);
         }
+        else Toast.makeText(this, MainActivity.REQUEST_ERROR_MSG, Toast.LENGTH_SHORT).show();
     }
 }
