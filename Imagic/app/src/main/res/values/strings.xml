@@ -14,4 +14,10 @@
     <string name="select_image_button_text">Select Image</string>
     <string name="capture_image_button_text">Capture Image</string>
     <string name="menu_activity_title">Magic Spell</string>
+    <string name="menu_message">
+        What magic spell do you want to use?
+    </string>
+    <string name="menu_option_title">Magic</string>
+    <string name="menu_option_description">Describes about magic</string>
+    <string name="menu_image_description">Magic spell book</string>
 </resources>
