@@ -20,9 +20,6 @@ public class Image {
     // Image extension
     public static final String EXTENSION = "jpg";
 
-    // Error messages
-    public static final String CREATE_IMAGE_ERROR_MSG = "Cannot save captured image.\nPlease try again later";
-
     // Get file provider URI
     public static Uri getFileProviderURI(Activity context, File file) {
         return FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);

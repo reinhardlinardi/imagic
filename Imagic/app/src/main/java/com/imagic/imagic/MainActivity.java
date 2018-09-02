@@ -5,9 +5,9 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.io.File;
 
@@ -16,9 +16,6 @@ public class MainActivity extends AppCompatActivity {
     // Intent request codes
     private static final int SELECT_IMAGE_REQUEST_CODE = 0;
     private static final int CAPTURE_IMAGE_REQUEST_CODE = 1;
-
-    // Error messages
-    private static final String REQUEST_ERROR_MSG = "Failed to get selected or captured image.\nPlease try again later.";
 
     // Selected or captured image URI
     private static Uri imageURI;
@@ -62,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(intent, MainActivity.CAPTURE_IMAGE_REQUEST_CODE);
                     }
                     catch(Exception e) {
-                        Toast.makeText(MainActivity.this, Image.CREATE_IMAGE_ERROR_MSG, Toast.LENGTH_SHORT).show();
+                        Log.e("Imagic", "Exception", e);
                     }
                 }
             }
@@ -79,6 +76,5 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("image", imageURI.toString());
             startActivity(intent);
         }
-        else Toast.makeText(this, MainActivity.REQUEST_ERROR_MSG, Toast.LENGTH_SHORT).show();
     }
 }

@@ -43,21 +43,21 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
             android:background="@android:color/holo_orange_light"
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/ic_folder"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="@string/select_image_button_text"
-            android:textColor="@android:color/white"
-            tools:layout_marginRight="5dp" />
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/captureImageButton"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginStart="5dp"
             android:background="@android:color/holo_blue_dark"
             android:drawablePadding="10dp"
