@@ -30,15 +30,12 @@ public class MenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        ActionBar actionBar = getActionBar();
-        if(actionBar != null) actionBar.setHomeButtonEnabled(true);
-
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) imageURI = Uri.parse(bundle.getString("image"));
+        if(bundle != null) MenuActivity.imageURI = Uri.parse(bundle.getString("image"));
 
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.menu), MenuActivity.DATA_SOURCE_CHARSET))) {
             ArrayList<MenuOption> options = loadDataSource(reader);
-            MenuAdapter menuAdapter = new MenuAdapter(this, options);
+            MenuAdapter menuAdapter = new MenuAdapter(this, options, MenuActivity.imageURI);
             ListView menuListView = findViewById(R.id.menuListView);
             menuListView.setAdapter(menuAdapter);
         }

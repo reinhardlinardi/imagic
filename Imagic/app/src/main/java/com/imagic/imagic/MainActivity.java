@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             if(requestCode == SELECT_IMAGE_REQUEST_CODE) MainActivity.imageURI = data.getData();
 
             Intent intent = new Intent(this, MenuActivity.class);
-            intent.putExtra("image", imageURI.toString());
+            intent.putExtra("image", MainActivity.imageURI.toString());
             startActivity(intent);
         }
     }

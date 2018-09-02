@@ -20,4 +20,5 @@
     <string name="menu_option_title">Magic</string>
     <string name="menu_option_description">Describes about magic</string>
     <string name="menu_image_description">Magic spell book</string>
+    <string name="histogram_activity_title">Histogram</string>
 </resources>

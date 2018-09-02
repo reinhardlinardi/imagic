@@ -2,6 +2,8 @@ package com.imagic.imagic;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +18,13 @@ public class MenuAdapter extends ArrayAdapter<MenuOption> {
     // Activity context
     private final Activity context;
 
-    MenuAdapter(Activity context, ArrayList<MenuOption> options) {
+    // Selected or captured image URI
+    private static Uri imageURI;
+
+    MenuAdapter(Activity context, ArrayList<MenuOption> options, Uri imageURI) {
         super(context, R.layout.list_menu_option, options);
         this.context = context;
+        MenuAdapter.imageURI = imageURI;
     }
 
     @NonNull
@@ -50,6 +56,9 @@ public class MenuAdapter extends ArrayAdapter<MenuOption> {
 
                 switch(title) {
                     case "Histogram":
+                        Intent intent = new Intent(context, HistogramActivity.class);
+                        intent.putExtra("image", MenuAdapter.imageURI.toString());
+                        context.startActivity(intent);
                         break;
                     default:
                         break;
