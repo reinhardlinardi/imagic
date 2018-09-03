@@ -34,10 +34,12 @@ public class MenuActivity extends AppCompatActivity {
         // Properties
         public String title;
         public String description;
+        public String activityOnClick;
 
-        Option(String title, String description) {
+        Option(String title, String description, String activityOnClick) {
             this.title = title;
             this.description = description;
+            this.activityOnClick = activityOnClick;
         }
     }
 
@@ -61,28 +63,24 @@ public class MenuActivity extends AppCompatActivity {
             if(option != null) {
                 optionTitleTextView.setText(option.title);
                 optionDescriptionTextView.setText(option.description);
-
-                optionView.setOnClickListener(getOptionOnClickListener(optionTitleTextView));
+                optionView.setOnClickListener(getOptionOnClickListener(option.activityOnClick));
             }
 
             return optionView;
         }
 
         // Option on click listener
-        private View.OnClickListener getOptionOnClickListener(final TextView optionTitleTextView) {
+        private View.OnClickListener getOptionOnClickListener(final String activityOnClick) {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String title = optionTitleTextView.getText().toString();
-
-                    switch(title) {
-                        case "Histogram":
-                            Intent intent = new Intent(MenuActivity.this, HistogramActivity.class);
-                            intent.putExtra("image", MenuActivity.imageURI.toString());
-                            MenuActivity.this.startActivity(intent);
-                            break;
-                        default:
-                            break;
+                    try {
+                        Intent intent = new Intent(MenuActivity.this, Class.forName(MenuActivity.this.getApplicationContext().getPackageName() + "." + activityOnClick + "Activity"));
+                        intent.putExtra("image", MenuActivity.imageURI.toString());
+                        MenuActivity.this.startActivity(intent);
+                    }
+                    catch(Exception e) {
+                        Log.e("Imagic", "Exception", e);
                     }
                 }
             };

@@ -15,12 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"
-        android:minHeight="0dp"
-        android:theme="@style/ImagicTheme" />
+        android:maxHeight="@dimen/progressbar_max_height"
+        android:minHeight="@dimen/progressbar_min_height" />
 
-    <ListView
-        android:id="@+id/histogramListView"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </ListView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
 </LinearLayout>

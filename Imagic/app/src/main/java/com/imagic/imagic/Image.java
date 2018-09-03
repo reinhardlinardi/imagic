@@ -25,7 +25,7 @@ public class Image {
     private static final String EXTENSION = "jpg";
 
     // Max possible colors
-    private static final int MAX_POSSIBLE_COLORS = 256;
+    public static final int MAX_POSSIBLE_COLORS = 256;
 
     // Color
     public static final int COLOR_RED = 0;

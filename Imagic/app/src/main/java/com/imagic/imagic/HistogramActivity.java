@@ -7,10 +7,15 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
 
 public class HistogramActivity extends AppCompatActivity {
 
@@ -26,7 +31,16 @@ public class HistogramActivity extends AppCompatActivity {
             for(int color : colors) {
                 try {
                     int[] count = Image.getColorCount(HistogramActivity.bitmap, color);
+                    /*
+                    DataPoint[] dataPoint = new DataPoint[Image.MAX_POSSIBLE_COLORS];
 
+                    for(int idx = 0; idx < count.length; idx++) {
+                        dataPoint[idx] = new DataPoint(idx, count[idx]);
+                    }
+
+                    BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoint);
+                    graphView.addSeries(series);
+                    */
                     numCount++;
                     publishProgress(countProgress(numCount, numColors));
 
@@ -64,6 +78,9 @@ public class HistogramActivity extends AppCompatActivity {
     // Progress bar
     private ProgressBar progressBar;
 
+    // Graph view
+    //private GraphView graphView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,28 +90,19 @@ public class HistogramActivity extends AppCompatActivity {
 
         if(bundle != null) {
             Uri imageURI = Uri.parse(bundle.getString("image"));
+
+            //graphView = findViewById(R.id.histogramGraphView);
             progressBar = findViewById(R.id.histogramProgressBar);
             progressBar.setVisibility(View.VISIBLE);
 
             try {
                 HistogramActivity.bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
                 HistogramTask histogramTask = new HistogramActivity.HistogramTask();
-                histogramTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, Image.COLOR_RED, Image.COLOR_GREEN, Image.COLOR_BLUE, Image.COLOR_GRAYSCALE);
+                histogramTask.execute(Image.COLOR_RED, Image.COLOR_GREEN, Image.COLOR_BLUE, Image.COLOR_GRAYSCALE);
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
             }
         }
     }
-
-    /*
-    <com.jjoe64.graphview.helper.GraphViewXML
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:title=""
-        app:seriesColor="#00cc00"
-        app:seriesData="0=5;2=5;3=0;4=2"
-        app:seriesTitle="Foobar"
-        app:seriesType="line" />
-     */
 }

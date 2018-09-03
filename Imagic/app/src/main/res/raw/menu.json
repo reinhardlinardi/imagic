@@ -1,6 +1,7 @@
 [
   {
     "title" : "Histogram",
-    "description" : "Create RGB and Grayscale histogram"
+    "description" : "Create RGB and Grayscale histogram",
+    "activityOnClick" : "Histogram"
   }
 ]
