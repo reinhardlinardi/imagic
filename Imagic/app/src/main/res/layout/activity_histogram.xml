@@ -1,49 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HistogramActivity"
-    android:layout_margin="@dimen/activity_margin">
+    android:layout_centerInParent="false"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical"
+    tools:context=".HistogramActivity">
 
-    <RelativeLayout
+    <ProgressBar
+        android:id="@+id/histogramProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom">
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:maxHeight="@dimen/progressbar_max_height"
+        android:minHeight="@dimen/progressbar_min_height" />
 
-        <ImageView
-            android:id="@+id/imageView"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/scrollableGraphLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp" />
-        <Button
-            android:id="@+id/button_open_gallery"
-            android:layout_below="@id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/secondary_color_button"
-            android:layout_margin="4dp"
-            android:text="@string/choose_photo_label"
-            android:onClick="pickImage"/>
-        <Button
-            android:id="@+id/button_open_camera"
-            android:layout_below="@id/button_open_gallery"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/secondary_color_button"
-            android:text="@string/take_photo_label"
-            android:onClick="takePicture"/>
-        <Button
-            android:id="@+id/button_generate_histogram"
-            android:layout_below="@id/button_open_camera"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/accent_color_button"
-            android:layout_margin="4dp"
-            android:text="@string/generate_histogram_label"
-            android:textColor="#FFFFFF"
-            android:onClick="generateHistogram"/>
-    </RelativeLayout>
-</android.support.constraint.ConstraintLayout>
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/graph_linear_layout_vertical_padding"
+            android:paddingEnd="@dimen/graph_linear_layout_side_padding"
+            android:paddingStart="@dimen/graph_linear_layout_side_padding"
+            android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/redGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/greenGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/blueGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/grayscaleGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

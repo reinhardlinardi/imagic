@@ -2,28 +2,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.imagic.imagic">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_magic_wand"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_magic_wand_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/ImagicTheme">
         <provider
-            android:name=".GenericFileProvider"
-            android:authorities="${applicationId}.provider"
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.imagic.imagic.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider_paths" />
+                android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,20 +33,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HistogramActivity"
-            android:label="@string/title_activity_histogram"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+            android:name=".MenuActivity"
+            android:configChanges="orientation"
+            android:label="@string/menu_activity_title"
+            android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".HistogramResultActivity"
-            android:label="@string/title_activity_histogram_result"
-            android:parentActivityName=".HistogramActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".HistogramActivity" />
+            android:name=".HistogramActivity"
+            android:configChanges="orientation"
+            android:label="@string/histogram_activity_title"
+            android:screenOrientation="portrait">
+
         </activity>
     </application>
 

@@ -1,126 +1,161 @@
 package com.imagic.imagic;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
-import android.os.Environment;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.ValueDependentColor;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+
+import java.util.ArrayList;
 
 public class HistogramActivity extends AppCompatActivity {
 
-    // Constants
-    private static final int PICK_IMAGE_REQUEST = 100;
-    private static final int CAMERA_TAKE_REQUEST = 200;
+    // Background task
+    @SuppressLint("StaticFieldLeak")
+    private class HistogramTask extends AsyncTask<Integer, Integer, Void> {
+        @Override
+        protected Void doInBackground(Integer... colors) {
+            int numColors = colors.length + 1;
+            int numCount = 1;
+            publishProgress(countProgress(numCount, numColors));
 
-    // Activity and context
-    private Context context;
-    private Activity activity;
+            for(int color : colors) {
+                try {
+                    int[] colorCount = Image.getColorCount(HistogramActivity.bitmap, color);
 
-    // Image
-    private File file;
-    private Uri imageUri;
-    private ImageView imageView;
-    private Bitmap imageBitmap;
+                    DataPoint[] dataPoint = new DataPoint[Image.MAX_POSSIBLE_COLORS];
+                    for(int idx = 0; idx < colorCount.length; idx++) dataPoint[idx] = new DataPoint(idx, colorCount[idx]);
+
+                    BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoint);
+                    series.setDrawValuesOnTop(true);
+
+                    int graphViewID = 0;
+
+                    switch(color) {
+                        case Image.COLOR_RED: graphViewID = R.id.redGraphView; break;
+                        case Image.COLOR_GREEN: graphViewID = R.id.greenGraphView; break;
+                        case Image.COLOR_BLUE: graphViewID = R.id.blueGraphView; break;
+                        case Image.COLOR_GRAYSCALE: graphViewID = R.id.grayscaleGraphView; break;
+                        default: break;
+                    }
+
+                    GraphView graphView = findViewById(graphViewID);
+                    graphView.addSeries(series);
+
+                    graphView.getViewport().setMinX(0);
+                    graphView.getViewport().setMaxX(Image.MAX_POSSIBLE_COLORS - 1);
+                    graphView.getViewport().setXAxisBoundsManual(true);
+
+                    series.setValueDependentColor(getValueDependentColor(color));
+
+                    numCount++;
+                    publishProgress(countProgress(numCount, numColors));
+
+                    if (isCancelled()) break;
+
+                } catch (Exception e) {
+                    Log.e("Imagic", "Exception", e);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            HistogramActivity.this.progressBar.setProgress(progress[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            findViewById(R.id.redGraphView).setVisibility(View.VISIBLE);
+            findViewById(R.id.greenGraphView).setVisibility(View.VISIBLE);
+            findViewById(R.id.blueGraphView).setVisibility(View.VISIBLE);
+            findViewById(R.id.grayscaleGraphView).setVisibility(View.VISIBLE);
+
+            HistogramActivity.this.progressBar.setVisibility(View.GONE);
+            Toast.makeText(HistogramActivity.this, "Histogram generated", Toast.LENGTH_SHORT).show();
+        }
+
+        // Count progress
+        private int countProgress(int taskDone, int numTask) {
+            float taskDoneFraction = (float)taskDone / numTask;
+            return (int)(taskDoneFraction * 100);
+        }
+
+        // Get value dependent color
+        private ValueDependentColor<DataPoint> getValueDependentColor(final int color) {
+            return new ValueDependentColor<DataPoint>() {
+                @Override
+                public int get(DataPoint data) {
+                    int dataColor = 0;
+
+                    int maxValue = Image.MAX_POSSIBLE_COLORS - 1;
+                    int midValue = Image.MAX_POSSIBLE_COLORS / 2;
+                    int quarterValue = Image.MAX_POSSIBLE_COLORS / 4;
+
+                    switch(color) {
+                        case Image.COLOR_RED: dataColor = Color.argb(quarterValue + ((int) data.getX() / 4), maxValue, 0, 0); break;
+                        case Image.COLOR_GREEN: dataColor = Color.argb(quarterValue + ((int) data.getX() / 4), 0, maxValue, 0); break;
+                        case Image.COLOR_BLUE: dataColor = Color.argb(quarterValue + ((int) data.getX() / 4), 0, 0, maxValue); break;
+                        case Image.COLOR_GRAYSCALE: dataColor = Color.argb(quarterValue + ((int) data.getX() / 4), midValue, midValue, midValue); break;
+                        default: break;
+                    }
+
+                    return dataColor;
+                }
+            };
+        }
+    }
+
+    // Image bitmap
+    private static Bitmap bitmap;
+
+    // Progress bar
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_histogram);
 
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        Bundle bundle = getIntent().getExtras();
 
-        if(actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        if(bundle != null) {
+            Uri imageURI = Uri.parse(bundle.getString("image"));
 
-            context = this;
-            activity = HistogramActivity.this;
-            imageView = findViewById(R.id.imageView);
-            imageBitmap = null;
-        }
-    }
+            findViewById(R.id.redGraphView).setVisibility(View.INVISIBLE);
+            findViewById(R.id.greenGraphView).setVisibility(View.INVISIBLE);
+            findViewById(R.id.blueGraphView).setVisibility(View.INVISIBLE);
+            findViewById(R.id.grayscaleGraphView).setVisibility(View.INVISIBLE);
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Uri selectedImage = null;
+            progressBar = findViewById(R.id.histogramProgressBar);
+            progressBar.setVisibility(View.VISIBLE);
 
-        switch(requestCode) {
-            case PICK_IMAGE_REQUEST:
-                if(resultCode == RESULT_OK) {
-                    selectedImage = data.getData();
-                }
-                break;
-            case CAMERA_TAKE_REQUEST:
-                if(resultCode == RESULT_OK) {
-                    selectedImage = Uri.parse(file.toURI().toString());
-                }
-                break;
-            default:
-                break;
-        }
-
-        try {
-            if(selectedImage != null) {
-                imageUri = selectedImage;
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                imageBitmap = bitmap;
-                imageView.setImageBitmap(bitmap);
+            try {
+                HistogramActivity.bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
+                HistogramTask histogramTask = new HistogramActivity.HistogramTask();
+                histogramTask.execute(Image.COLOR_RED, Image.COLOR_GREEN, Image.COLOR_BLUE, Image.COLOR_GRAYSCALE);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Check if camera feature is available
-    private boolean isCameraExists() {
-        return activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
-    }
-
-    // Launch camera
-    private void launchCamera() {
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-
-        file = new File(Environment.getExternalStorageDirectory(), String.valueOf(System.currentTimeMillis()) + ".jpg");
-        imageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file);
-        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
-
-        startActivityForResult(intent, CAMERA_TAKE_REQUEST);
-    }
-
-    // Generate histogram
-    public void generateHistogram(View v) {
-        if(imageBitmap == null){
-            Toast.makeText(activity, "No image selected", Toast.LENGTH_SHORT).show();
-        } else {
-            Intent intent = new Intent(context, HistogramResultActivity.class);
-            intent.putExtra("imageUri", imageUri);
-            startActivity(intent);
-        }
-    }
-
-    // Select image
-    public void pickImage(View v) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
-    // Take picture from camera
-    public void takePicture(View v) {
-        if(isCameraExists()) launchCamera();
-        else {
-            Toast.makeText(activity, "Camera not available.", Toast.LENGTH_SHORT).show();
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
         }
     }
 }

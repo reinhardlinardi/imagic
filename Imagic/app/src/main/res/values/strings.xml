@@ -1,8 +1,25 @@
 <resources>
     <string name="app_name">Imagic</string>
-    <string name="title_activity_histogram">Choose Image</string>
-    <string name="title_activity_histogram_result">Result</string>
-    <string name="choose_photo_label">Choose Photo from Gallery</string>
-    <string name="take_photo_label">Take a Picture</string>
-    <string name="generate_histogram_label">Generate Histogram</string>
+    <string name="welcome_message">
+        \n
+        Welcome to Imagic!
+        \n\n\n
+        We need an image as magic\n
+        ingredient.
+        \n\n
+        You can select from storage\n
+        or capture a new one.
+    </string>
+    <string name="welcome_image_description">Imagic Icon</string>
+    <string name="select_image_button_text">Select Image</string>
+    <string name="capture_image_button_text">Capture Image</string>
+    <string name="menu_activity_title">Magic Spell</string>
+    <string name="menu_message">
+        What magic spell do you want to use?
+    </string>
+    <string name="menu_option_title">Magic</string>
+    <string name="menu_option_description">Describes about magic</string>
+    <string name="menu_image_description">Magic spell book</string>
+    <string name="histogram_activity_title">Histogram</string>
+    <string name="graph_series_no_data">0=0</string>
 </resources>
