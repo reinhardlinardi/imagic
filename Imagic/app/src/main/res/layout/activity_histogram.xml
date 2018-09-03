@@ -23,8 +23,51 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/scrollableGraphLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/graph_linear_layout_vertical_padding"
+            android:paddingEnd="@dimen/graph_linear_layout_side_padding"
+            android:paddingStart="@dimen/graph_linear_layout_side_padding"
+            android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/redGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/greenGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/blueGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/grayscaleGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>
