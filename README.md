@@ -1,2 +1,7 @@
 # Imagic
-Image Processing Exploration Project
+Image Processing Application for Android.
+
+## Team
+- Reinhard Linardi
+- Roland Hartanto
+- Francisco Kenandi Cahyono
