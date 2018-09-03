@@ -2,4 +2,22 @@
 <resources>
     <dimen name="activity_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="main_space_layout_height">0dp</dimen>
+    <dimen name="main_image_layout_height">0dp</dimen>
+    <dimen name="main_text_layout_height">0dp</dimen>
+    <dimen name="main_linear_layout_height">0dp</dimen>
+    <dimen name="main_select_button_margin">10dp</dimen>
+    <dimen name="main_select_button_drawable_padding">10dp</dimen>
+    <dimen name="main_select_button_padding">10dp</dimen>
+    <dimen name="main_capture_button_margin">10dp</dimen>
+    <dimen name="main_capture_button_drawable_padding">10dp</dimen>
+    <dimen name="main_capture_button_padding">10dp</dimen>
+    <dimen name="menu_option_title_side_padding">20dp</dimen>
+    <dimen name="menu_option_title_top_padding">10dp</dimen>
+    <dimen name="menu_option_description_bottom_padding">10dp</dimen>
+    <dimen name="menu_option_description_side_padding">20dp</dimen>
+    <dimen name="main_text_size">18sp</dimen>
+    <dimen name="menu_text_size">18sp</dimen>
+    <dimen name="menu_option_title_text_size">18sp</dimen>
+    <dimen name="menu_option_description_text_size">12sp</dimen>
 </resources>

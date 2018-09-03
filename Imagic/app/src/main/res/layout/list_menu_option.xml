@@ -12,22 +12,22 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="10dp"
+        android:paddingLeft="@dimen/menu_option_title_side_padding"
+        android:paddingRight="@dimen/menu_option_title_side_padding"
+        android:paddingTop="@dimen/menu_option_title_top_padding"
         android:text="@string/menu_option_title"
         android:textColor="@android:color/black"
-        android:textSize="18sp" />
+        android:textSize="@dimen/menu_option_title_text_size" />
 
     <TextView
         android:id="@+id/menuOptionDescriptionTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingBottom="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:paddingBottom="@dimen/menu_option_description_bottom_padding"
+        android:paddingLeft="@dimen/menu_option_description_side_padding"
+        android:paddingRight="@dimen/menu_option_description_side_padding"
         android:text="@string/menu_option_description"
-        android:textSize="12sp" />
+        android:textSize="@dimen/menu_option_description_text_size" />
 
 </LinearLayout>

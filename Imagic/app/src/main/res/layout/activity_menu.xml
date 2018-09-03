@@ -28,7 +28,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/menu_message"
-        android:textSize="18sp" />
+        android:textSize="@dimen/menu_text_size" />
 
     <ListView
         android:id="@+id/menuListView"

@@ -10,13 +10,13 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/main_space_layout_height"
         android:layout_weight="1" />
 
     <ImageView
         android:id="@+id/welcomeImageView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/main_image_layout_height"
         android:layout_weight="1"
         android:contentDescription="@string/welcome_image_description"
         app:srcCompat="@drawable/ic_magic_wand_64" />
@@ -24,15 +24,15 @@
     <TextView
         android:id="@+id/welcomeTextView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/main_text_layout_height"
         android:layout_weight="2"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/welcome_message"
-        android:textSize="18sp" />
+        android:textSize="@dimen/main_text_size" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/main_linear_layout_height"
         android:layout_weight="1"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal"
@@ -43,12 +43,12 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="@dimen/main_select_button_margin"
             android:background="@android:color/holo_orange_light"
-            android:drawablePadding="10dp"
+            android:drawablePadding="@dimen/main_select_button_drawable_padding"
             android:drawableStart="@drawable/ic_folder"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:paddingLeft="@dimen/main_select_button_padding"
+            android:paddingRight="@dimen/main_select_button_padding"
             android:text="@string/select_image_button_text"
             android:textColor="@android:color/white" />
 
@@ -57,13 +57,12 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="@dimen/main_capture_button_margin"
             android:background="@android:color/holo_blue_dark"
-            android:drawablePadding="10dp"
+            android:drawablePadding="@dimen/main_capture_button_drawable_padding"
             android:drawableStart="@drawable/ic_camera"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:paddingLeft="@dimen/main_capture_button_padding"
+            android:paddingRight="@dimen/main_capture_button_padding"
             android:text="@string/capture_image_button_text"
             android:textColor="@android:color/white" />
     </LinearLayout>
