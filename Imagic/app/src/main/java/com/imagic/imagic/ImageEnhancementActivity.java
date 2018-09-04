@@ -108,8 +108,8 @@ public class ImageEnhancementActivity extends AppCompatActivity {
 
             ImageEnhancementActivity.this.progressBar.setVisibility(View.GONE);
             Toast.makeText(ImageEnhancementActivity.this, "Histogram generated", Toast.LENGTH_SHORT).show();
-            ImageEnhancementActivity.this.imageViewBefore.setImageBitmap(ImageEnhancementActivity.bitmap);
-            ImageEnhancementActivity.this.imageViewResult.setImageBitmap(ImageEnhancementActivity.newBitmap);
+            new ImageLoadingTask(ImageEnhancementActivity.this.imageViewBefore).execute(ImageEnhancementActivity.bitmap);
+            new ImageLoadingTask(ImageEnhancementActivity.this.imageViewResult).execute(ImageEnhancementActivity.newBitmap);
         }
 
         // Count progress
