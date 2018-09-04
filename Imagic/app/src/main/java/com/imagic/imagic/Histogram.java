@@ -1,5 +1,7 @@
 package com.imagic.imagic;
 
+import android.util.Log;
+
 import java.util.Arrays;
 
 public class Histogram {
@@ -30,7 +32,7 @@ public class Histogram {
         generatePMF();
         generateCDF();
         for(int it = 0; it < this.dataCount.length; it++) {
-            newEqualizedValue[it] = (int) (cdf[it] * (double) this.dataCount.length);
+            newEqualizedValue[it] = (int) (cdf[it] * (double) (this.dataCount.length - 1));
         }
 
         for(int it = 0; it < this.dataCount.length; it++) {
@@ -50,5 +52,9 @@ public class Histogram {
         for(int it = 0; it < this.dataCount.length; it++) {
             cdf[it] = (it == 0)? pmf[it] : pmf[it] + cdf[it-1];
         }
+    }
+
+    public int[] getNewEqualizedValue() {
+        return newEqualizedValue;
     }
 }
