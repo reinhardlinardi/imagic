@@ -7,16 +7,37 @@ public class Histogram {
     private int sampleCount = 0;
     private double[] pmf;
     private double[] cdf;
+    private int[] newEqualizedValue;
+    private int[] dataCountNewValue;
 
     public Histogram(int[] dataCount) {
         this.dataCount = dataCount.clone();
         for(int it = 0; it < this.dataCount.length; it++) {
             sampleCount += this.dataCount[it];
         }
+        newEqualizedValue = new int[this.dataCount.length];
+        dataCountNewValue = new int[this.dataCount.length];
         pmf = new double[this.dataCount.length];
         cdf = new double[this.dataCount.length];
+
+        Arrays.fill(newEqualizedValue, 0);
+        Arrays.fill(dataCountNewValue, 0);
         Arrays.fill(pmf,0.0);
         Arrays.fill(cdf,0.0);
+    }
+
+    public int[] equalizeHistogram() {
+        generatePMF();
+        generateCDF();
+        for(int it = 0; it < this.dataCount.length; it++) {
+            newEqualizedValue[it] = (int) (cdf[it] * (double) this.dataCount.length);
+        }
+
+        for(int it = 0; it < this.dataCount.length; it++) {
+            dataCountNewValue[newEqualizedValue[it]] += dataCount[it];
+        }
+
+        return dataCountNewValue;
     }
 
     public void generatePMF() {
