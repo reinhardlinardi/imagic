@@ -7,6 +7,6 @@
   {
     "title" : "Enhance Contrast",
     "description" : "Histogram equalization using cumulative distributive function",
-    "activityOnClick" : ""
+    "activityOnClick" : "ImageEnhancement"
   }
 ]
