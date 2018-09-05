@@ -3,5 +3,10 @@
     "title" : "Histogram",
     "description" : "Create RGB and Grayscale histogram",
     "activityOnClick" : "Histogram"
+  },
+  {
+    "title" : "Enhance Contrast",
+    "description" : "Histogram equalization using cumulative distributive function",
+    "activityOnClick" : "ImageEnhancement"
   }
 ]

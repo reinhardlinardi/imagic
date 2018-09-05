@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ImageEnhancementActivity">
+    <ProgressBar
+        android:id="@+id/histogramProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:maxHeight="@dimen/progressbar_max_height"
+        android:minHeight="@dimen/progressbar_min_height" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/scrollableGraphLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/graph_linear_layout_vertical_padding"
+            android:paddingEnd="@dimen/graph_linear_layout_side_padding"
+            android:paddingStart="@dimen/graph_linear_layout_side_padding"
+            android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
+
+            <ImageView
+                android:id="@+id/iv_before"
+                android:layout_width="match_parent"
+                android:layout_height="330dp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <ImageView
+                android:id="@+id/iv_result"
+                android:layout_width="match_parent"
+                android:layout_height="330dp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/redGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/greenGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/blueGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_layout_height"
+                app:seriesData="@string/graph_series_no_data" />
+
+        </LinearLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

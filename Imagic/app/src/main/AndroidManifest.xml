@@ -36,15 +36,13 @@
             android:name=".MenuActivity"
             android:configChanges="orientation"
             android:label="@string/menu_activity_title"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".HistogramActivity"
             android:configChanges="orientation"
             android:label="@string/histogram_activity_title"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".ImageEnhancementActivity"></activity>
     </application>
 
 </manifest>
