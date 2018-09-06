@@ -26,4 +26,19 @@
     <dimen name="graph_space_layout_height">20dp</dimen>
     <dimen name="graph_linear_layout_vertical_padding">20dp</dimen>
     <dimen name="graph_linear_layout_side_padding">10dp</dimen>
+    <dimen name="image_compare_layout_height">180dp</dimen>
+    <dimen name="image_compare_layout_width">0dp</dimen>
+    <dimen name="image_compare_linear_layout_margin_top_bottom">10dp</dimen>
+    <dimen name="image_compare_margin_all">10dp</dimen>
+    <dimen name="all_seek_bar_linear_layout_margin_all">10dp</dimen>
+    <dimen name="seek_bar_linear_layout_margin_top_bottom">5dp</dimen>
+    <dimen name="seek_bar_layout_width">0dp</dimen>
+    <dimen name="spinner_layout_width">0dp</dimen>
+    <dimen name="spinner_and_button_linear_layout_side_margin">10dp</dimen>
+    <dimen name="contrast_enhance_spinner_side_margin">5dp</dimen>
+    <dimen name="contrast_enhance_button_layout_width">0dp</dimen>
+    <dimen name="contrast_enhance_button_side_margin">5dp</dimen>
+    <dimen name="contrast_enhance_space_layout_height">5dp</dimen>
+    <dimen name="seek_bar_color_description_layout_width">0dp</dimen>
+    <dimen name="spinner_and_button_linear_layout_top_margin">15dp</dimen>
 </resources>

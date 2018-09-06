@@ -1,3 +1,4 @@
+/*
 package com.imagic.imagic;
 
 import android.graphics.Bitmap;
@@ -22,3 +23,4 @@ public class ImageLoadingTask extends AsyncTask<Bitmap, Bitmap, Void> {
         imageView.setImageBitmap(bitmap);
     }
 }
+*/

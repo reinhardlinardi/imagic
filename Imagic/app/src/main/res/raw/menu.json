@@ -5,8 +5,8 @@
     "activityOnClick" : "Histogram"
   },
   {
-    "title" : "Enhance Contrast",
-    "description" : "Histogram equalization using cumulative distributive function",
-    "activityOnClick" : ""
+    "title" : "Contrast Enhancement",
+    "description" : "Enhance contrast using various histogram equalization algorithms",
+    "activityOnClick" : "ContrastEnhancement"
   }
 ]
