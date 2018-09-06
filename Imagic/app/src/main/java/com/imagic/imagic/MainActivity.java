@@ -88,10 +88,10 @@ public class MainActivity extends AppCompatActivity {
             if(requestCode == MainActivity.RequestCode.SELECT_IMAGE.value) MainActivity.externalSharedURI = data.getData();
 
             try {
-                @SuppressLint("SimpleDateFormat") String filename = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                File imageDataFile = File.createTempFile(filename, ".imagic", getApplicationContext().getCacheDir());
-                MainActivity.imageDataURI = Uri.fromFile(imageDataFile);
+                File imageDataFile = File.createTempFile("cache", ".imagic", getApplicationContext().getCacheDir());
+                if(imageDataFile.exists() && imageDataFile.isFile()) imageDataFile.delete();
 
+                MainActivity.imageDataURI = Uri.fromFile(imageDataFile);
                 Image image = new Image(this, MainActivity.externalSharedURI);
                 String json = image.jsonSerialize();
 
@@ -107,13 +107,5 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
         }
-    }
-
-    // Clean up cache
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        File imageDataFile = new File(MainActivity.imageDataURI.getPath());
-        if(imageDataFile.exists() && imageDataFile.isFile()) imageDataFile.delete();
     }
 }

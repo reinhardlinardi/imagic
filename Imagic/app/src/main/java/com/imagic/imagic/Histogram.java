@@ -20,7 +20,9 @@ abstract class Histogram implements JSONSerializable {
     protected BarGraphSeries<DataPoint> series;
     protected ArrayList<DataPoint> dataPoints;
 
-    // Constructor
+    // Constructors
+    Histogram() { viewID = 0; }
+
     Histogram(Activity activity, int viewID) {
         this.viewID = viewID;
         view = activity.findViewById(viewID);
@@ -31,6 +33,9 @@ abstract class Histogram implements JSONSerializable {
         series = new BarGraphSeries<>();
         dataPoints = new ArrayList<>();
     }
+
+    // Check if histogram is not initialized
+    public boolean isUninitialized() { return viewID == 0; }
 
     @Override
     public final String jsonSerialize() throws Exception {
@@ -69,6 +74,8 @@ abstract class Histogram implements JSONSerializable {
             JSONArray dataPointArray = dataPointsArray.getJSONArray(idx);
             dataPoints.add(new DataPoint(dataPointArray.getDouble(0), dataPointArray.getDouble(1)));
         }
+
+        setSeriesDataPoints();
     }
 
     // Show histogram

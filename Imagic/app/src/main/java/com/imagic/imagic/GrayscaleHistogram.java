@@ -8,7 +8,8 @@ import com.jjoe64.graphview.series.DataPoint;
 
 class GrayscaleHistogram extends Histogram {
 
-    // Constructor
+    // Constructors
+    GrayscaleHistogram() { super(); }
     GrayscaleHistogram(Activity activity, int viewID) { super(activity, viewID); }
 
     @Override

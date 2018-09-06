@@ -8,7 +8,8 @@ import com.jjoe64.graphview.series.DataPoint;
 
 class GreenHistogram extends Histogram {
 
-    // Constructor
+    // Constructors
+    GreenHistogram() { super(); }
     GreenHistogram(Activity activity, int viewID) { super(activity, viewID); }
 
     @Override

@@ -69,6 +69,14 @@ public class HistogramActivity extends AppCompatActivity {
             image.blueHistogram.render();
             image.grayscaleHistogram.render();
 
+            try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(HistogramActivity.imageDataURI.getPath())))) {
+                String json = image.jsonSerialize();
+                writer.write(json);
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
+
             progressBar.hide();
             showToastOnTaskCompletion();
         }
@@ -104,6 +112,13 @@ public class HistogramActivity extends AppCompatActivity {
                 image.jsonDeserialize(this, json);
 
                 if(dataAvailableInCache()) {
+                    Log.d("JSON", json);
+
+                    image.redHistogram.enableValueDependentColor();
+                    image.greenHistogram.enableValueDependentColor();
+                    image.blueHistogram.enableValueDependentColor();
+                    image.grayscaleHistogram.enableValueDependentColor();
+
                     image.redHistogram.render();
                     image.greenHistogram.render();
                     image.blueHistogram.render();
@@ -128,22 +143,9 @@ public class HistogramActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(HistogramActivity.imageDataURI.getPath())))) {
-            String json = image.jsonSerialize();
-            writer.write(json);
-        }
-        catch(Exception e) {
-            Log.e("Imagic", "Exception", e);
-        }
-    }
-
     // Check if data is available in cache
     private boolean dataAvailableInCache() {
-        if(image.redHistogram == null || image.greenHistogram == null || image.blueHistogram == null || image.grayscaleHistogram == null) return false;
+        if(image.redHistogram.isUninitialized() || image.greenHistogram.isUninitialized() || image.blueHistogram.isUninitialized() || image.grayscaleHistogram.isUninitialized()) return false;
         else return true;
     }
 

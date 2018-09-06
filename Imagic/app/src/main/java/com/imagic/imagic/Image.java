@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -39,10 +40,10 @@ class Image implements JSONSerializable {
     Image(Activity activity, Uri uri) throws IOException {
         this.uri = uri;
         bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
-        redHistogram = null;
-        greenHistogram = null;
-        blueHistogram = null;
-        grayscaleHistogram = null;
+        redHistogram = new RedHistogram();
+        greenHistogram = new GreenHistogram();
+        blueHistogram = new BlueHistogram();
+        grayscaleHistogram = new GrayscaleHistogram();
     }
 
     @Override
@@ -50,10 +51,10 @@ class Image implements JSONSerializable {
         JSONObject imageJSON = new JSONObject();
 
         imageJSON.put("uri", uri.toString());
-        imageJSON.put("redHistogram", (redHistogram == null)? null : redHistogram.jsonSerialize());
-        imageJSON.put("greenHistogram", (greenHistogram == null)? null : greenHistogram.jsonSerialize());
-        imageJSON.put("blueHistogram", (blueHistogram == null)? null : blueHistogram.jsonSerialize());
-        imageJSON.put("grayscaleHistogram", (grayscaleHistogram == null)? null : grayscaleHistogram.jsonSerialize());
+        imageJSON.put("redHistogram", (redHistogram.isUninitialized())? null : new JSONObject(redHistogram.jsonSerialize()));
+        imageJSON.put("greenHistogram", (greenHistogram.isUninitialized())? null : new JSONObject(greenHistogram.jsonSerialize()));
+        imageJSON.put("blueHistogram", (blueHistogram.isUninitialized())? null : new JSONObject(blueHistogram.jsonSerialize()));
+        imageJSON.put("grayscaleHistogram", (grayscaleHistogram.isUninitialized())? null : new JSONObject(grayscaleHistogram.jsonSerialize()));
 
         return imageJSON.toString();
     }
@@ -64,15 +65,15 @@ class Image implements JSONSerializable {
 
         uri = Uri.parse(imageJSON.getString("uri"));
         bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
-        redHistogram = null;
-        greenHistogram = null;
-        blueHistogram = null;
-        grayscaleHistogram = null;
+        redHistogram = new RedHistogram();
+        greenHistogram = new GreenHistogram();
+        blueHistogram = new BlueHistogram();
+        grayscaleHistogram = new GrayscaleHistogram();
 
-        if(!imageJSON.isNull("redHistogram")) redHistogram.jsonDeserialize(activity, imageJSON.get("redHistogram").toString());
-        if(!imageJSON.isNull("greenHistogram")) greenHistogram.jsonDeserialize(activity, imageJSON.get("greenHistogram").toString());
-        if(!imageJSON.isNull("blueHistogram")) blueHistogram.jsonDeserialize(activity, imageJSON.get("blueHistogram").toString());
-        if(!imageJSON.isNull("grayscaleHistogram")) grayscaleHistogram.jsonDeserialize(activity, imageJSON.get("grayscaleHistogram").toString());
+        if(!imageJSON.isNull("redHistogram")) redHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("redHistogram").toString());
+        if(!imageJSON.isNull("greenHistogram")) greenHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("greenHistogram").toString());
+        if(!imageJSON.isNull("blueHistogram")) blueHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("blueHistogram").toString());
+        if(!imageJSON.isNull("grayscaleHistogram")) grayscaleHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("grayscaleHistogram").toString());
     }
 
     // Generate histogram
