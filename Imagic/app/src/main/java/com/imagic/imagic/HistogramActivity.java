@@ -1,180 +1,154 @@
 package com.imagic.imagic;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
-import android.renderscript.Sampler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.ValueDependentColor;
-import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.DataPoint;
-
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class HistogramActivity extends AppCompatActivity {
 
     // Background task
     @SuppressLint("StaticFieldLeak")
-    private class HistogramTask extends AsyncTask<Integer, Integer, Void> {
+    private class HistogramTask extends AsyncTask<Void, Integer, Void> {
         @Override
-        protected Void doInBackground(Integer... colors) {
-            int numColors = colors.length + 1;
-            int numCount = 1;
-            publishProgress(countProgress(numCount, numColors));
+        protected Void doInBackground(Void... voids) {
+            Image.ColorType[] colorTypes = Image.ColorType.values();
 
-            for(int color : colors) {
-                try {
-                    int[] colorCount = Image.getColorCount(HistogramActivity.bitmap, color);
+            int done = 0;
+            int numColors = colorTypes.length;
+            publishProgress(Progress.countProgess(done + 1, numColors + 1));
 
-                    DataPoint[] dataPoint = new DataPoint[Image.MAX_POSSIBLE_COLORS];
-                    for(int idx = 0; idx < colorCount.length; idx++) dataPoint[idx] = new DataPoint(idx, colorCount[idx]);
+            for(Image.ColorType colorType : colorTypes) {
+                HistogramActivity.this.image.generateHistogramByColorType(colorType);
 
-                    BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoint);
+                done++;
+                publishProgress(Progress.countProgess(done + 1, numColors + 1));
 
-                    int graphViewID = getGraphViewID(color);
-                    GraphView graphView = findViewById(graphViewID);
-                    graphView.addSeries(series);
-
-                    graphView.getViewport().setMinX(0);
-                    graphView.getViewport().setMaxX(Image.MAX_POSSIBLE_COLORS - 1);
-                    graphView.getViewport().setXAxisBoundsManual(true);
-
-                    series.setValueDependentColor(getValueDependentColor(color));
-
-                    numCount++;
-                    publishProgress(countProgress(numCount, numColors));
-
-                    if (isCancelled()) break;
-
-                } catch (Exception e) {
-                    Log.e("Imagic", "Exception", e);
-                }
+                if(isCancelled()) break;
             }
 
             return null;
         }
 
         @Override
-        protected void onProgressUpdate(Integer... progress) {
-            HistogramActivity.this.progressBar.setProgress(progress[0]);
+        protected void onPreExecute() {
+            image.redHistogram.hide();
+            image.greenHistogram.hide();
+            image.blueHistogram.hide();
+            image.grayscaleHistogram.hide();
+
+            progressBar.show();
         }
 
         @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgess(progress); }
+
+        @Override
         protected void onPostExecute(Void results) {
-            findViewById(R.id.redGraphView).setVisibility(View.VISIBLE);
-            findViewById(R.id.greenGraphView).setVisibility(View.VISIBLE);
-            findViewById(R.id.blueGraphView).setVisibility(View.VISIBLE);
-            findViewById(R.id.grayscaleGraphView).setVisibility(View.VISIBLE);
+            image.redHistogram.enableValueDependentColor();
+            image.greenHistogram.enableValueDependentColor();
+            image.blueHistogram.enableValueDependentColor();
+            image.grayscaleHistogram.enableValueDependentColor();
 
-            HistogramActivity.this.progressBar.setVisibility(View.GONE);
-            Toast.makeText(HistogramActivity.this, "Histogram generated", Toast.LENGTH_SHORT).show();
-        }
+            image.redHistogram.show();
+            image.greenHistogram.show();
+            image.blueHistogram.show();
+            image.grayscaleHistogram.show();
 
-        // Count progress
-        private int countProgress(int taskDone, int numTask) {
-            float taskDoneFraction = (float)taskDone / numTask;
-            return (int)(taskDoneFraction * 100);
-        }
+            image.redHistogram.render();
+            image.greenHistogram.render();
+            image.blueHistogram.render();
+            image.grayscaleHistogram.render();
 
-        // Get graph view ID
-        private int getGraphViewID(int color) {
-            int graphViewID = 0;
-
-            switch(color) {
-                case Image.COLOR_RED: graphViewID = R.id.redGraphView; break;
-                case Image.COLOR_GREEN: graphViewID = R.id.greenGraphView; break;
-                case Image.COLOR_BLUE: graphViewID = R.id.blueGraphView; break;
-                case Image.COLOR_GRAYSCALE: graphViewID = R.id.grayscaleGraphView; break;
-                default: break;
-            }
-
-            return graphViewID;
-        }
-
-        // Get data color
-        private int getDataColor(DataPoint data, int color) {
-            int dataColor = 0;
-
-            if(color == Image.COLOR_GRAYSCALE) {
-                float baseValue = 0.75f;
-                float extraValue = ((float)((int)(data.getX()) + 1) / Image.MAX_POSSIBLE_COLORS) / 2;
-                float totalValue = baseValue - extraValue;
-
-                dataColor = Color.HSVToColor(new float[]{0.0f, 0.0f, totalValue});
-            }
-            else {
-                float baseSaturation = 0.25f;
-                float extraSaturation = ((float)((int)(data.getX()) + 1) / Image.MAX_POSSIBLE_COLORS) / 2;
-                float totalSaturation = baseSaturation + extraSaturation;
-
-                switch(color) {
-                    case Image.COLOR_RED: dataColor = Color.HSVToColor(new float[]{0.0f, totalSaturation, 0.9f}); break;
-                    case Image.COLOR_GREEN: dataColor = Color.HSVToColor(new float[]{120.0f, totalSaturation, 0.9f}); break;
-                    case Image.COLOR_BLUE: dataColor = Color.HSVToColor(new float[]{240.0f, totalSaturation, 0.9f}); break;
-                    default: break;
-                }
-            }
-
-            return dataColor;
-        }
-
-        // Get value dependent color
-        private ValueDependentColor<DataPoint> getValueDependentColor(final int color) {
-            return new ValueDependentColor<DataPoint>() {
-                @Override
-                public int get(DataPoint data) {
-                    return getDataColor(data, color);
-                }
-            };
+            progressBar.hide();
+            showToastOnTaskCompletion();
         }
     }
 
+    // Internal shared cached image data URI
+    private static Uri imageDataURI;
+
     // Image bitmap
-    private static Bitmap bitmap;
+    private Image image;
 
     // Progress bar
-    private ProgressBar progressBar;
+    private Progress progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_histogram);
-
-        findViewById(R.id.redGraphView).setVisibility(View.INVISIBLE);
-        findViewById(R.id.greenGraphView).setVisibility(View.INVISIBLE);
-        findViewById(R.id.blueGraphView).setVisibility(View.INVISIBLE);
-        findViewById(R.id.grayscaleGraphView).setVisibility(View.INVISIBLE);
-
         Bundle bundle = getIntent().getExtras();
 
         if(bundle != null) {
-            Uri imageURI = Uri.parse(bundle.getString("image"));
+            HistogramActivity.imageDataURI = Uri.parse(bundle.getString("imageData"));
+            File imageDataFile = new File(HistogramActivity.imageDataURI.getPath());
 
-            progressBar = findViewById(R.id.histogramProgressBar);
-            progressBar.setVisibility(View.VISIBLE);
+            try(BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
+                StringBuilder imageData = new StringBuilder();
+                String line;
 
-            try {
-                HistogramActivity.bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageURI);
-                HistogramActivity.HistogramTask histogramTask = new HistogramActivity.HistogramTask();
-                histogramTask.execute(Image.COLOR_RED, Image.COLOR_GREEN, Image.COLOR_BLUE, Image.COLOR_GRAYSCALE);
+                while((line = reader.readLine()) != null) imageData.append(line);
+                String json = imageData.toString();
+
+                image = new Image();
+                image.jsonDeserialize(this, json);
+
+                if(dataAvailableInCache()) {
+                    image.redHistogram.render();
+                    image.greenHistogram.render();
+                    image.blueHistogram.render();
+                    image.grayscaleHistogram.render();
+
+                    showToastOnTaskCompletion();
+                }
+                else {
+                    image.redHistogram = new RedHistogram(this, R.id.redGraphView);
+                    image.greenHistogram = new GreenHistogram(this, R.id.greenGraphView);
+                    image.blueHistogram = new BlueHistogram(this, R.id.blueGraphView);
+                    image.grayscaleHistogram = new GrayscaleHistogram(this, R.id.grayscaleGraphView);
+
+                    progressBar = new Progress(this, R.id.histogramProgressBar);
+                    HistogramActivity.HistogramTask histogramTask = new HistogramActivity.HistogramTask();
+                    histogramTask.execute();
+                }
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(HistogramActivity.imageDataURI.getPath())))) {
+            String json = image.jsonSerialize();
+            writer.write(json);
+        }
+        catch(Exception e) {
+            Log.e("Imagic", "Exception", e);
+        }
+    }
+
+    // Check if data is available in cache
+    private boolean dataAvailableInCache() {
+        if(image.redHistogram == null || image.greenHistogram == null || image.blueHistogram == null || image.grayscaleHistogram == null) return false;
+        else return true;
+    }
+
+    // Show toast on task completion
+    private void showToastOnTaskCompletion() {
+        Toast.makeText(this, "Histogram generated.", Toast.LENGTH_SHORT).show();
     }
 }

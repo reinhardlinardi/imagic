@@ -1,60 +1,95 @@
 package com.imagic.imagic;
 
-import android.util.Log;
+import android.app.Activity;
+import android.view.View;
 
-import java.util.Arrays;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
 
-public class Histogram {
-    private int[] dataCount;
-    private int sampleCount = 0;
-    private double[] pmf;
-    private double[] cdf;
-    private int[] newEqualizedValue;
-    private int[] dataCountNewValue;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-    public Histogram(int[] dataCount) {
-        this.dataCount = dataCount.clone();
-        for(int it = 0; it < this.dataCount.length; it++) {
-            sampleCount += this.dataCount[it];
-        }
-        newEqualizedValue = new int[this.dataCount.length];
-        dataCountNewValue = new int[this.dataCount.length];
-        pmf = new double[this.dataCount.length];
-        cdf = new double[this.dataCount.length];
+import java.util.ArrayList;
 
-        Arrays.fill(newEqualizedValue, 0);
-        Arrays.fill(dataCountNewValue, 0);
-        Arrays.fill(pmf,0.0);
-        Arrays.fill(cdf,0.0);
+abstract class Histogram implements JSONSerializable {
+
+    // Properties
+    protected int viewID;
+    protected GraphView view;
+    protected BarGraphSeries<DataPoint> series;
+    protected ArrayList<DataPoint> dataPoints;
+
+    // Constructor
+    Histogram(Activity activity, int viewID) {
+        this.viewID = viewID;
+        view = activity.findViewById(viewID);
+        view.getViewport().setMinX(0f);
+        view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+        view.getViewport().setXAxisBoundsManual(true);
+
+        series = new BarGraphSeries<>();
+        dataPoints = new ArrayList<>();
     }
 
-    public int[] equalizeHistogram() {
-        generatePMF();
-        generateCDF();
-        for(int it = 0; it < this.dataCount.length; it++) {
-            newEqualizedValue[it] = (int) (cdf[it] * (double) (this.dataCount.length - 1));
+    @Override
+    public final String jsonSerialize() throws Exception {
+        JSONObject histogramJSON = new JSONObject();
+        histogramJSON.put("viewID", viewID);
+
+        JSONArray dataPointsArray = new JSONArray();
+
+        for(DataPoint dataPoint : dataPoints) {
+            JSONArray dataPointArray = new JSONArray();
+            dataPointArray.put(dataPoint.getX());
+            dataPointArray.put(dataPoint.getY());
+            dataPointsArray.put(dataPointArray);
         }
 
-        for(int it = 0; it < this.dataCount.length; it++) {
-            dataCountNewValue[newEqualizedValue[it]] += dataCount[it];
+        histogramJSON.put("dataPoints", dataPointsArray);
+        return histogramJSON.toString();
+    }
+
+    @Override
+    public final void jsonDeserialize(Activity activity, String json) throws Exception {
+        JSONObject histogramJSON = new JSONObject(json);
+        viewID = histogramJSON.getInt("viewID");
+        view = activity.findViewById(viewID);
+
+        view.getViewport().setMinX(0f);
+        view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+        view.getViewport().setXAxisBoundsManual(true);
+
+        series = new BarGraphSeries<>();
+        dataPoints = new ArrayList<>();
+
+        JSONArray dataPointsArray = histogramJSON.getJSONArray("dataPoints");
+
+        for(int idx = 0; idx < dataPointsArray.length(); idx++) {
+            JSONArray dataPointArray = dataPointsArray.getJSONArray(idx);
+            dataPoints.add(new DataPoint(dataPointArray.getDouble(0), dataPointArray.getDouble(1)));
         }
-
-        return dataCountNewValue;
     }
 
-    public void generatePMF() {
-        for(int it = 0; it < this.dataCount.length; it++) {
-            pmf[it] = (double) this.dataCount[it] / (double) sampleCount;
-        }
+    // Show histogram
+    protected final void show() { view.setVisibility(View.VISIBLE); }
+
+    // Hide histogram
+    protected final void hide() { view.setVisibility(View.INVISIBLE); }
+
+    // Render histogram
+    protected final void render() { view.addSeries(series); }
+
+    // Add data point
+    protected final void addDataPoint(double x, double y) { dataPoints.add(new DataPoint(x, y)); }
+
+    // Set series data points
+    protected final void setSeriesDataPoints() {
+        DataPoint[] dataPointArray = new DataPoint[dataPoints.size()];
+        for(int idx = 0; idx < dataPoints.size(); idx++) dataPointArray[idx] = dataPoints.get(idx);
+        series = new BarGraphSeries<>(dataPointArray);
     }
 
-    public void generateCDF() {
-        for(int it = 0; it < this.dataCount.length; it++) {
-            cdf[it] = (it == 0)? pmf[it] : pmf[it] + cdf[it-1];
-        }
-    }
-
-    public int[] getNewEqualizedValue() {
-        return newEqualizedValue;
-    }
+    // Enable value dependent color
+    protected abstract void enableValueDependentColor();
 }

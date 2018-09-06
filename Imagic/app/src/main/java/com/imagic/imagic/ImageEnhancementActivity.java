@@ -20,7 +20,7 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
 public class ImageEnhancementActivity extends AppCompatActivity {
-
+    /*
     @SuppressLint("StaticFieldLeak")
     private class ImageEnhancementTask extends AsyncTask<Integer, Integer, Void> {
         @Override
@@ -208,4 +208,5 @@ public class ImageEnhancementActivity extends AppCompatActivity {
             }
         }
     }
+    */
 }

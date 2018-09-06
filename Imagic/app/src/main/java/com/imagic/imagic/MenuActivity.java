@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -14,29 +15,44 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class MenuActivity extends AppCompatActivity {
 
     // Menu option
-    private class Option {
+    private class Option implements JSONSerializable {
 
         // Properties
         public String title;
         public String description;
         public String activityOnClick;
 
-        Option(String title, String description, String activityOnClick) {
-            this.title = title;
-            this.description = description;
-            this.activityOnClick = activityOnClick;
+        // Constructors
+        Option() {}
+
+        @Override
+        public String jsonSerialize() throws Exception {
+            JSONObject optionJSON = new JSONObject();
+
+            optionJSON.put("title", title);
+            optionJSON.put("description", description);
+            optionJSON.put("activityOnClick", activityOnClick);
+
+            return optionJSON.toString();
+        }
+
+        @Override
+        public void jsonDeserialize(Activity activity, String json) throws Exception {
+            JSONObject optionJSON = new JSONObject(json);
+
+            title = optionJSON.getString("title");
+            description = optionJSON.getString("description");
+            activityOnClick = optionJSON.getString("activityOnClick");
         }
     }
 
@@ -73,7 +89,7 @@ public class MenuActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     try {
                         Intent intent = new Intent(MenuActivity.this, Class.forName(MenuActivity.this.getApplicationContext().getPackageName() + "." + activityOnClick + "Activity"));
-                        intent.putExtra("image", MenuActivity.imageURI.toString());
+                        intent.putExtra("imageData", MenuActivity.imageDataURI.toString());
                         MenuActivity.this.startActivity(intent);
                     }
                     catch(Exception e) {
@@ -84,11 +100,8 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
-    // Data source charset
-    private static final String DATA_SOURCE_CHARSET = "UTF8";
-
-    // Selected or captured image URI
-    private static Uri imageURI;
+    // Internal shared cached image data URI
+    private static Uri imageDataURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,10 +109,24 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) MenuActivity.imageURI = Uri.parse(bundle.getString("image"));
+        if(bundle != null) MenuActivity.imageDataURI = Uri.parse(bundle.getString("imageData"));
 
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.menu), MenuActivity.DATA_SOURCE_CHARSET))) {
-            ArrayList<MenuActivity.Option> options = loadDataSource(reader);
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.menu), "UTF8"))) {
+            StringBuilder data = new StringBuilder();
+            String line;
+
+            while((line = reader.readLine()) != null) data.append(line);
+            String json = data.toString();
+
+            ArrayList<MenuActivity.Option> options = new ArrayList<>();
+            JSONArray optionList = new JSONArray(json);
+
+            for(int idx = 0; idx < optionList.length(); idx++) {
+                MenuActivity.Option option = new Option();
+                option.jsonDeserialize(this, optionList.get(idx).toString());
+                options.add(option);
+            }
+
             MenuAdapter menuAdapter = new MenuAdapter(options);
             ListView menuListView = findViewById(R.id.menuListView);
             menuListView.setAdapter(menuAdapter);
@@ -107,17 +134,5 @@ public class MenuActivity extends AppCompatActivity {
         catch(Exception e) {
             Log.e("Imagic", "Exception", e);
         }
-    }
-
-    // Load data from JSON data source
-    private ArrayList<MenuActivity.Option> loadDataSource(BufferedReader reader) throws IOException {
-        StringBuilder data = new StringBuilder();
-        String line;
-
-        while((line = reader.readLine()) != null) data.append(line);
-        String json = data.toString();
-
-        Type type = new TypeToken<ArrayList<MenuActivity.Option>>(){}.getType();
-        return new Gson().fromJson(json, type);
     }
 }
