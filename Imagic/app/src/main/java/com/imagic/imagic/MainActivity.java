@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        MainActivity.imageDataURI = null;
         Button selectImageButton = findViewById(R.id.selectImageButton);
         Button captureImageButton = findViewById(R.id.captureImageButton);
 
@@ -84,13 +85,16 @@ public class MainActivity extends AppCompatActivity {
     // Select or capture image result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(MainActivity.imageDataURI != null) {
+            File oldImageDataFile = new File(MainActivity.imageDataURI.getPath());
+            if (oldImageDataFile.exists() && oldImageDataFile.isFile()) oldImageDataFile.delete();
+        }
+
         if(resultCode == RESULT_OK) {
             if(requestCode == MainActivity.RequestCode.SELECT_IMAGE.value) MainActivity.externalSharedURI = data.getData();
 
             try {
                 File imageDataFile = File.createTempFile("cache", ".imagic", getApplicationContext().getCacheDir());
-                if(imageDataFile.exists() && imageDataFile.isFile()) imageDataFile.delete();
-
                 MainActivity.imageDataURI = Uri.fromFile(imageDataFile);
                 Image image = new Image(this, MainActivity.externalSharedURI);
                 String json = image.jsonSerialize();
