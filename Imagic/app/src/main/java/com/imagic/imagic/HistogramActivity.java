@@ -112,8 +112,6 @@ public class HistogramActivity extends AppCompatActivity {
                 image.jsonDeserialize(this, json);
 
                 if(dataAvailableInCache()) {
-                    Log.d("JSON", json);
-
                     image.redHistogram.enableValueDependentColor();
                     image.greenHistogram.enableValueDependentColor();
                     image.blueHistogram.enableValueDependentColor();
