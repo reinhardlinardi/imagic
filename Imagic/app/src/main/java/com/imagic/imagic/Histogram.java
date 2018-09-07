@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import com.jjoe64.graphview.GraphView;
@@ -97,7 +98,8 @@ abstract class Histogram implements JSONSerializable {
         JSONObject histogramJSON = new JSONObject(json);
         viewID = histogramJSON.getInt("viewID");
         view = activity.findViewById(viewID);
-        if (view != null){
+
+        if(view != null){
             view.getViewport().setMinX(0f);
             view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
             view.getViewport().setXAxisBoundsManual(true);
@@ -156,6 +158,9 @@ abstract class Histogram implements JSONSerializable {
         for(int it = 0; it < dataPoints.size(); it++) {
             newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
+
+        dataPoints = newDataPoints;
+        setSeriesDataPoints();
     }
 
     private void generatePMF() {
@@ -205,6 +210,9 @@ abstract class Histogram implements JSONSerializable {
         for(int it = 0; it < dataPoints.size(); it++) {
             newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
+
+        dataPoints = newDataPoints;
+        setSeriesDataPoints();
     }
 
     public void logarithmicHistogram(){
@@ -231,5 +239,8 @@ abstract class Histogram implements JSONSerializable {
         for(int it = 0; it < dataPoints.size(); it++) {
             newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
+
+        dataPoints = newDataPoints;
+        setSeriesDataPoints();
     }
 }

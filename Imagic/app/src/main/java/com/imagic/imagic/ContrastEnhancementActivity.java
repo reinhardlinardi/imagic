@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.jjoe64.graphview.series.DataPoint;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,27 +61,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         }
     }
 
-    // Spinner adapter
-    private class SpinnerAdapter extends ArrayAdapter<ContrastEnhancementActivity.Option> {
-
-        SpinnerAdapter(ArrayList<ContrastEnhancementActivity.Option> options) {
-            super(ContrastEnhancementActivity.this, R.layout.contrast_enhance_spinner_option, options);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View view, @NonNull ViewGroup parent) {
-            LayoutInflater inflater = ContrastEnhancementActivity.this.getLayoutInflater();
-            @SuppressLint({"ViewHolder", "InflateParams"}) View optionView = inflater.inflate(R.layout.contrast_enhance_spinner_option, null, true);
-
-            TextView optionTextView = optionView.findViewById(R.id.contrastEnhanceSpinnerOptionTextView);
-            ContrastEnhancementActivity.Option option = getItem(position);
-
-            if(option != null) optionTextView.setText(option.name);
-            return optionView;
-        }
-    }
-
     // Internal shared cached image data URI
     private static Uri imageDataURI;
 
@@ -102,6 +82,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
     // Spinner selected text
     private String spinnerText;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,28 +118,19 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 beforeView = findViewById(R.id.contrastEnhancementImageBefore);
                 afterView = findViewById(R.id.contrastEnhancementImageAfter);
 
+                transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
+                transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
+                transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
+
+                transformedImage.redHistogram.hide();
+                transformedImage.greenHistogram.hide();
+                transformedImage.blueHistogram.hide();
+
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
-//                Image.ColorType[] colorTypes = Image.ColorType.values();
-//
-//                for(Image.ColorType colorType : colorTypes) {
-//                    ContrastEnhancementActivity.this.transformedImage.generateHistogramByColorType(colorType);
-//                }
+                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
-                //ArrayList<ContrastEnhancementActivity.Option> options = new ArrayList<>();
-                //JSONSerializer.deserialize(this, Text.readRawResource(this, R.raw.equalization_algorithms), (ArrayList<JSONSerializable>) options);
-                /*
-                JSONArray optionList = new JSONArray(Text.readRawResource(this, R.raw.equalization_algorithms));
-
-                for(int idx = 0; idx < optionList.length(); idx++) {
-                    ContrastEnhancementActivity.Option option = new ContrastEnhancementActivity.Option();
-                    option.jsonDeserialize(this, optionList.get(idx).toString());
-                    options.add(option);
-                }
-
-                ContrastEnhancementActivity.SpinnerAdapter spinnerAdapter = new ContrastEnhancementActivity.SpinnerAdapter(options);
-                */
 
                 ArrayList<String> options = new ArrayList<>();
                 options.add("Stretching");
@@ -174,20 +146,44 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         spinnerText = adapterView.getItemAtPosition(i).toString();
                         transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
-                        if(adapterView.getItemAtPosition(i).toString().equals("Stretching")) {
+
+                        if(spinnerText.equals("Stretching")) {
                             transformedImage.redHistogram.linearHistogram();
                             transformedImage.greenHistogram.linearHistogram();
                             transformedImage.blueHistogram.linearHistogram();
-                        } else if(adapterView.getItemAtPosition(i).toString().equals("CDF")) {
+
+                            Log.d("Enter", "Stretching");
+                        }
+                        else if(spinnerText.equals("CDF")) {
                             transformedImage.redHistogram.cummulativeEqualizeHistogram();
                             transformedImage.greenHistogram.cummulativeEqualizeHistogram();
                             transformedImage.blueHistogram.cummulativeEqualizeHistogram();
-                        } else {
+
+                            Log.d("Enter", "CDF");
+                        }
+                        else {
                             transformedImage.redHistogram.logarithmicHistogram();
                             transformedImage.greenHistogram.logarithmicHistogram();
                             transformedImage.blueHistogram.logarithmicHistogram();
+
+                            Log.d("Enter", "Log");
                         }
                         transformedImage.updateBitmap();
+
+                        for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+
+                        transformedImage.redHistogram.enableValueDependentColor();
+                        transformedImage.greenHistogram.enableValueDependentColor();
+                        transformedImage.blueHistogram.enableValueDependentColor();
+
+                        transformedImage.redHistogram.show();
+                        transformedImage.greenHistogram.show();
+                        transformedImage.blueHistogram.show();
+
+                        transformedImage.redHistogram.render();
+                        transformedImage.greenHistogram.render();
+                        transformedImage.blueHistogram.render();
+
                         Glide.with(ContrastEnhancementActivity.this).load(transformedImage.bitmap).into(afterView);
                     }
 

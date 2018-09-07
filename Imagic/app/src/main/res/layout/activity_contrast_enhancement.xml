@@ -16,174 +16,218 @@
         android:maxHeight="@dimen/progressbar_max_height"
         android:minHeight="@dimen/progressbar_min_height" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/image_compare_linear_layout_margin_top_bottom"
-        android:layout_marginTop="@dimen/image_compare_linear_layout_margin_top_bottom"
-        android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal"
-        android:weightSum="2">
-
-        <ImageView
-            android:id="@+id/contrastEnhancementImageBefore"
-            android:layout_width="@dimen/image_compare_layout_width"
-            android:layout_height="@dimen/image_compare_layout_height"
-            android:layout_margin="@dimen/image_compare_margin_all"
-            android:layout_weight="1"
-            android:contentDescription="@string/original_image_content_description" />
-
-        <ImageView
-            android:id="@+id/contrastEnhancementImageAfter"
-            android:layout_width="@dimen/image_compare_layout_width"
-            android:layout_height="@dimen/image_compare_layout_height"
-            android:layout_margin="@dimen/image_compare_margin_all"
-            android:layout_weight="1"
-            android:contentDescription="@string/transformed_image_content_description" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/all_seek_bar_linear_layout_margin_all"
-        android:orientation="vertical"
-        android:weightSum="3">
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
-            android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/graph_linear_layout_vertical_padding"
+            android:paddingEnd="@dimen/graph_linear_layout_side_padding"
+            android:paddingStart="@dimen/graph_linear_layout_side_padding"
+            android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/image_compare_linear_layout_margin_top_bottom"
+            android:layout_marginTop="@dimen/image_compare_linear_layout_margin_top_bottom"
             android:gravity="center_vertical|center_horizontal"
             android:orientation="horizontal"
-            android:weightSum="10">
+            android:weightSum="2">
 
-            <TextView
-                android:layout_width="@dimen/seek_bar_color_description_layout_width"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/contrastEnhancementImageBefore"
+                android:layout_width="@dimen/image_compare_layout_width"
+                android:layout_height="@dimen/image_compare_layout_height"
+                android:layout_margin="@dimen/image_compare_margin_all"
                 android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/seek_bar_red_color_description" />
+                android:contentDescription="@string/original_image_content_description" />
 
-            <SeekBar
-                android:id="@+id/redConstantEqualizationSeekBar"
-                android:layout_width="@dimen/seek_bar_layout_width"
-                android:layout_height="match_parent"
-                android:layout_weight="7"
-                android:max="100" />
+            <ImageView
+                android:id="@+id/contrastEnhancementImageAfter"
+                android:layout_width="@dimen/image_compare_layout_width"
+                android:layout_height="@dimen/image_compare_layout_height"
+                android:layout_margin="@dimen/image_compare_margin_all"
+                android:layout_weight="1"
+                android:contentDescription="@string/transformed_image_content_description" />
 
-            <TextView
-                android:id="@+id/redConstantEqualizationTextView"
-                android:layout_width="@dimen/seek_bar_layout_width"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/all_seek_bar_linear_layout_margin_all"
+            android:orientation="vertical"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="@string/seek_bar_text_view_initial_value" />
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <TextView
+                    android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/seek_bar_red_color_description" />
+
+                <SeekBar
+                    android:id="@+id/redConstantEqualizationSeekBar"
+                    android:layout_width="@dimen/seek_bar_layout_width"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7"
+                    android:max="100" />
+
+                <TextView
+                    android:id="@+id/redConstantEqualizationTextView"
+                    android:layout_width="@dimen/seek_bar_layout_width"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/seek_bar_text_view_initial_value" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <TextView
+                    android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/seek_bar_green_color_description" />
+
+                <SeekBar
+                    android:id="@+id/greenConstantEqualizationSeekBar"
+                    android:layout_width="@dimen/seek_bar_layout_width"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7"
+                    android:max="100" />
+
+                <TextView
+                    android:id="@+id/greenConstantEqualizationTextView"
+                    android:layout_width="@dimen/seek_bar_layout_width"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/seek_bar_text_view_initial_value" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <TextView
+                    android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/seek_bar_blue_color_description" />
+
+                <SeekBar
+                    android:id="@+id/blueConstantEqualizationSeekBar"
+                    android:layout_width="@dimen/seek_bar_layout_width"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7"
+                    android:max="100" />
+
+                <TextView
+                    android:id="@+id/blueConstantEqualizationTextView"
+                    android:layout_width="@dimen/seek_bar_layout_width"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/seek_bar_text_view_initial_value" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spinner_and_button_linear_layout_side_margin"
+            android:layout_marginStart="@dimen/spinner_and_button_linear_layout_side_margin"
+            android:layout_marginTop="@dimen/spinner_and_button_linear_layout_top_margin"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Spinner
+                android:id="@+id/equalizationAlgorithmSpinner"
+                android:layout_width="@dimen/spinner_layout_width"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/contrast_enhance_spinner_side_margin"
+                android:layout_marginStart="@dimen/contrast_enhance_spinner_side_margin"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/enhanceContrastButton"
+                android:layout_width="@dimen/contrast_enhance_button_layout_width"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/contrast_enhance_button_side_margin"
+                android:layout_marginStart="@dimen/contrast_enhance_button_side_margin"
+                android:layout_weight="1"
+                android:background="@color/colorAccent"
+                android:text="@string/contrast_enhance_button_text"
+                android:textColor="@android:color/white" />
         </LinearLayout>
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+            android:layout_height="@dimen/graph_space_layout_height" />
 
-        <LinearLayout
+        <com.jjoe64.graphview.helper.GraphViewXML
+            android:id="@+id/contrastEnhancementRedGraphView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
-            android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
-            android:gravity="center_vertical|center_horizontal"
-            android:orientation="horizontal"
-            android:weightSum="10">
-
-            <TextView
-                android:layout_width="@dimen/seek_bar_color_description_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/seek_bar_green_color_description" />
-
-            <SeekBar
-                android:id="@+id/greenConstantEqualizationSeekBar"
-                android:layout_width="@dimen/seek_bar_layout_width"
-                android:layout_height="match_parent"
-                android:layout_weight="7"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/greenConstantEqualizationTextView"
-                android:layout_width="@dimen/seek_bar_layout_width"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/seek_bar_text_view_initial_value" />
-        </LinearLayout>
+            android:layout_height="@dimen/graph_layout_height"
+            app:seriesData="@string/graph_series_no_data" />
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+            android:layout_height="@dimen/graph_space_layout_height" />
 
-        <LinearLayout
+        <com.jjoe64.graphview.helper.GraphViewXML
+            android:id="@+id/contrastEnhancementGreenGraphView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
-            android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
-            android:gravity="center_vertical|center_horizontal"
-            android:orientation="horizontal"
-            android:weightSum="10">
+            android:layout_height="@dimen/graph_layout_height"
+            app:seriesData="@string/graph_series_no_data" />
 
-            <TextView
-                android:layout_width="@dimen/seek_bar_color_description_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/seek_bar_blue_color_description" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/graph_space_layout_height" />
 
-            <SeekBar
-                android:id="@+id/blueConstantEqualizationSeekBar"
-                android:layout_width="@dimen/seek_bar_layout_width"
-                android:layout_height="match_parent"
-                android:layout_weight="7"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/blueConstantEqualizationTextView"
-                android:layout_width="@dimen/seek_bar_layout_width"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="center_vertical|center_horizontal"
-                android:text="@string/seek_bar_text_view_initial_value" />
-
+        <com.jjoe64.graphview.helper.GraphViewXML
+            android:id="@+id/contrastEnhancementBlueGraphView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/graph_layout_height"
+            app:seriesData="@string/graph_series_no_data" />
         </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/spinner_and_button_linear_layout_side_margin"
-        android:layout_marginStart="@dimen/spinner_and_button_linear_layout_side_margin"
-        android:layout_marginTop="@dimen/spinner_and_button_linear_layout_top_margin"
-        android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal"
-        android:weightSum="2">
-
-        <Spinner
-            android:id="@+id/equalizationAlgorithmSpinner"
-            android:layout_width="@dimen/spinner_layout_width"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/contrast_enhance_spinner_side_margin"
-            android:layout_marginStart="@dimen/contrast_enhance_spinner_side_margin"
-            android:layout_weight="1"/>
-
-        <Button
-            android:id="@+id/enhanceContrastButton"
-            android:layout_width="@dimen/contrast_enhance_button_layout_width"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/contrast_enhance_button_side_margin"
-            android:layout_marginStart="@dimen/contrast_enhance_button_side_margin"
-            android:layout_weight="1"
-            android:background="@color/colorAccent"
-            android:text="@string/contrast_enhance_button_text"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
+    </ScrollView>
 </LinearLayout>
