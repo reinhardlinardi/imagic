@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 abstract class Histogram implements JSONSerializable {
 
@@ -19,6 +20,13 @@ abstract class Histogram implements JSONSerializable {
     protected GraphView view;
     protected BarGraphSeries<DataPoint> series;
     protected ArrayList<DataPoint> dataPoints;
+    protected ArrayList<DataPoint> newDataPoints;
+
+    private double[] pmf;
+    private double[] cdf;
+    private int sampleCount = 0;
+    private int[] newEqualizedValue;
+    private int[] dataCountNewValue;
 
     // Constructors
     Histogram() { viewID = 0; }
@@ -32,6 +40,22 @@ abstract class Histogram implements JSONSerializable {
 
         series = new BarGraphSeries<>();
         dataPoints = new ArrayList<>();
+        newDataPoints = new ArrayList<>();
+
+        newEqualizedValue = new int[this.dataPoints.size()];
+        dataCountNewValue = new int[this.dataPoints.size()];
+
+        pmf = new double[this.dataPoints.size()];
+        cdf = new double[this.dataPoints.size()];
+
+        Arrays.fill(newEqualizedValue, 0);
+        Arrays.fill(dataCountNewValue, 0);
+        Arrays.fill(pmf,0.0);
+        Arrays.fill(cdf,0.0);
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            sampleCount += this.dataPoints.get(it).getY();
+        }
     }
 
     // Check if histogram is not initialized
@@ -99,4 +123,89 @@ abstract class Histogram implements JSONSerializable {
 
     // Enable value dependent color
     protected abstract void enableValueDependentColor();
+
+    //Equalization Part
+    protected void cummulativeEqualizeHistogram() {
+        generatePMF();
+        generateCDF();
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            newEqualizedValue[it] = (int) (cdf[it] * (double) (this.dataPoints.size() - 1));
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+    }
+
+    private void generatePMF() {
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            pmf[it] = (double) this.dataPoints.get(it).getY() / (double) sampleCount;
+        }
+    }
+
+    private void generateCDF() {
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            cdf[it] = (it == 0)? pmf[it] : pmf[it] + cdf[it-1];
+        }
+    }
+
+    public int[] getNewEqualizedValue() {
+        return newEqualizedValue;
+    }
+
+    protected void linearHistogram(){
+        int min = 0;
+        int max = 255;
+        for(int it = 0;it<this.dataPoints.size();it++){
+            if(this.dataPoints.get(it).getY()>0){
+                min = it;
+                break;
+            }
+        }
+        for(int it = this.dataPoints.size();it>=0;it--){
+            if(this.dataPoints.get(it).getY()>0){
+                max = it;
+                break;
+            }
+        }
+
+        for(int it = 0;it<this.dataPoints.size();it++){
+            newEqualizedValue[it] = 255*(it-min)/(max-min);
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+    }
+
+    protected void logarithmicHistogram(){
+        final int c = 2;
+        int max = 255;
+        for(int it = this.dataPoints.size();it>=0;it--){
+            if(this.dataPoints.get(it).getY()>0){
+                max = it;
+                break;
+            }
+        }
+
+        for(int it = 0;it<this.dataPoints.size();it++){
+            newEqualizedValue[it] = (int) (Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+    }
 }
