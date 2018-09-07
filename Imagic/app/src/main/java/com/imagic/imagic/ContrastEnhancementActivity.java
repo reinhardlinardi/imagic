@@ -129,9 +129,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
-//                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
-
-
                 ArrayList<String> options = new ArrayList<>();
                 options.add("CDF");
                 options.add("Stretching");
@@ -145,7 +142,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         spinnerText = adapterView.getItemAtPosition(i).toString();
-//                        transformedImage = originalImage;
                         transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
                         if(spinnerText.equals("Stretching")) {
@@ -170,12 +166,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                             Log.d("Enter", "Log");
                         }
                         transformedImage.updateBitmap();
-
-                        for(DataPoint dp : originalImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
-
-//                        transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
-//                        transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
-//                        transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
 
                         transformedImage.redHistogram.enableValueDependentColor();
                         transformedImage.greenHistogram.enableValueDependentColor();

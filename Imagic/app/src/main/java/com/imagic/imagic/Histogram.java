@@ -146,8 +146,7 @@ abstract class Histogram implements JSONSerializable {
         for(int it = 0; it < originalDataPoints.size(); it++) {
             sampleCount += originalDataPoints.get(it).getY();
         }
-        Log.v("original Data Points: ", Integer.toString(dataPoints.size()));
-//        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
+
         for(int it = 0;it<originalDataPoints.size();it++){
             newEqualizedValue[it] = 0;
             dataCountNewValue[it] = 0;
@@ -164,12 +163,9 @@ abstract class Histogram implements JSONSerializable {
         }
 
         for(int it = 0; it < originalDataPoints.size(); it++) {
-//            Log.v("it: ", Integer.toString(it));
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
-        for(DataPoint dp : originalDataPoints) Log.d("DataPointCUM", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
-//        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
     }
 
@@ -199,7 +195,6 @@ abstract class Histogram implements JSONSerializable {
             newEqualizedValue[it] = 0;
             dataCountNewValue[it] = 0;
         }
-        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
 
         int min = 0;
         int max = 255;
@@ -228,7 +223,6 @@ abstract class Histogram implements JSONSerializable {
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-//        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
     }
 
@@ -243,8 +237,6 @@ abstract class Histogram implements JSONSerializable {
             dataCountNewValue[it] = 0;
         }
 
-        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
-
         final int c = 2;
         int max = 255;
         for(int it = originalDataPoints.size()-1;it>=0;it--){
@@ -254,15 +246,11 @@ abstract class Histogram implements JSONSerializable {
             }
         }
 
-        Log.v("MAX", Integer.toString(max));
         for(int it = 0;it<max;it++){
             newEqualizedValue[it] = (int) Math.floor(Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
-            Log.v("IT", Double.toString(Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max))));
         }
 
         for(int it = 0; it < originalDataPoints.size(); it++) {
-//            Log.v("IT", Integer.toString(it));
-//            Log.v("NEV", Integer.toString(newEqualizedValue[it]));
             dataCountNewValue[newEqualizedValue[it]] += originalDataPoints.get(it).getY();
         }
 
@@ -270,7 +258,6 @@ abstract class Histogram implements JSONSerializable {
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-//        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
     }
 }
