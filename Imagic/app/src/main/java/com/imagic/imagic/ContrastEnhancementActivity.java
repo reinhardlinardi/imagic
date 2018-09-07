@@ -1,20 +1,84 @@
 package com.imagic.imagic;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 public class ContrastEnhancementActivity extends AppCompatActivity {
+
+    // Dropdown option
+    private class Option implements JSONSerializable {
+
+        // Properties
+        public String name;
+        public String functionToExecute;
+
+        // Constructor
+        Option() {}
+
+        @Override
+        public String jsonSerialize() throws Exception {
+            JSONObject optionJSON = new JSONObject();
+
+            optionJSON.put("name", name);
+            optionJSON.put("functionToExecute", functionToExecute);
+
+            return optionJSON.toString();
+        }
+
+        @Override
+        public void jsonDeserialize(Activity activity, String json) throws Exception {
+            JSONObject optionJSON = new JSONObject(json);
+
+            name = optionJSON.getString("name");
+            functionToExecute = optionJSON.getString("functionToExecute");
+        }
+    }
+
+    // Spinner adapter
+    private class SpinnerAdapter extends ArrayAdapter<ContrastEnhancementActivity.Option> {
+
+        SpinnerAdapter(ArrayList<ContrastEnhancementActivity.Option> options) {
+            super(ContrastEnhancementActivity.this, R.layout.contrast_enhance_spinner_option, options);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, View view, @NonNull ViewGroup parent) {
+            LayoutInflater inflater = ContrastEnhancementActivity.this.getLayoutInflater();
+            @SuppressLint({"ViewHolder", "InflateParams"}) View optionView = inflater.inflate(R.layout.contrast_enhance_spinner_option, null, true);
+
+            TextView optionTextView = optionView.findViewById(R.id.contrastEnhanceSpinnerOptionTextView);
+            ContrastEnhancementActivity.Option option = getItem(position);
+
+            if(option != null) optionTextView.setText(option.name);
+            return optionView;
+        }
+    }
 
     // Internal shared cached image data URI
     private static Uri imageDataURI;
@@ -35,6 +99,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     private Slider greenSlider;
     private Slider blueSlider;
 
+    // Spinner selected text
+    private String spinnerText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +112,11 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             ContrastEnhancementActivity.imageDataURI = Uri.parse(bundle.getString("imageData"));
             File imageDataFile = new File(ContrastEnhancementActivity.imageDataURI.getPath());
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
                 StringBuilder imageData = new StringBuilder();
                 String line;
 
-                while ((line = reader.readLine()) != null) imageData.append(line);
+                while((line = reader.readLine()) != null) imageData.append(line);
                 String json = imageData.toString();
 
                 originalImage = new Image();
@@ -71,6 +138,40 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
+
+                //ArrayList<ContrastEnhancementActivity.Option> options = new ArrayList<>();
+                //JSONSerializer.deserialize(this, Text.readRawResource(this, R.raw.equalization_algorithms), (ArrayList<JSONSerializable>) options);
+                /*
+                JSONArray optionList = new JSONArray(Text.readRawResource(this, R.raw.equalization_algorithms));
+
+                for(int idx = 0; idx < optionList.length(); idx++) {
+                    ContrastEnhancementActivity.Option option = new ContrastEnhancementActivity.Option();
+                    option.jsonDeserialize(this, optionList.get(idx).toString());
+                    options.add(option);
+                }
+
+                ContrastEnhancementActivity.SpinnerAdapter spinnerAdapter = new ContrastEnhancementActivity.SpinnerAdapter(options);
+                */
+
+                ArrayList<String> options = new ArrayList<>();
+                options.add("Stretching");
+                options.add("CDF");
+                options.add("Something");
+
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
+                Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
+                spinner.setAdapter(spinnerAdapter);
+
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        spinnerText = adapterView.getItemAtPosition(i).toString();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                    }
+                });
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);

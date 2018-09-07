@@ -173,7 +173,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/contrast_enhance_spinner_side_margin"
             android:layout_marginStart="@dimen/contrast_enhance_spinner_side_margin"
-            android:layout_weight="1" />
+            android:layout_weight="1"/>
 
         <Button
             android:id="@+id/enhanceContrastButton"
