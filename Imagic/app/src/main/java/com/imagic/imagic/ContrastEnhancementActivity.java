@@ -129,7 +129,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
-                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+//                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
 
                 ArrayList<String> options = new ArrayList<>();
@@ -148,29 +148,29 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                         transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
                         if(spinnerText.equals("Stretching")) {
-                            transformedImage.redHistogram.linearHistogram();
-                            transformedImage.greenHistogram.linearHistogram();
-                            transformedImage.blueHistogram.linearHistogram();
+                            transformedImage.redHistogram.linearHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.linearHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.linearHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "Stretching");
                         }
                         else if(spinnerText.equals("CDF")) {
-                            transformedImage.redHistogram.cummulativeEqualizeHistogram();
-                            transformedImage.greenHistogram.cummulativeEqualizeHistogram();
-                            transformedImage.blueHistogram.cummulativeEqualizeHistogram();
+                            transformedImage.redHistogram.cummulativeEqualizeHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.cummulativeEqualizeHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.cummulativeEqualizeHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "CDF");
                         }
                         else {
-                            transformedImage.redHistogram.logarithmicHistogram();
-                            transformedImage.greenHistogram.logarithmicHistogram();
-                            transformedImage.blueHistogram.logarithmicHistogram();
+                            transformedImage.redHistogram.logarithmicHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.logarithmicHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.logarithmicHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "Log");
                         }
                         transformedImage.updateBitmap();
 
-                        for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+                        for(DataPoint dp : originalImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
                         transformedImage.redHistogram.enableValueDependentColor();
                         transformedImage.greenHistogram.enableValueDependentColor();

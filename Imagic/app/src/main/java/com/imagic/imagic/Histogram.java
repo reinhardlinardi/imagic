@@ -20,8 +20,7 @@ abstract class Histogram implements JSONSerializable {
     protected int viewID;
     protected GraphView view;
     protected BarGraphSeries<DataPoint> series;
-    protected ArrayList<DataPoint> dataPoints;
-    protected ArrayList<DataPoint> newDataPoints;
+    public ArrayList<DataPoint> dataPoints;
 
     private double[] pmf;
     private double[] cdf;
@@ -31,7 +30,6 @@ abstract class Histogram implements JSONSerializable {
 
     // Constructors
     Histogram() {
-        newDataPoints = new ArrayList<>();
         viewID = 0;
         newEqualizedValue = new int[256];
         dataCountNewValue = new int[256];
@@ -54,7 +52,6 @@ abstract class Histogram implements JSONSerializable {
 
         series = new BarGraphSeries<>();
         dataPoints = new ArrayList<>();
-        newDataPoints = new ArrayList<>();
 
         newEqualizedValue = new int[256];
         dataCountNewValue = new int[this.dataPoints.size()];
@@ -141,35 +138,39 @@ abstract class Histogram implements JSONSerializable {
     protected abstract void enableValueDependentColor();
 
     //Equalization Part
-    protected void cummulativeEqualizeHistogram() {
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
+    protected void cummulativeEqualizeHistogram(ArrayList<DataPoint> originalDataPoints) {
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            sampleCount += originalDataPoints.get(it).getY();
         }
-        generatePMF();
-        generateCDF();
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newEqualizedValue[it] = (int) (cdf[it] * (double) (this.dataPoints.size() - 1));
-        }
-
-        for(int it = 0; it < dataPoints.size(); it++) {
-            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
-        }
-
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        Log.v("original Data Points: ", Integer.toString(dataPoints.size()));
+//        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
+        dataPoints = new ArrayList<>();
+        generatePMF(originalDataPoints);
+        generateCDF(originalDataPoints);
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            newEqualizedValue[it] = (int) Math.floor(cdf[it] * (double) (originalDataPoints.size() - 1));
         }
 
-        dataPoints = newDataPoints;
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += originalDataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+//            Log.v("it: ", Integer.toString(it));
+            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+
+//        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
     }
 
-    private void generatePMF() {
+    private void generatePMF(ArrayList<DataPoint> dataPoints) {
         for(int it = 0; it < dataPoints.size(); it++) {
             pmf[it] = (double) dataPoints.get(it).getY() / (double) sampleCount;
         }
     }
 
-    private void generateCDF() {
+    private void generateCDF(ArrayList<DataPoint> dataPoints) {
         for(int it = 0; it < dataPoints.size(); it++) {
             cdf[it] = (it == 0)? pmf[it] : pmf[it] + cdf[it-1];
         }
@@ -179,68 +180,74 @@ abstract class Histogram implements JSONSerializable {
         return newEqualizedValue;
     }
 
-    public void linearHistogram(){
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
+    public void linearHistogram(ArrayList<DataPoint> originalDataPoints){
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            sampleCount += originalDataPoints.get(it).getY();
         }
+        dataPoints = new ArrayList<>();
+        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
+
         int min = 0;
         int max = 255;
-        for(int it = 0;it<dataPoints.size();it++){
-            if(this.dataPoints.get(it).getY()>0){
+        for(int it = 0;it<originalDataPoints.size();it++){
+            if(originalDataPoints.get(it).getY()>0){
                 min = it;
                 break;
             }
         }
-        for(int it = dataPoints.size()-1;it>=0;it--){
-            if(this.dataPoints.get(it).getY()>0){
+        for(int it = originalDataPoints.size()-1;it>=0;it--){
+            if(originalDataPoints.get(it).getY()>0){
                 max = it;
                 break;
             }
         }
 
         for(int it = min;it<max;it++){
-            newEqualizedValue[it] = 255*Math.abs(it-min)/(max-min);
-            newEqualizedValue[it] = (newEqualizedValue[it] > 255)? 255:newEqualizedValue[it];
+            newEqualizedValue[it] = 255*(it-min)/(max-min);
         }
 
-        for(int it = 0; it < dataPoints.size(); it++) {
-            dataCountNewValue[Math.abs(newEqualizedValue[it])] += dataPoints.get(it).getY();
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += originalDataPoints.get(it).getY();
         }
 
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-        dataPoints = newDataPoints;
+//        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
     }
 
-    public void logarithmicHistogram(){
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
+    public void logarithmicHistogram(ArrayList<DataPoint> originalDataPoints){
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            sampleCount += originalDataPoints.get(it).getY();
         }
+        dataPoints = new ArrayList<>();
+        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
+
         final int c = 2;
         int max = 255;
-        for(int it = dataPoints.size()-1;it>=0;it--){
-            if(dataPoints.get(it).getY()>0){
+        for(int it = originalDataPoints.size()-1;it>=0;it--){
+            if(originalDataPoints.get(it).getY()>0){
                 max = it;
                 break;
             }
         }
 
-        for(int it = 0;it<dataPoints.size();it++){
+        for(int it = 0;it<originalDataPoints.size();it++){
             newEqualizedValue[it] = (int) (Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
         }
 
-        for(int it = 0; it < dataPoints.size(); it++) {
-            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += originalDataPoints.get(it).getY();
         }
 
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-        dataPoints = newDataPoints;
+//        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
     }
 }
+
