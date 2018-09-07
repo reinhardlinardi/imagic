@@ -181,7 +181,7 @@ abstract class Histogram implements JSONSerializable {
         int min = searchMinimumColorValue(originalDataPoints);
         int max = searchMaximumColorValue(originalDataPoints);
 
-        for(int it = min;it<max;it++){
+        for(int it = min;it <= max;it++){
             newColorValueMap[it] = 255 * (it - min)/(max - min);
         }
 
@@ -202,7 +202,7 @@ abstract class Histogram implements JSONSerializable {
         int max = searchMaximumColorValue(originalDataPoints);
         double c = 1 / Math.log10((double)(1 + max));
 
-        for(int it = 0;it<max;it++){
+        for(int it = 0;it <= max;it++){
             newColorValueMap[it] = (int) Math.floor(Math.log10((double)(it + 1)) * 255.0 * c);
         }
 
