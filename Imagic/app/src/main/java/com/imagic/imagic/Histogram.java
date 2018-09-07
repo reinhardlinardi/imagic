@@ -142,6 +142,7 @@ abstract class Histogram implements JSONSerializable {
 
     //Equalization Part
     protected void cummulativeEqualizeHistogram(ArrayList<DataPoint> originalDataPoints) {
+        sampleCount = 0;
         for(int it = 0; it < originalDataPoints.size(); it++) {
             sampleCount += originalDataPoints.get(it).getY();
         }
@@ -189,6 +190,7 @@ abstract class Histogram implements JSONSerializable {
     }
 
     public void linearHistogram(ArrayList<DataPoint> originalDataPoints){
+        sampleCount = 0;
         for(int it = 0; it < originalDataPoints.size(); it++) {
             sampleCount += originalDataPoints.get(it).getY();
         }
@@ -231,6 +233,7 @@ abstract class Histogram implements JSONSerializable {
     }
 
     public void logarithmicHistogram(ArrayList<DataPoint> originalDataPoints){
+        sampleCount = 0;
         for(int it = 0; it < originalDataPoints.size(); it++) {
             sampleCount += originalDataPoints.get(it).getY();
         }
