@@ -33,6 +33,16 @@
             android:paddingStart="@dimen/graph_linear_layout_side_padding"
             android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
 
+            <ImageView
+                android:id="@+id/histogramImageView"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:contentDescription="@string/original_image_content_description" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/graph_space_layout_height" />
+
             <com.jjoe64.graphview.helper.GraphViewXML
                 android:id="@+id/redGraphView"
                 android:layout_width="match_parent"

@@ -6,7 +6,10 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -111,6 +114,8 @@ public class HistogramActivity extends AppCompatActivity {
                 image = new Image();
                 image.jsonDeserialize(this, json);
 
+                Glide.with(this).load(image.uri).into((ImageView) findViewById(R.id.histogramImageView));
+
                 if(dataAvailableInCache()) {
                     image.redHistogram.enableValueDependentColor();
                     image.greenHistogram.enableValueDependentColor();
@@ -139,6 +144,12 @@ public class HistogramActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Glide.get(this).clearMemory();
     }
 
     // Check if data is available in cache
