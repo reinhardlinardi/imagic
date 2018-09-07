@@ -254,11 +254,15 @@ abstract class Histogram implements JSONSerializable {
             }
         }
 
-        for(int it = 0;it<originalDataPoints.size();it++){
-            newEqualizedValue[it] = (int) (Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
+        Log.v("MAX", Integer.toString(max));
+        for(int it = 0;it<max;it++){
+            newEqualizedValue[it] = (int) Math.floor(Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
+            Log.v("IT", Double.toString(Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max))));
         }
 
         for(int it = 0; it < originalDataPoints.size(); it++) {
+//            Log.v("IT", Integer.toString(it));
+//            Log.v("NEV", Integer.toString(newEqualizedValue[it]));
             dataCountNewValue[newEqualizedValue[it]] += originalDataPoints.get(it).getY();
         }
 
