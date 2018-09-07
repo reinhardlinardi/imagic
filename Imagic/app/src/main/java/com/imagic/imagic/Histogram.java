@@ -156,4 +156,56 @@ abstract class Histogram implements JSONSerializable {
     public int[] getNewEqualizedValue() {
         return newEqualizedValue;
     }
+
+    protected void linearHistogram(){
+        int min = 0;
+        int max = 255;
+        for(int it = 0;it<this.dataPoints.size();it++){
+            if(this.dataPoints.get(it).getY()>0){
+                min = it;
+                break;
+            }
+        }
+        for(int it = this.dataPoints.size();it>=0;it--){
+            if(this.dataPoints.get(it).getY()>0){
+                max = it;
+                break;
+            }
+        }
+
+        for(int it = 0;it<this.dataPoints.size();it++){
+            newEqualizedValue[it] = 255*(it-min)/(max-min);
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+    }
+
+    protected void logarithmicHistogram(){
+        final int c = 2;
+        int max = 255;
+        for(int it = this.dataPoints.size();it>=0;it--){
+            if(this.dataPoints.get(it).getY()>0){
+                max = it;
+                break;
+            }
+        }
+
+        for(int it = 0;it<this.dataPoints.size();it++){
+            newEqualizedValue[it] = (int) (Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < this.dataPoints.size(); it++) {
+            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+    }
 }
