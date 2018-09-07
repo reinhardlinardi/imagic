@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -126,9 +125,9 @@ class Image implements JSONSerializable {
     }
 
     public void updateBitmap() {
-        int[] newRed = redHistogram.getNewEqualizedValue();
-        int[] newGreen = greenHistogram.getNewEqualizedValue();
-        int[] newBlue = blueHistogram.getNewEqualizedValue();
+        int[] newRed = redHistogram.getNewColorValueMap();
+        int[] newGreen = greenHistogram.getNewColorValueMap();
+        int[] newBlue = blueHistogram.getNewColorValueMap();
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
