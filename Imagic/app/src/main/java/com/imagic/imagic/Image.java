@@ -35,7 +35,12 @@ class Image implements JSONSerializable {
     GrayscaleHistogram grayscaleHistogram;
     
     // Constructors
-    Image() {}
+    Image() {
+        redHistogram = new RedHistogram();
+        greenHistogram = new GreenHistogram();
+        blueHistogram = new BlueHistogram();
+        grayscaleHistogram = new GrayscaleHistogram();
+    }
 
     Image(Activity activity, Uri uri) throws IOException {
         this.uri = uri;
@@ -118,5 +123,28 @@ class Image implements JSONSerializable {
             case GRAYSCALE: grayscaleHistogram.setSeriesDataPoints(); break;
             default: break;
         }
+    }
+
+    public void updateBitmap() {
+        int[] newRed = redHistogram.getNewEqualizedValue();
+        int[] newGreen = greenHistogram.getNewEqualizedValue();
+        int[] newBlue = blueHistogram.getNewEqualizedValue();
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                int pixel = bitmap.getPixel(col, row);
+                int alpha = Color.alpha(pixel);
+                int red = Color.red(pixel);
+                int green = Color.green(pixel);
+                int blue = Color.blue(pixel);
+                newBitmap.setPixel(col, row, Color.argb(alpha, newRed[red], newGreen[green], newBlue[blue]));
+            }
+        }
+
+        bitmap = newBitmap;
+
     }
 }

@@ -2,6 +2,7 @@ package com.imagic.imagic;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -139,6 +140,12 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
+//                Image.ColorType[] colorTypes = Image.ColorType.values();
+//
+//                for(Image.ColorType colorType : colorTypes) {
+//                    ContrastEnhancementActivity.this.transformedImage.generateHistogramByColorType(colorType);
+//                }
+
                 //ArrayList<ContrastEnhancementActivity.Option> options = new ArrayList<>();
                 //JSONSerializer.deserialize(this, Text.readRawResource(this, R.raw.equalization_algorithms), (ArrayList<JSONSerializable>) options);
                 /*
@@ -156,7 +163,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 ArrayList<String> options = new ArrayList<>();
                 options.add("Stretching");
                 options.add("CDF");
-                options.add("Something");
+                options.add("Logarithmic");
 
                 ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
                 Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
@@ -166,6 +173,22 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         spinnerText = adapterView.getItemAtPosition(i).toString();
+                        transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
+                        if(adapterView.getItemAtPosition(i).toString().equals("Stretching")) {
+                            transformedImage.redHistogram.linearHistogram();
+                            transformedImage.greenHistogram.linearHistogram();
+                            transformedImage.blueHistogram.linearHistogram();
+                        } else if(adapterView.getItemAtPosition(i).toString().equals("CDF")) {
+                            transformedImage.redHistogram.cummulativeEqualizeHistogram();
+                            transformedImage.greenHistogram.cummulativeEqualizeHistogram();
+                            transformedImage.blueHistogram.cummulativeEqualizeHistogram();
+                        } else {
+                            transformedImage.redHistogram.logarithmicHistogram();
+                            transformedImage.greenHistogram.logarithmicHistogram();
+                            transformedImage.blueHistogram.logarithmicHistogram();
+                        }
+                        transformedImage.updateBitmap();
+                        Glide.with(ContrastEnhancementActivity.this).load(transformedImage.bitmap).into(afterView);
                     }
 
                     @Override
