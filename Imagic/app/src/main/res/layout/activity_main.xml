@@ -8,10 +8,13 @@
     android:weightSum="5"
     tools:context="com.imagic.imagic.MainActivity">
 
-    <Space
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/main_space_layout_height"
-        android:layout_weight="1" />
+        android:layout_height="@dimen/main_text_layout_height"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/main_above_picture_message"
+        android:textSize="@dimen/main_above_picture_text_size" />
 
     <ImageView
         android:id="@+id/welcomeImageView"
@@ -22,21 +25,28 @@
         app:srcCompat="@drawable/ic_magic_wand_64" />
 
     <TextView
-        android:id="@+id/welcomeTextView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/main_text_layout_height"
-        android:layout_weight="2"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/main_below_picture_message"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_text_layout_height"
+        android:layout_weight="1"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/welcome_message"
-        android:textSize="@dimen/main_text_size" />
+        android:textSize="18sp" />
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="@dimen/main_linear_layout_height"
         android:layout_weight="1"
         android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal"
-        style="?android:attr/buttonBarStyle">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/selectImageButton"
