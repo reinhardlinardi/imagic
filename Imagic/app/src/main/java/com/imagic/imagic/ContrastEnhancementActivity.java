@@ -133,8 +133,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
 
                 ArrayList<String> options = new ArrayList<>();
-                options.add("Stretching");
                 options.add("CDF");
+                options.add("Stretching");
                 options.add("Logarithmic");
 
                 ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
@@ -145,6 +145,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         spinnerText = adapterView.getItemAtPosition(i).toString();
+//                        transformedImage = originalImage;
                         transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
                         if(spinnerText.equals("Stretching")) {
@@ -171,6 +172,10 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                         transformedImage.updateBitmap();
 
                         for(DataPoint dp : originalImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+
+//                        transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
+//                        transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
+//                        transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
 
                         transformedImage.redHistogram.enableValueDependentColor();
                         transformedImage.greenHistogram.enableValueDependentColor();

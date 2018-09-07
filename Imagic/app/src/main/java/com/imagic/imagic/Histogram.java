@@ -122,7 +122,10 @@ abstract class Histogram implements JSONSerializable {
     protected final void hide() { view.setVisibility(View.INVISIBLE); }
 
     // Render histogram
-    protected final void render() { view.addSeries(series); }
+    protected final void render() {
+        view.removeAllSeries();
+        view.addSeries(series);
+    }
 
     // Add data point
     protected final void addDataPoint(double x, double y) { dataPoints.add(new DataPoint(x, y)); }
@@ -144,6 +147,10 @@ abstract class Histogram implements JSONSerializable {
         }
         Log.v("original Data Points: ", Integer.toString(dataPoints.size()));
 //        ArrayList<DataPoint> newDataPoints = new ArrayList<>();
+        for(int it = 0;it<originalDataPoints.size();it++){
+            newEqualizedValue[it] = 0;
+            dataCountNewValue[it] = 0;
+        }
         dataPoints = new ArrayList<>();
         generatePMF(originalDataPoints);
         generateCDF(originalDataPoints);
@@ -159,6 +166,7 @@ abstract class Histogram implements JSONSerializable {
 //            Log.v("it: ", Integer.toString(it));
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
+        for(DataPoint dp : originalDataPoints) Log.d("DataPointCUM", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
 //        dataPoints = (ArrayList<DataPoint>) newDataPoints.clone();
         setSeriesDataPoints();
@@ -185,6 +193,10 @@ abstract class Histogram implements JSONSerializable {
             sampleCount += originalDataPoints.get(it).getY();
         }
         dataPoints = new ArrayList<>();
+        for(int it = 0;it<originalDataPoints.size();it++){
+            newEqualizedValue[it] = 0;
+            dataCountNewValue[it] = 0;
+        }
         ArrayList<DataPoint> newDataPoints = new ArrayList<>();
 
         int min = 0;
@@ -223,6 +235,11 @@ abstract class Histogram implements JSONSerializable {
             sampleCount += originalDataPoints.get(it).getY();
         }
         dataPoints = new ArrayList<>();
+        for(int it = 0;it<originalDataPoints.size();it++){
+            newEqualizedValue[it] = 0;
+            dataCountNewValue[it] = 0;
+        }
+
         ArrayList<DataPoint> newDataPoints = new ArrayList<>();
 
         final int c = 2;
