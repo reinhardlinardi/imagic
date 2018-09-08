@@ -3,4 +3,5 @@
     android:id="@+id/contrastEnhanceSpinnerOptionTextView"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:gravity="center_vertical|center_horizontal"></TextView>
+    android:gravity="center_vertical|center_horizontal"
+    android:textColor="@android:color/white"></TextView>

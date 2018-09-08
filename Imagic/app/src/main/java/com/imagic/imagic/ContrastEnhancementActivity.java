@@ -94,10 +94,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
-        /*
-        File imageDataFile = new File(ContrastEnhancementActivity.imageDataURI.getPath());
 
-        try(BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
+        try {
+            /*
             StringBuilder imageData = new StringBuilder();
             String line;
 
@@ -142,19 +141,23 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
             Glide.with(this).load(originalImage.bitmap).into(beforeView);
             Glide.with(this).load(transformedImage.bitmap).into(afterView);
-
+            */
             ArrayList<String> options = new ArrayList<>();
             options.add("CDF");
             options.add("Stretching");
             options.add("Logarithmic");
 
             ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
+
             Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
             spinner.setAdapter(spinnerAdapter);
 
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    String selectedText = adapterView.getItemAtPosition(i).toString();
+                    ((TextView) view).setText(selectedText + "    ▾");
+                    /*
                     spinnerText = adapterView.getItemAtPosition(i).toString();
                     transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
@@ -194,6 +197,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     transformedImage.blueHistogram.render();
 
                     Glide.with(ContrastEnhancementActivity.this).load(transformedImage.bitmap).into(afterView);
+                    */
                 }
 
                 @Override
@@ -204,7 +208,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
         }
-        */
     }
     /*
     @Override
