@@ -1,10 +1,7 @@
 package com.imagic.imagic;
 
-import android.app.Activity;
 import android.content.Context;
-import android.view.View;
 
-import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
@@ -12,25 +9,23 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 abstract class Histogram implements JSONSerializable {
 
     // Properties
-    protected int viewID;
-    protected GraphView view;
     protected BarGraphSeries<DataPoint> series;
     public ArrayList<DataPoint> dataPoints;
-
+    /*
     private double[] pmf;
     private double[] cdf;
     private int sampleCount = 0;
     private int[] newColorValueMap;
     private int[] dataCountNewValue;
-
+    */
     // Constructors
     Histogram() {
-        viewID = 0;
+        resetData();
+        /*
         newColorValueMap = new int[256];
         dataCountNewValue = new int[256];
 
@@ -41,8 +36,9 @@ abstract class Histogram implements JSONSerializable {
         Arrays.fill(dataCountNewValue, 0);
         Arrays.fill(pmf,0.0);
         Arrays.fill(cdf,0.0);
+        */
     }
-
+    /*
     Histogram(Activity activity, int viewID) {
         this.viewID = viewID;
         view = activity.findViewById(viewID);
@@ -68,79 +64,63 @@ abstract class Histogram implements JSONSerializable {
             sampleCount += this.dataPoints.get(it).getY();
         }
     }
-
-    // Check if histogram is not initialized
-    public boolean isUninitialized() { return viewID == 0; }
+    */
 
     @Override
-    public final String jsonSerialize() throws Exception {
+    public String jsonSerialize() throws Exception {
         JSONObject histogramJSON = new JSONObject();
-        histogramJSON.put("viewID", viewID);
-
-        JSONArray dataPointsArray = new JSONArray();
+        JSONArray dataPointsJSON = new JSONArray();
 
         for(DataPoint dataPoint : dataPoints) {
-            JSONArray dataPointArray = new JSONArray();
-            dataPointArray.put(dataPoint.getX());
-            dataPointArray.put(dataPoint.getY());
-            dataPointsArray.put(dataPointArray);
+            JSONArray dataPointJSON = new JSONArray();
+            dataPointJSON.put(dataPoint.getX());
+            dataPointJSON.put(dataPoint.getY());
+            dataPointsJSON.put(dataPointJSON);
         }
 
-        histogramJSON.put("dataPoints", dataPointsArray);
+        histogramJSON.put("dataPoints", dataPointsJSON);
         return histogramJSON.toString();
     }
 
     @Override
-    public final void jsonDeserialize(Context context, String json) throws Exception {
+    public void jsonDeserialize(Context context, String json) throws Exception {
+        resetData();
+
         JSONObject histogramJSON = new JSONObject(json);
-        viewID = histogramJSON.getInt("viewID");
-        /*
-        view = context.findViewById(viewID);
+        JSONArray dataPointsJSON = histogramJSON.getJSONArray("dataPoints");
 
-        if(view != null){
-            view.getViewport().setMinX(0f);
-            view.getViewport().setMaxX(255);
-            view.getViewport().setXAxisBoundsManual(true);
-        }
-        */
-        series = new BarGraphSeries<>();
-        dataPoints = new ArrayList<>();
-
-        JSONArray dataPointsArray = histogramJSON.getJSONArray("dataPoints");
-
-        for(int idx = 0; idx < dataPointsArray.length(); idx++) {
-            JSONArray dataPointArray = dataPointsArray.getJSONArray(idx);
-            dataPoints.add(new DataPoint(dataPointArray.getDouble(0), dataPointArray.getDouble(1)));
+        for(int idx = 0; idx < dataPointsJSON.length(); idx++) {
+            JSONArray dataPointJSON = dataPointsJSON.getJSONArray(idx);
+            dataPoints.add(new DataPoint(dataPointJSON.getDouble(0), dataPointJSON.getDouble(1)));
         }
 
-        setSeriesDataPoints();
-    }
-
-    // Show histogram
-    protected final void show() { view.setVisibility(View.VISIBLE); }
-
-    // Hide histogram
-    protected final void hide() { view.setVisibility(View.INVISIBLE); }
-
-    // Render histogram
-    protected final void render() {
-        view.removeAllSeries();
-        view.addSeries(series);
-    }
-
-    // Add data point
-    protected final void addDataPoint(double x, double y) { dataPoints.add(new DataPoint(x, y)); }
-
-    // Set series data points
-    protected final void setSeriesDataPoints() {
-        DataPoint[] dataPointArray = new DataPoint[dataPoints.size()];
-        for(int idx = 0; idx < dataPoints.size(); idx++) dataPointArray[idx] = dataPoints.get(idx);
-        series = new BarGraphSeries<>(dataPointArray);
+        updateSeries();
     }
 
     // Enable value dependent color
     protected abstract void enableValueDependentColor();
 
+    // Is histogram data empty
+    protected final boolean isDataEmpty() { return dataPoints.size() == 0; }
+
+    // Reset data
+    protected final void resetData() {
+        series = new BarGraphSeries<>();
+        dataPoints = new ArrayList<>();
+    }
+
+    // Add data point
+    protected final void addDataPoint(double x, double y) { dataPoints.add(new DataPoint(x, y)); }
+
+    // Update series
+    protected final void updateSeries() {
+        DataPoint[] dataPointArray = new DataPoint[dataPoints.size()];
+        for(int idx = 0; idx < dataPoints.size(); idx++) dataPointArray[idx] = dataPoints.get(idx);
+        series = new BarGraphSeries<>(dataPointArray);
+    }
+
+    // --------------------------------------------------------------
+    /*
     //Equalization Part
     protected void cummulativeEqualizeHistogram(ArrayList<DataPoint> originalDataPoints) {
         prepareForTransformation(originalDataPoints);
@@ -158,7 +138,7 @@ abstract class Histogram implements JSONSerializable {
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-        setSeriesDataPoints();
+        updateSeries();
     }
 
     private void generatePMF(ArrayList<DataPoint> dataPoints) {
@@ -195,7 +175,7 @@ abstract class Histogram implements JSONSerializable {
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-        setSeriesDataPoints();
+        updateSeries();
     }
 
     public void logarithmicHistogram(ArrayList<DataPoint> originalDataPoints){
@@ -216,7 +196,7 @@ abstract class Histogram implements JSONSerializable {
             dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-        setSeriesDataPoints();
+        updateSeries();
     }
 
     private void prepareForTransformation(ArrayList<DataPoint> originalDataPoints) {
@@ -252,5 +232,6 @@ abstract class Histogram implements JSONSerializable {
         }
         return min;
     }
+    */
 }
 

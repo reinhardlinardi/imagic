@@ -1,6 +1,5 @@
 package com.imagic.imagic;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -28,26 +27,16 @@ class Image implements JSONSerializable {
     // Properties
     Uri uri;
     Bitmap bitmap;
-    RedHistogram redHistogram;
-    GreenHistogram greenHistogram;
-    BlueHistogram blueHistogram;
-    GrayscaleHistogram grayscaleHistogram;
+    RGBHistogram rgb;
+    GrayscaleHistogram grayscale;
     
     // Constructors
-    Image() {
-        redHistogram = new RedHistogram();
-        greenHistogram = new GreenHistogram();
-        blueHistogram = new BlueHistogram();
-        grayscaleHistogram = new GrayscaleHistogram();
-    }
+    Image() { resetHistogram(); }
 
-    Image(Context appContext, Uri uri) throws IOException {
+    Image(Context context, Uri uri) throws IOException {
         this.uri = uri;
-        bitmap = MediaStore.Images.Media.getBitmap(appContext.getContentResolver(), uri);
-        redHistogram = new RedHistogram();
-        greenHistogram = new GreenHistogram();
-        blueHistogram = new BlueHistogram();
-        grayscaleHistogram = new GrayscaleHistogram();
+        bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+        resetHistogram();
     }
 
     @Override
@@ -55,29 +44,28 @@ class Image implements JSONSerializable {
         JSONObject imageJSON = new JSONObject();
 
         imageJSON.put("uri", uri.toString());
-        imageJSON.put("redHistogram", (redHistogram.isUninitialized())? null : new JSONObject(redHistogram.jsonSerialize()));
-        imageJSON.put("greenHistogram", (greenHistogram.isUninitialized())? null : new JSONObject(greenHistogram.jsonSerialize()));
-        imageJSON.put("blueHistogram", (blueHistogram.isUninitialized())? null : new JSONObject(blueHistogram.jsonSerialize()));
-        imageJSON.put("grayscaleHistogram", (grayscaleHistogram.isUninitialized())? null : new JSONObject(grayscaleHistogram.jsonSerialize()));
+        imageJSON.put("rgb", new JSONObject(rgb.jsonSerialize()));
+        imageJSON.put("grayscale", new JSONObject(grayscale.jsonSerialize()));
 
         return imageJSON.toString();
     }
 
     @Override
     public void jsonDeserialize(Context context, String json) throws Exception {
-        JSONObject imageJSON = new JSONObject(json);
+        resetHistogram();
 
+        JSONObject imageJSON = new JSONObject(json);
         uri = Uri.parse(imageJSON.getString("uri"));
         bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-        redHistogram = new RedHistogram();
-        greenHistogram = new GreenHistogram();
-        blueHistogram = new BlueHistogram();
-        grayscaleHistogram = new GrayscaleHistogram();
 
-        if(!imageJSON.isNull("redHistogram")) redHistogram.jsonDeserialize(context, imageJSON.getJSONObject("redHistogram").toString());
-        if(!imageJSON.isNull("greenHistogram")) greenHistogram.jsonDeserialize(context, imageJSON.getJSONObject("greenHistogram").toString());
-        if(!imageJSON.isNull("blueHistogram")) blueHistogram.jsonDeserialize(context, imageJSON.getJSONObject("blueHistogram").toString());
-        if(!imageJSON.isNull("grayscaleHistogram")) grayscaleHistogram.jsonDeserialize(context, imageJSON.getJSONObject("grayscaleHistogram").toString());
+        rgb.jsonDeserialize(context, imageJSON.getJSONObject("rgb").toString());
+        grayscale.jsonDeserialize(context, imageJSON.getJSONObject("grayscale").toString());
+    }
+
+    // Reset all histogram
+    void resetHistogram() {
+        rgb = new RGBHistogram();
+        grayscale = new GrayscaleHistogram();
     }
 
     // Generate histogram
@@ -107,23 +95,23 @@ class Image implements JSONSerializable {
 
         for(int val = 0; val < 256; val++) {
             switch(colorType) {
-                case RED: redHistogram.addDataPoint(val, valueCount[val]); break;
-                case GREEN: greenHistogram.addDataPoint(val, valueCount[val]); break;
-                case BLUE: blueHistogram.addDataPoint(val, valueCount[val]); break;
-                case GRAYSCALE: grayscaleHistogram.addDataPoint(val, valueCount[val]); break;
+                case RED: rgb.red.addDataPoint(val, valueCount[val]); break;
+                case GREEN: rgb.green.addDataPoint(val, valueCount[val]); break;
+                case BLUE: rgb.blue.addDataPoint(val, valueCount[val]); break;
+                case GRAYSCALE: grayscale.addDataPoint(val, valueCount[val]); break;
                 default: break;
             }
         }
 
         switch(colorType) {
-            case RED: redHistogram.setSeriesDataPoints(); break;
-            case GREEN: greenHistogram.setSeriesDataPoints(); break;
-            case BLUE: blueHistogram.setSeriesDataPoints(); break;
-            case GRAYSCALE: grayscaleHistogram.setSeriesDataPoints(); break;
+            case RED: rgb.red.updateSeries(); break;
+            case GREEN: rgb.green.updateSeries(); break;
+            case BLUE: rgb.blue.updateSeries(); break;
+            case GRAYSCALE: grayscale.updateSeries(); break;
             default: break;
         }
     }
-
+    /*
     public void updateBitmap() {
         int[] newRed = redHistogram.getNewColorValueMap();
         int[] newGreen = greenHistogram.getNewColorValueMap();
@@ -144,6 +132,6 @@ class Image implements JSONSerializable {
         }
 
         bitmap = newBitmap;
-
     }
+    */
 }

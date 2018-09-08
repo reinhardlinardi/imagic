@@ -9,8 +9,7 @@ import com.jjoe64.graphview.series.DataPoint;
 class BlueHistogram extends Histogram {
 
     // Constructors
-    BlueHistogram() { super(); }
-    BlueHistogram(Activity activity, int viewID) { super(activity, viewID); }
+    BlueHistogram() {}
 
     @Override
     protected void enableValueDependentColor() {

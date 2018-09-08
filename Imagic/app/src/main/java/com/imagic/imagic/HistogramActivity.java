@@ -1,37 +1,30 @@
 package com.imagic.imagic;
 
-import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import com.jjoe64.graphview.GraphView;
 
 public class HistogramActivity extends AppCompatActivity {
 
-    // Background task
-    @SuppressLint("StaticFieldLeak")
-    private class HistogramTask extends AsyncTask<Void, Integer, Void> {
+    // Async task
+    private class HistogramGenerationTask extends AsyncTask<Void, Integer, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             Image.ColorType[] colorTypes = Image.ColorType.values();
+            int numColors = colorTypes.length;
 
             int done = 0;
-            int numColors = colorTypes.length;
             publishProgress(Progress.countProgess(done + 1, numColors + 1));
 
             for(Image.ColorType colorType : colorTypes) {
-                HistogramActivity.this.image.generateHistogramByColorType(colorType);
+                image.generateHistogramByColorType(colorType);
 
                 done++;
                 publishProgress(Progress.countProgess(done + 1, numColors + 1));
@@ -44,33 +37,31 @@ public class HistogramActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            image.redHistogram.hide();
-            image.greenHistogram.hide();
-            image.blueHistogram.hide();
-            image.grayscaleHistogram.hide();
+            UI.hide(redGraphView);
+            UI.hide(greenGraphView);
+            UI.hide(blueGraphView);
+            UI.hide(grayscaleGraphView);
 
-            progressBar.show();
+            UI.show(progressBar);
         }
 
         @Override
-        protected void onProgressUpdate(Integer... progress) { progressBar.setProgess(progress); }
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(Progress.getProgess(progress));}
 
         @Override
         protected void onPostExecute(Void results) {
-            image.redHistogram.enableValueDependentColor();
-            image.greenHistogram.enableValueDependentColor();
-            image.blueHistogram.enableValueDependentColor();
-            image.grayscaleHistogram.enableValueDependentColor();
+            image.rgb.enableValueDependentColor();
+            image.grayscale.enableValueDependentColor();
 
-            image.redHistogram.show();
-            image.greenHistogram.show();
-            image.blueHistogram.show();
-            image.grayscaleHistogram.show();
+            UI.show(redGraphView);
+            UI.show(greenGraphView);
+            UI.show(blueGraphView);
+            UI.show(grayscaleGraphView);
 
-            image.redHistogram.render();
-            image.greenHistogram.render();
-            image.blueHistogram.render();
-            image.grayscaleHistogram.render();
+            UI.renderGraphView(redGraphView, image.rgb.red.series);
+            UI.renderGraphView(greenGraphView, image.rgb.green.series);
+            UI.renderGraphView(blueGraphView, image.rgb.blue.series);
+            UI.renderGraphView(grayscaleGraphView, image.grayscale.series);
 
             try {
                 Cache.write(cachedImageDataURI, JSONSerializer.serialize(image));
@@ -79,7 +70,7 @@ public class HistogramActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
 
-            progressBar.hide();
+            UI.vanish(progressBar);
             showToastOnTaskCompletion();
         }
     }
@@ -90,8 +81,14 @@ public class HistogramActivity extends AppCompatActivity {
     // Image bitmap
     private Image image;
 
-    // Progress bar
-    private Progress progressBar;
+    // UI components
+    private ProgressBar progressBar;
+    private ImageView imageView;
+
+    private GraphView redGraphView;
+    private GraphView greenGraphView;
+    private GraphView blueGraphView;
+    private GraphView grayscaleGraphView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,33 +98,37 @@ public class HistogramActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
-        try{
-            image = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
+        progressBar = findViewById(R.id.histogramProgressBar);
+        imageView = findViewById(R.id.histogramImageView);
 
-            Glide.with(this).load(image.uri).into((ImageView) findViewById(R.id.histogramImageView));
+        redGraphView = findViewById(R.id.redGraphView);
+        greenGraphView = findViewById(R.id.greenGraphView);
+        blueGraphView = findViewById(R.id.blueGraphView);
+        grayscaleGraphView = findViewById(R.id.grayscaleGraphView);
+
+        UI.showAllXGraphView(redGraphView);
+        UI.showAllXGraphView(greenGraphView);
+        UI.showAllXGraphView(blueGraphView);
+        UI.showAllXGraphView(grayscaleGraphView);
+
+        try {
+            image = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
+            UI.updateImageView(this, image.uri, imageView);
 
             if(dataAvailableInCache()) {
-                image.redHistogram.enableValueDependentColor();
-                image.greenHistogram.enableValueDependentColor();
-                image.blueHistogram.enableValueDependentColor();
-                image.grayscaleHistogram.enableValueDependentColor();
+                image.rgb.enableValueDependentColor();
+                image.grayscale.enableValueDependentColor();
 
-                image.redHistogram.render();
-                image.greenHistogram.render();
-                image.blueHistogram.render();
-                image.grayscaleHistogram.render();
+                UI.renderGraphView(redGraphView, image.rgb.red.series);
+                UI.renderGraphView(greenGraphView, image.rgb.green.series);
+                UI.renderGraphView(blueGraphView, image.rgb.blue.series);
+                UI.renderGraphView(grayscaleGraphView, image.grayscale.series);
 
                 showToastOnTaskCompletion();
             }
             else {
-                image.redHistogram = new RedHistogram(this, R.id.redGraphView);
-                image.greenHistogram = new GreenHistogram(this, R.id.greenGraphView);
-                image.blueHistogram = new BlueHistogram(this, R.id.blueGraphView);
-                image.grayscaleHistogram = new GrayscaleHistogram(this, R.id.grayscaleGraphView);
-
-                progressBar = new Progress(this, R.id.histogramProgressBar);
-                HistogramActivity.HistogramTask histogramTask = new HistogramActivity.HistogramTask();
-                histogramTask.execute();
+                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
+                histogramGenerationTask.execute();
             }
         }
         catch(Exception e) {
@@ -138,14 +139,11 @@ public class HistogramActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Glide.get(this).clearMemory();
+        UI.clearImageViewMemory(this);
     }
 
     // Check if data is available in cache
-    private boolean dataAvailableInCache() {
-        if(image.redHistogram.isUninitialized() || image.greenHistogram.isUninitialized() || image.blueHistogram.isUninitialized() || image.grayscaleHistogram.isUninitialized()) return false;
-        else return true;
-    }
+    private boolean dataAvailableInCache() { return !(image.rgb.isDataEmpty() || image.grayscale.isDataEmpty()); }
 
     // Show toast on task completion
     private void showToastOnTaskCompletion() {

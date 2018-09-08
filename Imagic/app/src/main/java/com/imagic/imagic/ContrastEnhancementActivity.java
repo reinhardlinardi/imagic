@@ -34,6 +34,7 @@ import java.util.ArrayList;
 public class ContrastEnhancementActivity extends AppCompatActivity {
 
     // Dropdown option
+    /*
     private class Option implements JSONSerializable {
 
         // Properties
@@ -61,10 +62,11 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             functionToExecute = optionJSON.getString("functionToExecute");
         }
     }
+    */
+    // Cached image data URI
+    private static Uri cachedImageDataURI;
 
-    // Internal shared cached image data URI
-    private static Uri imageDataURI;
-
+    /*
     // Image bitmap
     private Image originalImage;
     private Image transformedImage;
@@ -84,127 +86,127 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     // Spinner selected text
     private String spinnerText;
     private Spinner spinner;
-
+    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contrast_enhancement);
+
         Bundle bundle = getIntent().getExtras();
+        if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
+        /*
+        File imageDataFile = new File(ContrastEnhancementActivity.imageDataURI.getPath());
 
-        if(bundle != null) {
-            ContrastEnhancementActivity.imageDataURI = Uri.parse(bundle.getString("imageData"));
-            File imageDataFile = new File(ContrastEnhancementActivity.imageDataURI.getPath());
+        try(BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
+            StringBuilder imageData = new StringBuilder();
+            String line;
 
-            try(BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
-                StringBuilder imageData = new StringBuilder();
-                String line;
+            while((line = reader.readLine()) != null) imageData.append(line);
+            String json = imageData.toString();
 
-                while((line = reader.readLine()) != null) imageData.append(line);
-                String json = imageData.toString();
+            originalImage = new Image();
+            transformedImage = new Image();
 
-                originalImage = new Image();
-                transformedImage = new Image();
+            originalImage.jsonDeserialize(this, json);
+            transformedImage.jsonDeserialize(this, json);
 
-                originalImage.jsonDeserialize(this, json);
-                transformedImage.jsonDeserialize(this, json);
+            if(!dataAvailableInCache()) Log.d("Cache", "Data not available");
 
-                if(!dataAvailableInCache()) Log.d("Cache", "Data not available");
+            redSlider = new Slider(this, R.id.redConstantEqualizationSeekBar, R.id.redConstantEqualizationTextView);
+            greenSlider = new Slider(this, R.id.greenConstantEqualizationSeekBar, R.id.greenConstantEqualizationTextView);
+            blueSlider = new Slider(this, R.id.blueConstantEqualizationSeekBar, R.id.blueConstantEqualizationTextView);
 
-                redSlider = new Slider(this, R.id.redConstantEqualizationSeekBar, R.id.redConstantEqualizationTextView);
-                greenSlider = new Slider(this, R.id.greenConstantEqualizationSeekBar, R.id.greenConstantEqualizationTextView);
-                blueSlider = new Slider(this, R.id.blueConstantEqualizationSeekBar, R.id.blueConstantEqualizationTextView);
+            progressBar = new Progress(this, R.id.contrastEnhancementProgressBar);
 
-                progressBar = new Progress(this, R.id.contrastEnhancementProgressBar);
+            beforeView = findViewById(R.id.contrastEnhancementImageBefore);
+            afterView = findViewById(R.id.contrastEnhancementImageAfter);
 
-                beforeView = findViewById(R.id.contrastEnhancementImageBefore);
-                afterView = findViewById(R.id.contrastEnhancementImageAfter);
+            transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
+            transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
+            transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
+            transformedImage.redHistogram.view.getViewport().setMinX(0f);
+            transformedImage.redHistogram.view.getViewport().setMaxX((double) 255);
+            transformedImage.redHistogram.view.getViewport().setXAxisBoundsManual(true);
 
-                transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
-                transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
-                transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
-                transformedImage.redHistogram.view.getViewport().setMinX(0f);
-                transformedImage.redHistogram.view.getViewport().setMaxX((double) 255);
-                transformedImage.redHistogram.view.getViewport().setXAxisBoundsManual(true);
+            transformedImage.greenHistogram.view.getViewport().setMinX(0f);
+            transformedImage.greenHistogram.view.getViewport().setMaxX((double) 255);
+            transformedImage.greenHistogram.view.getViewport().setXAxisBoundsManual(true);
 
-                transformedImage.greenHistogram.view.getViewport().setMinX(0f);
-                transformedImage.greenHistogram.view.getViewport().setMaxX((double) 255);
-                transformedImage.greenHistogram.view.getViewport().setXAxisBoundsManual(true);
+            transformedImage.blueHistogram.view.getViewport().setMinX(0f);
+            transformedImage.blueHistogram.view.getViewport().setMaxX((double) 255);
+            transformedImage.blueHistogram.view.getViewport().setXAxisBoundsManual(true);
 
-                transformedImage.blueHistogram.view.getViewport().setMinX(0f);
-                transformedImage.blueHistogram.view.getViewport().setMaxX((double) 255);
-                transformedImage.blueHistogram.view.getViewport().setXAxisBoundsManual(true);
+            transformedImage.redHistogram.hide();
+            transformedImage.greenHistogram.hide();
+            transformedImage.blueHistogram.hide();
 
-                transformedImage.redHistogram.hide();
-                transformedImage.greenHistogram.hide();
-                transformedImage.blueHistogram.hide();
+            Glide.with(this).load(originalImage.bitmap).into(beforeView);
+            Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
-                Glide.with(this).load(originalImage.bitmap).into(beforeView);
-                Glide.with(this).load(transformedImage.bitmap).into(afterView);
+            ArrayList<String> options = new ArrayList<>();
+            options.add("CDF");
+            options.add("Stretching");
+            options.add("Logarithmic");
 
-                ArrayList<String> options = new ArrayList<>();
-                options.add("CDF");
-                options.add("Stretching");
-                options.add("Logarithmic");
+            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
+            Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
+            spinner.setAdapter(spinnerAdapter);
 
-                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
-                Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
-                spinner.setAdapter(spinnerAdapter);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    spinnerText = adapterView.getItemAtPosition(i).toString();
+                    transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        spinnerText = adapterView.getItemAtPosition(i).toString();
-                        transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
+                    if(spinnerText.equals("Stretching")) {
+                        transformedImage.redHistogram.linearHistogram(originalImage.redHistogram.dataPoints);
+                        transformedImage.greenHistogram.linearHistogram(originalImage.greenHistogram.dataPoints);
+                        transformedImage.blueHistogram.linearHistogram(originalImage.blueHistogram.dataPoints);
 
-                        if(spinnerText.equals("Stretching")) {
-                            transformedImage.redHistogram.linearHistogram(originalImage.redHistogram.dataPoints);
-                            transformedImage.greenHistogram.linearHistogram(originalImage.greenHistogram.dataPoints);
-                            transformedImage.blueHistogram.linearHistogram(originalImage.blueHistogram.dataPoints);
-
-                            Log.d("Enter", "Stretching");
-                        }
-                        else if(spinnerText.equals("CDF")) {
-                            transformedImage.redHistogram.cummulativeEqualizeHistogram(originalImage.redHistogram.dataPoints);
-                            transformedImage.greenHistogram.cummulativeEqualizeHistogram(originalImage.greenHistogram.dataPoints);
-                            transformedImage.blueHistogram.cummulativeEqualizeHistogram(originalImage.blueHistogram.dataPoints);
-
-                            Log.d("Enter", "CDF");
-                        }
-                        else {
-                            transformedImage.redHistogram.logarithmicHistogram(originalImage.redHistogram.dataPoints);
-                            transformedImage.greenHistogram.logarithmicHistogram(originalImage.greenHistogram.dataPoints);
-                            transformedImage.blueHistogram.logarithmicHistogram(originalImage.blueHistogram.dataPoints);
-
-                            Log.d("Enter", "Log");
-                        }
-                        transformedImage.updateBitmap();
-
-                        transformedImage.redHistogram.enableValueDependentColor();
-                        transformedImage.greenHistogram.enableValueDependentColor();
-                        transformedImage.blueHistogram.enableValueDependentColor();
-
-                        transformedImage.redHistogram.show();
-                        transformedImage.greenHistogram.show();
-                        transformedImage.blueHistogram.show();
-
-                        transformedImage.redHistogram.render();
-                        transformedImage.greenHistogram.render();
-                        transformedImage.blueHistogram.render();
-
-                        Glide.with(ContrastEnhancementActivity.this).load(transformedImage.bitmap).into(afterView);
+                        Log.d("Enter", "Stretching");
                     }
+                    else if(spinnerText.equals("CDF")) {
+                        transformedImage.redHistogram.cummulativeEqualizeHistogram(originalImage.redHistogram.dataPoints);
+                        transformedImage.greenHistogram.cummulativeEqualizeHistogram(originalImage.greenHistogram.dataPoints);
+                        transformedImage.blueHistogram.cummulativeEqualizeHistogram(originalImage.blueHistogram.dataPoints);
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        Log.d("Enter", "CDF");
                     }
-                });
-            }
-            catch(Exception e) {
-                Log.e("Imagic", "Exception", e);
-            }
+                    else {
+                        transformedImage.redHistogram.logarithmicHistogram(originalImage.redHistogram.dataPoints);
+                        transformedImage.greenHistogram.logarithmicHistogram(originalImage.greenHistogram.dataPoints);
+                        transformedImage.blueHistogram.logarithmicHistogram(originalImage.blueHistogram.dataPoints);
+
+                        Log.d("Enter", "Log");
+                    }
+                    transformedImage.updateBitmap();
+
+                    transformedImage.redHistogram.enableValueDependentColor();
+                    transformedImage.greenHistogram.enableValueDependentColor();
+                    transformedImage.blueHistogram.enableValueDependentColor();
+
+                    transformedImage.redHistogram.show();
+                    transformedImage.greenHistogram.show();
+                    transformedImage.blueHistogram.show();
+
+                    transformedImage.redHistogram.render();
+                    transformedImage.greenHistogram.render();
+                    transformedImage.blueHistogram.render();
+
+                    Glide.with(ContrastEnhancementActivity.this).load(transformedImage.bitmap).into(afterView);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
         }
+        catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+        }
+        */
     }
-
+    /*
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -216,4 +218,5 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         if(originalImage.redHistogram.isUninitialized() || originalImage.greenHistogram.isUninitialized() || originalImage.blueHistogram.isUninitialized()) return false;
         else return true;
     }
+    */
 }
