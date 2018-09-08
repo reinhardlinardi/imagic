@@ -78,12 +78,11 @@ public class HistogramActivity extends AppCompatActivity {
     // Cached image data URI
     private static Uri cachedImageDataURI;
 
-    // Image bitmap
+    // Image
     private Image image;
 
     // UI components
     private ProgressBar progressBar;
-    private ImageView imageView;
 
     private GraphView redGraphView;
     private GraphView greenGraphView;
@@ -99,7 +98,7 @@ public class HistogramActivity extends AppCompatActivity {
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
         progressBar = findViewById(R.id.histogramProgressBar);
-        imageView = findViewById(R.id.histogramImageView);
+        ImageView imageView = findViewById(R.id.histogramImageView);
 
         redGraphView = findViewById(R.id.redGraphView);
         greenGraphView = findViewById(R.id.greenGraphView);

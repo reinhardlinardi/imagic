@@ -10,8 +10,6 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
-import java.util.ArrayList;
-
 class UI {
 
     // Show

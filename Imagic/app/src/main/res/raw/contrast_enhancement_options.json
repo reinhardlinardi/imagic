@@ -1,0 +1,5 @@
+[
+  { "algorithm" : "Linear" },
+  { "algorithm" : "CDF" },
+  { "algorithm" : "Logarithmic" }
+]

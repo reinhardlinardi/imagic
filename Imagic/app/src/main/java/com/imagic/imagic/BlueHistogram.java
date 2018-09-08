@@ -1,6 +1,5 @@
 package com.imagic.imagic;
 
-import android.app.Activity;
 import android.graphics.Color;
 
 import com.jjoe64.graphview.ValueDependentColor;

@@ -1,34 +1,27 @@
 package com.imagic.imagic;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.GraphView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 public class ContrastEnhancementActivity extends AppCompatActivity {
@@ -63,30 +56,48 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         }
     }
     */
+    // Option adapter
+    private class ContrastEnhancementAdapter extends ArrayAdapter<ContrastEnhancementOption> {
+
+        ContrastEnhancementAdapter(ArrayList<ContrastEnhancementOption> options) {
+            super(ContrastEnhancementActivity.this, R.layout.contrast_enhance_spinner_option, options);
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            LayoutInflater inflater = ContrastEnhancementActivity.this.getLayoutInflater();
+            View optionView = inflater.inflate(R.layout.contrast_enhance_spinner_option, parent, false);
+
+            TextView optionTextView = optionView.findViewById(R.id.contrastEnhanceSpinnerOptionTextView);
+            ContrastEnhancementOption option = getItem(position);
+
+            if(option != null) optionTextView.setText(option.algorithm);
+
+            return optionView;
+        }
+
+        @Override
+        public View getDropDownView(int position, View view, ViewGroup parent) {
+            return getView(position, view, parent);
+        }
+    }
+
+
     // Cached image data URI
     private static Uri cachedImageDataURI;
 
-    /*
-    // Image bitmap
+    // Image
     private Image originalImage;
     private Image transformedImage;
 
-    // Image view
+    // UI components
+    private ProgressBar progressBar;
     private ImageView beforeView;
     private ImageView afterView;
+    private GraphView redGraphView;
+    private GraphView greenGraphView;
+    private GraphView blueGraphView;
 
-    // Progress bar
-    private Progress progressBar;
-
-    // Slider
-    private Slider redSlider;
-    private Slider greenSlider;
-    private Slider blueSlider;
-
-    // Spinner selected text
-    private String spinnerText;
-    private Spinner spinner;
-    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +106,56 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
+        progressBar = findViewById(R.id.contrastEnhancementProgressBar);
+        beforeView = findViewById(R.id.contrastEnhancementImageBefore);
+        afterView = findViewById(R.id.contrastEnhancementImageAfter);
+
+        SeekBar redSeekBar = findViewById(R.id.redConstantEqualizationSeekBar);
+        SeekBar greenSeekBar = findViewById(R.id.greenConstantEqualizationSeekBar);
+        SeekBar blueSeekBar = findViewById(R.id.blueConstantEqualizationSeekBar);
+
+        TextView redSeekBarTextView = findViewById(R.id.redConstantEqualizationTextView);
+        TextView greenSeekBarTextView = findViewById(R.id.greenConstantEqualizationTextView);
+        TextView blueSeekBarTextView = findViewById(R.id.blueConstantEqualizationTextView);
+
+        Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
+        Button button = findViewById(R.id.enhanceContrastButton);
+
+        redGraphView = findViewById(R.id.contrastEnhancementRedGraphView);
+        greenGraphView = findViewById(R.id.contrastEnhancementGreenGraphView);
+        blueGraphView = findViewById(R.id.contrastEnhancementBlueGraphView);
+
+        UI.showAllXGraphView(redGraphView);
+        UI.showAllXGraphView(greenGraphView);
+        UI.showAllXGraphView(blueGraphView);
+
+        UI.hide(redGraphView);
+        UI.hide(greenGraphView);
+        UI.hide(blueGraphView);
+
         try {
+            originalImage = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
+            transformedImage = originalImage;
+
+            UI.updateImageView(this, originalImage.uri, beforeView);
+            UI.updateImageView(this, originalImage.uri, afterView);
+
+            ArrayList<ContrastEnhancementOption> options = JSONSerializer.arrayDeserialize(getApplicationContext(), Text.readRawResource(getApplicationContext(), R.raw.contrast_enhancement_options), ContrastEnhancementOption.class);
+            ContrastEnhancementAdapter adapter = new ContrastEnhancementAdapter(options);
+            spinner.setAdapter(adapter);
+            spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
+
+            // button on click listener
+            /*
+            if(dataAvailableInCache()) {
+                transformedImage.rgb.enableValueDependentColor();
+
+
+            }
+            else {
+
+            }
+            */
             /*
             StringBuilder imageData = new StringBuilder();
             String line;
@@ -141,17 +201,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
             Glide.with(this).load(originalImage.bitmap).into(beforeView);
             Glide.with(this).load(transformedImage.bitmap).into(afterView);
-            */
-            ArrayList<String> options = new ArrayList<>();
-            options.add("CDF");
-            options.add("Stretching");
-            options.add("Logarithmic");
 
-            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
-
-            Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
-            spinner.setAdapter(spinnerAdapter);
-
+            /*
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -197,29 +248,48 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     transformedImage.blueHistogram.render();
 
                     Glide.with(ContrastEnhancementActivity.this).load(transformedImage.bitmap).into(afterView);
-                    */
+
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
+            */
         }
         catch(Exception e) {
-                Log.e("Imagic", "Exception", e);
+            Log.e("Imagic", "Exception", e);
         }
     }
-    /*
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Glide.get(this).clearMemory();
+        UI.clearImageViewMemory(this);
+    }
+
+    // Spinner on item selected listener
+    private AdapterView.OnItemSelectedListener getSpinnerOnItemSelectedListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                ContrastEnhancementOption selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(i);
+                String selectedAlgorithm = selectedOption.algorithm;
+
+                TextView textView = (TextView) view;
+                textView.setText(selectedAlgorithm + "   ▾");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        };
     }
 
     // Check if data is available in cache
-    private boolean dataAvailableInCache() {
-        if(originalImage.redHistogram.isUninitialized() || originalImage.greenHistogram.isUninitialized() || originalImage.blueHistogram.isUninitialized()) return false;
-        else return true;
+    private boolean dataAvailableInCache() { return !(originalImage.rgb.isDataEmpty()); }
+
+    // Show toast on task completion
+    private void showToastOnTaskCompletion() {
+        Toast.makeText(this, "Enhancement finished.", Toast.LENGTH_SHORT).show();
     }
-    */
 }
