@@ -16,10 +16,7 @@ class UI {
     static void show(View view) { view.setVisibility(View.VISIBLE); }
 
     // Hide
-    static void hide(View view) { view.setVisibility(View.INVISIBLE); }
-
-    // Vanish
-    static void vanish(View view) { view.setVisibility(View.GONE); }
+    static void hide(View view) { view.setVisibility(View.GONE); }
 
     // Update image view using Glide
     static void updateImageView(Activity activity, Uri uri, ImageView view) { Glide.with(activity).load(uri).into(view); }

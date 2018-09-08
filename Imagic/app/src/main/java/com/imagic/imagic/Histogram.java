@@ -38,33 +38,6 @@ abstract class Histogram implements JSONSerializable {
         Arrays.fill(cdf,0.0);
         */
     }
-    /*
-    Histogram(Activity activity, int viewID) {
-        this.viewID = viewID;
-        view = activity.findViewById(viewID);
-        view.getViewport().setMinX(0f);
-        view.getViewport().setMaxX(255);
-        view.getViewport().setXAxisBoundsManual(true);
-
-        series = new BarGraphSeries<>();
-        dataPoints = new ArrayList<>();
-
-        newColorValueMap = new int[256];
-        dataCountNewValue = new int[this.dataPoints.size()];
-
-        pmf = new double[this.dataPoints.size()];
-        cdf = new double[this.dataPoints.size()];
-
-        Arrays.fill(newColorValueMap, 0);
-        Arrays.fill(dataCountNewValue, 0);
-        Arrays.fill(pmf,0.0);
-        Arrays.fill(cdf,0.0);
-
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
-        }
-    }
-    */
 
     @Override
     public String jsonSerialize() throws Exception {

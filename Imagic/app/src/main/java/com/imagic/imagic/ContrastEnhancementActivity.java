@@ -1,11 +1,8 @@
 package com.imagic.imagic;
 
-import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,36 +23,6 @@ import java.util.ArrayList;
 
 public class ContrastEnhancementActivity extends AppCompatActivity {
 
-    // Dropdown option
-    /*
-    private class Option implements JSONSerializable {
-
-        // Properties
-        public String name;
-        public String functionToExecute;
-
-        // Constructor
-        Option() {}
-
-        @Override
-        public String jsonSerialize() throws Exception {
-            JSONObject optionJSON = new JSONObject();
-
-            optionJSON.put("name", name);
-            optionJSON.put("functionToExecute", functionToExecute);
-
-            return optionJSON.toString();
-        }
-
-        @Override
-        public void jsonDeserialize(Context context, String json) throws Exception {
-            JSONObject optionJSON = new JSONObject(json);
-
-            name = optionJSON.getString("name");
-            functionToExecute = optionJSON.getString("functionToExecute");
-        }
-    }
-    */
     // Option adapter
     private class ContrastEnhancementAdapter extends ArrayAdapter<ContrastEnhancementOption> {
 
@@ -140,12 +107,17 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             UI.updateImageView(this, originalImage.uri, beforeView);
             UI.updateImageView(this, originalImage.uri, afterView);
 
+            redSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(redSeekBarTextView));
+            greenSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(greenSeekBarTextView));
+            blueSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(blueSeekBarTextView));
+
             ArrayList<ContrastEnhancementOption> options = JSONSerializer.arrayDeserialize(getApplicationContext(), Text.readRawResource(getApplicationContext(), R.raw.contrast_enhancement_options), ContrastEnhancementOption.class);
             ContrastEnhancementAdapter adapter = new ContrastEnhancementAdapter(options);
             spinner.setAdapter(adapter);
             spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
 
-            // button on click listener
+            // Button on click listener
+
             /*
             if(dataAvailableInCache()) {
                 transformedImage.rgb.enableValueDependentColor();
@@ -268,12 +240,28 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         UI.clearImageViewMemory(this);
     }
 
+    // Seek bar on change listener
+    private SeekBar.OnSeekBarChangeListener getSeekBarOnChangeListener(final TextView textView) {
+        return new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser) textView.setText(Integer.toString(progress) + "%");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        };
+    }
+
     // Spinner on item selected listener
     private AdapterView.OnItemSelectedListener getSpinnerOnItemSelectedListener() {
         return new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                ContrastEnhancementOption selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(i);
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                ContrastEnhancementOption selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(position);
                 String selectedAlgorithm = selectedOption.algorithm;
 
                 TextView textView = (TextView) view;
