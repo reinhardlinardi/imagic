@@ -121,6 +121,17 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
                 transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
                 transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
+                transformedImage.redHistogram.view.getViewport().setMinX(0f);
+                transformedImage.redHistogram.view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+                transformedImage.redHistogram.view.getViewport().setXAxisBoundsManual(true);
+
+                transformedImage.greenHistogram.view.getViewport().setMinX(0f);
+                transformedImage.greenHistogram.view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+                transformedImage.greenHistogram.view.getViewport().setXAxisBoundsManual(true);
+
+                transformedImage.blueHistogram.view.getViewport().setMinX(0f);
+                transformedImage.blueHistogram.view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+                transformedImage.blueHistogram.view.getViewport().setXAxisBoundsManual(true);
 
                 transformedImage.redHistogram.hide();
                 transformedImage.greenHistogram.hide();
