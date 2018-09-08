@@ -22,6 +22,8 @@
     <dimen name="menu_option_description_text_size">12sp</dimen>
     <dimen name="progressbar_min_height">0dp</dimen>
     <dimen name="progressbar_max_height">2dp</dimen>
+    <dimen name="single_image_layout_width">0dp</dimen>
+    <dimen name="single_image_layout_height">180dp</dimen>
     <dimen name="graph_layout_height">300dp</dimen>
     <dimen name="graph_space_layout_height">20dp</dimen>
     <dimen name="graph_linear_layout_vertical_padding">20dp</dimen>
@@ -41,5 +43,4 @@
     <dimen name="contrast_enhance_space_layout_height">5dp</dimen>
     <dimen name="seek_bar_color_description_layout_width">0dp</dimen>
     <dimen name="spinner_and_button_linear_layout_top_margin">15dp</dimen>
-
 </resources>

@@ -72,9 +72,8 @@ public class HistogramActivity extends AppCompatActivity {
             image.blueHistogram.render();
             image.grayscaleHistogram.render();
 
-            try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(HistogramActivity.imageDataURI.getPath())))) {
-                String json = image.jsonSerialize();
-                writer.write(json);
+            try {
+                Cache.write(cachedImageDataURI, JSONSerializer.serialize(image));
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
@@ -85,8 +84,8 @@ public class HistogramActivity extends AppCompatActivity {
         }
     }
 
-    // Internal shared cached image data URI
-    private static Uri imageDataURI;
+    // Cached image data URI
+    private static Uri cachedImageDataURI;
 
     // Image bitmap
     private Image image;
@@ -98,51 +97,41 @@ public class HistogramActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_histogram);
+
         Bundle bundle = getIntent().getExtras();
+        if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
-        if(bundle != null) {
-            HistogramActivity.imageDataURI = Uri.parse(bundle.getString("imageData"));
-            File imageDataFile = new File(HistogramActivity.imageDataURI.getPath());
+        try{
+            image = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
 
-            try(BufferedReader reader = new BufferedReader(new FileReader(imageDataFile))) {
-                StringBuilder imageData = new StringBuilder();
-                String line;
+            Glide.with(this).load(image.uri).into((ImageView) findViewById(R.id.histogramImageView));
 
-                while((line = reader.readLine()) != null) imageData.append(line);
-                String json = imageData.toString();
+            if(dataAvailableInCache()) {
+                image.redHistogram.enableValueDependentColor();
+                image.greenHistogram.enableValueDependentColor();
+                image.blueHistogram.enableValueDependentColor();
+                image.grayscaleHistogram.enableValueDependentColor();
 
-                image = new Image();
-                image.jsonDeserialize(this, json);
+                image.redHistogram.render();
+                image.greenHistogram.render();
+                image.blueHistogram.render();
+                image.grayscaleHistogram.render();
 
-                Glide.with(this).load(image.uri).into((ImageView) findViewById(R.id.histogramImageView));
-
-                if(dataAvailableInCache()) {
-                    image.redHistogram.enableValueDependentColor();
-                    image.greenHistogram.enableValueDependentColor();
-                    image.blueHistogram.enableValueDependentColor();
-                    image.grayscaleHistogram.enableValueDependentColor();
-
-                    image.redHistogram.render();
-                    image.greenHistogram.render();
-                    image.blueHistogram.render();
-                    image.grayscaleHistogram.render();
-
-                    showToastOnTaskCompletion();
-                }
-                else {
-                    image.redHistogram = new RedHistogram(this, R.id.redGraphView);
-                    image.greenHistogram = new GreenHistogram(this, R.id.greenGraphView);
-                    image.blueHistogram = new BlueHistogram(this, R.id.blueGraphView);
-                    image.grayscaleHistogram = new GrayscaleHistogram(this, R.id.grayscaleGraphView);
-
-                    progressBar = new Progress(this, R.id.histogramProgressBar);
-                    HistogramActivity.HistogramTask histogramTask = new HistogramActivity.HistogramTask();
-                    histogramTask.execute();
-                }
+                showToastOnTaskCompletion();
             }
-            catch(Exception e) {
-                Log.e("Imagic", "Exception", e);
+            else {
+                image.redHistogram = new RedHistogram(this, R.id.redGraphView);
+                image.greenHistogram = new GreenHistogram(this, R.id.greenGraphView);
+                image.blueHistogram = new BlueHistogram(this, R.id.blueGraphView);
+                image.grayscaleHistogram = new GrayscaleHistogram(this, R.id.grayscaleGraphView);
+
+                progressBar = new Progress(this, R.id.histogramProgressBar);
+                HistogramActivity.HistogramTask histogramTask = new HistogramActivity.HistogramTask();
+                histogramTask.execute();
             }
+        }
+        catch(Exception e) {
+            Log.e("Imagic", "Exception", e);
         }
     }
 

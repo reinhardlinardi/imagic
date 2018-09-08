@@ -32,11 +32,20 @@
             android:paddingStart="@dimen/graph_linear_layout_side_padding"
             android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
 
-            <ImageView
-                android:id="@+id/histogramImageView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:contentDescription="@string/original_image_content_description" />
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <ImageView
+                    android:id="@+id/histogramImageView"
+                    android:layout_width="@dimen/single_image_layout_width"
+                    android:layout_height="@dimen/single_image_layout_height"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/original_image_content_description" />
+            </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"

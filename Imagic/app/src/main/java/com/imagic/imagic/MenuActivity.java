@@ -54,7 +54,7 @@ public class MenuActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     try {
                         Intent intent = new Intent(MenuActivity.this, Class.forName(MenuActivity.this.getApplicationContext().getPackageName() + "." + activityOnClick + "Activity"));
-                        intent.putExtra("imageData", cachedImageDataURI.toString());
+                        intent.putExtra(Cache.INTENT_BUNDLE_NAME, cachedImageDataURI.toString());
                         MenuActivity.this.startActivity(intent);
                     }
                     catch(Exception e) {
