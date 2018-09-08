@@ -111,27 +111,24 @@ class Image implements JSONSerializable {
             default: break;
         }
     }
-    /*
-    public void updateBitmap() {
-        int[] newRed = redHistogram.getNewColorValueMap();
-        int[] newGreen = greenHistogram.getNewColorValueMap();
-        int[] newBlue = blueHistogram.getNewColorValueMap();
+
+    // Update bitmap
+    public void updateBitmap(int[] newRedValue, int[] newGreenValue, int[] newBlueValue) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
-                int pixel = bitmap.getPixel(col, row);
-                int alpha = Color.alpha(pixel);
-                int red = Color.red(pixel);
-                int green = Color.green(pixel);
-                int blue = Color.blue(pixel);
-                newBitmap.setPixel(col, row, Color.argb(alpha, newRed[red], newGreen[green], newBlue[blue]));
+                int pixel = pixels[row * width + col];
+                pixels[row * width + col] = Color.rgb(newRedValue[Color.red(pixel)], newGreenValue[Color.green(pixel)], newBlueValue[Color.blue(pixel)]);
             }
         }
 
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        newBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
         bitmap = newBitmap;
     }
-    */
 }

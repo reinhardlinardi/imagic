@@ -51,11 +51,4 @@ class RGBHistogram implements JSONSerializable {
         green = new GreenHistogram();
         blue = new BlueHistogram();
     }
-
-    // Update series
-    void updateSeries() {
-        red.updateSeries();
-        green.updateSeries();
-        blue.updateSeries();
-    }
 }

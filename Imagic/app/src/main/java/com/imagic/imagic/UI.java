@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,8 +19,17 @@ class UI {
     // Hide
     static void hide(View view) { view.setVisibility(View.GONE); }
 
-    // Update image view using Glide
+    // Enable
+    static void enable(View view) { view.setEnabled(true); }
+
+    // Disable
+    static void disable(View view) { view.setEnabled(false); }
+
+    // Update image view by URI using Glide
     static void updateImageView(Activity activity, Uri uri, ImageView view) { Glide.with(activity).load(uri).into(view); }
+
+    // Update image view by bitmap using Glide
+    static void updateImageView(Activity activity, Bitmap bitmap, ImageView view) { Glide.with(activity).load(bitmap).into(view); }
 
     // Clear Glide memory
     static void clearImageViewMemory(Activity activity) { Glide.get(activity).clearMemory(); }

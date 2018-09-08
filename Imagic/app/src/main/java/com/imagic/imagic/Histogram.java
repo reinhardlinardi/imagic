@@ -9,35 +9,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 abstract class Histogram implements JSONSerializable {
 
     // Properties
     protected BarGraphSeries<DataPoint> series;
     public ArrayList<DataPoint> dataPoints;
-    /*
-    private double[] pmf;
-    private double[] cdf;
-    private int sampleCount = 0;
-    private int[] newColorValueMap;
-    private int[] dataCountNewValue;
-    */
+
     // Constructors
-    Histogram() {
-        resetData();
-        /*
-        newColorValueMap = new int[256];
-        dataCountNewValue = new int[256];
-
-        pmf = new double[256];
-        cdf = new double[256];
-
-        Arrays.fill(newColorValueMap, 0);
-        Arrays.fill(dataCountNewValue, 0);
-        Arrays.fill(pmf,0.0);
-        Arrays.fill(cdf,0.0);
-        */
-    }
+    Histogram() { resetData(); }
 
     @Override
     public String jsonSerialize() throws Exception {
@@ -92,119 +73,114 @@ abstract class Histogram implements JSONSerializable {
         series = new BarGraphSeries<>(dataPointArray);
     }
 
-    // --------------------------------------------------------------
-    /*
-    //Equalization Part
-    protected void cummulativeEqualizeHistogram(ArrayList<DataPoint> originalDataPoints) {
-        prepareForTransformation(originalDataPoints);
-        generatePMF(originalDataPoints);
-        generateCDF(originalDataPoints);
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            newColorValueMap[it] = (int) Math.floor(cdf[it] * (double) (originalDataPoints.size() - 1));
-        }
-
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            dataCountNewValue[newColorValueMap[it]] += originalDataPoints.get(it).getY();
-        }
-
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
-        }
-
-        updateSeries();
-    }
-
-    private void generatePMF(ArrayList<DataPoint> dataPoints) {
-        for(int it = 0; it < dataPoints.size(); it++) {
-            pmf[it] = dataPoints.get(it).getY() / (double) sampleCount;
-        }
-    }
-
-    private void generateCDF(ArrayList<DataPoint> dataPoints) {
-        for(int it = 0; it < dataPoints.size(); it++) {
-            cdf[it] = (it == 0)? pmf[it] : pmf[it] + cdf[it-1];
-        }
-    }
-
-    public int[] getNewColorValueMap() {
-        return newColorValueMap;
-    }
-
-    public void linearHistogram(ArrayList<DataPoint> originalDataPoints){
-        prepareForTransformation(originalDataPoints);
-
-        int min = searchMinimumColorValue(originalDataPoints);
-        int max = searchMaximumColorValue(originalDataPoints);
-
-        for(int it = min;it <= max;it++){
-            newColorValueMap[it] = 255 * (it - min)/(max - min);
-        }
-
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            dataCountNewValue[newColorValueMap[it]] += originalDataPoints.get(it).getY();
-        }
-
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
-        }
-
-        updateSeries();
-    }
-
-    public void logarithmicHistogram(ArrayList<DataPoint> originalDataPoints){
-        prepareForTransformation(originalDataPoints);
-
-        int max = searchMaximumColorValue(originalDataPoints);
-        double c = 1 / Math.log10((double)(1 + max));
-
-        for(int it = 0;it <= max;it++){
-            newColorValueMap[it] = (int) Math.floor(Math.log10((double)(it + 1)) * 255.0 * c);
-        }
-
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            dataCountNewValue[newColorValueMap[it]] += originalDataPoints.get(it).getY();
-        }
-
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
-        }
-
-        updateSeries();
-    }
-
-    private void prepareForTransformation(ArrayList<DataPoint> originalDataPoints) {
-        sampleCount = 0;
-        for(int it = 0; it < originalDataPoints.size(); it++) {
-            sampleCount += originalDataPoints.get(it).getY();
-        }
-        dataPoints = new ArrayList<>();
-        for(int it = 0;it<originalDataPoints.size();it++){
-            newColorValueMap[it] = 0;
-            dataCountNewValue[it] = 0;
-        }
-    }
-
-    private int searchMaximumColorValue(ArrayList<DataPoint> originalDataPoints) {
+    // Get highest existing color value
+    private int getMaxColorValue() {
         int max = 255;
-        for(int it = originalDataPoints.size()-1;it>=0;it--){
-            if(originalDataPoints.get(it).getY()>0){
-                max = it;
+
+        for(int idx = 255; idx >= 0; idx--) {
+            if(dataPoints.get(idx).getY() > 0) {
+                max = (int) dataPoints.get(idx).getX();
                 break;
             }
         }
+
         return max;
     }
 
-    private int searchMinimumColorValue(ArrayList<DataPoint> originalDataPoints) {
+    // Get lowest existing color value
+    private int getMinColorValue() {
         int min = 0;
-        for(int it = 0;it<originalDataPoints.size();it++){
-            if(originalDataPoints.get(it).getY()>0){
-                min = it;
+
+        for(int idx = 0; idx < 256; idx++) {
+            if(dataPoints.get(idx).getY() > 0) {
+                min = (int) dataPoints.get(idx).getX();
                 break;
             }
         }
+
         return min;
     }
-    */
+
+    // Get probability mass function
+    private double[] getPMF() {
+        int totalCount = 0;
+
+        double[] PMF = new double[256];
+        Arrays.fill(PMF, 0.0);
+
+        for(int idx = 0; idx < 256; idx++) totalCount += dataPoints.get(idx).getY();
+        for(int idx = 0; idx < 256; idx++) PMF[idx] = dataPoints.get(idx).getY() / (double) totalCount;
+
+        return PMF;
+    }
+
+    // Get cumulative distribution function
+    private double[] getCDF() {
+        double[] PMF = getPMF();
+        double[] CDF = new double[256];
+        Arrays.fill(CDF, 0.0);
+
+        for(int idx = 0; idx < 256; idx++) CDF[idx] = (idx == 0)? PMF[idx] : PMF[idx] + CDF[idx -1];
+        return CDF;
+    }
+
+    // Linear stretching equalization
+    protected int[] stretch() {
+        int[] newColorValue = new int[256];
+        int[] newValueCount = new int[256];
+        Arrays.fill(newColorValue, 0);
+        Arrays.fill(newValueCount, 0);
+
+        int min = getMaxColorValue();
+        int max = getMinColorValue();
+
+        for(int val = min; val <= max; val++) newColorValue[val] = 255 * (val - min) / (max - min);
+        for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
+
+        resetData();
+        for(int idx = 0; idx < 256; idx++) addDataPoint(idx, newValueCount[idx]);
+        updateSeries();
+
+        return newColorValue;
+    }
+
+    // Cumulative frequency equalization
+    protected int[] cumulativeFrequencyEqualization() {
+        int[] newColorValue = new int[256];
+        int[] cumulativeValueCount = new int[256];
+        Arrays.fill(newColorValue, 0);
+        Arrays.fill(cumulativeValueCount, 0);
+
+        double[] CDF = getCDF();
+
+        for(int val = 0; val < 256; val++) newColorValue[val] = (int) Math.floor(CDF[val] * (double) 255);
+        for(int idx = 0; idx < 256; idx++) cumulativeValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
+
+        resetData();
+        for(int idx = 0; idx < 256; idx++) addDataPoint(idx, cumulativeValueCount[idx]);
+        updateSeries();
+
+        return newColorValue;
+    }
+
+    // Logarithmic equalization
+    protected int[] logarithmicEqualization() {
+        int[] newColorValue = new int[256];
+        int[] newValueCount = new int[256];
+        Arrays.fill(newColorValue, 0);
+        Arrays.fill(newValueCount, 0);
+
+        int max = getMaxColorValue();
+        double c = 1 / Math.log10((double)(1 + max));
+
+        for(int val = 0; val <= max; val++) newColorValue[val] = (int) Math.floor(Math.log10((double)(val + 1)) * 255.0 * c);
+        for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
+
+        resetData();
+        for(int idx = 0; idx < 256; idx++) addDataPoint(idx, newValueCount[idx]);
+        updateSeries();
+
+        return newColorValue;
+    }
 }
 

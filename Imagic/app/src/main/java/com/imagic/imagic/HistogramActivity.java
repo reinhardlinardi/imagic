@@ -21,13 +21,13 @@ public class HistogramActivity extends AppCompatActivity {
             int numColors = colorTypes.length;
 
             int done = 0;
-            publishProgress(countProgess(done + 1, numColors + 1));
+            publishProgress(countProgress(done + 1, numColors + 1));
 
             for(Image.ColorType colorType : colorTypes) {
                 image.generateHistogramByColorType(colorType);
 
                 done++;
-                publishProgress(countProgess(done + 1, numColors + 1));
+                publishProgress(countProgress(done + 1, numColors + 1));
 
                 if(isCancelled()) break;
             }
@@ -75,7 +75,7 @@ public class HistogramActivity extends AppCompatActivity {
         }
 
         // Count progress
-        private int countProgess(int numTaskDone, int totalNumTask) {
+        private int countProgress(int numTaskDone, int totalNumTask) {
             float taskDoneFraction = (float) numTaskDone / totalNumTask;
             return (int)(taskDoneFraction * 100);
         }
