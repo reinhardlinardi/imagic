@@ -1,6 +1,6 @@
 package com.imagic.imagic;
 
-import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 
 import java.io.BufferedReader;
@@ -11,6 +11,9 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 
 class Text {
+
+    // Constants
+    private static final String DEFAULT_CHARSET = "UTF8";
 
     // Read all lines
     private static String readAllLines(BufferedReader reader) throws Exception {
@@ -31,8 +34,8 @@ class Text {
     }
 
     // Read raw resource file
-    static String readRawResource(Activity activity, int rawResourceID) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(activity.getResources().openRawResource(rawResourceID), "UTF8"));
+    static String readRawResource(Context context, int rawResourceID) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(rawResourceID), Text.DEFAULT_CHARSET));
         String result = readAllLines(reader);
 
         reader.close();

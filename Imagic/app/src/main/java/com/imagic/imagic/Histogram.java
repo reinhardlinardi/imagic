@@ -1,7 +1,7 @@
 package com.imagic.imagic;
 
 import android.app.Activity;
-import android.util.Log;
+import android.content.Context;
 import android.view.View;
 
 import com.jjoe64.graphview.GraphView;
@@ -49,7 +49,7 @@ abstract class Histogram implements JSONSerializable {
         this.viewID = viewID;
         view = activity.findViewById(viewID);
         view.getViewport().setMinX(0f);
-        view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+        view.getViewport().setMaxX(255);
         view.getViewport().setXAxisBoundsManual(true);
 
         series = new BarGraphSeries<>();
@@ -94,17 +94,18 @@ abstract class Histogram implements JSONSerializable {
     }
 
     @Override
-    public final void jsonDeserialize(Activity activity, String json) throws Exception {
+    public final void jsonDeserialize(Context context, String json) throws Exception {
         JSONObject histogramJSON = new JSONObject(json);
         viewID = histogramJSON.getInt("viewID");
-        view = activity.findViewById(viewID);
+        /*
+        view = context.findViewById(viewID);
 
         if(view != null){
             view.getViewport().setMinX(0f);
-            view.getViewport().setMaxX((double) Image.NUM_COLOR_VALUES);
+            view.getViewport().setMaxX(255);
             view.getViewport().setXAxisBoundsManual(true);
         }
-
+        */
         series = new BarGraphSeries<>();
         dataPoints = new ArrayList<>();
 

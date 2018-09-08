@@ -1,11 +1,11 @@
 package com.imagic.imagic;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -24,7 +24,6 @@ class Image implements JSONSerializable {
 
     // Constants
     static final String MIME_TYPE = "image/*";
-    static final int NUM_COLOR_VALUES = 256;
 
     // Properties
     Uri uri;
@@ -42,9 +41,9 @@ class Image implements JSONSerializable {
         grayscaleHistogram = new GrayscaleHistogram();
     }
 
-    Image(Activity activity, Uri uri) throws IOException {
+    Image(Context appContext, Uri uri) throws IOException {
         this.uri = uri;
-        bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
+        bitmap = MediaStore.Images.Media.getBitmap(appContext.getContentResolver(), uri);
         redHistogram = new RedHistogram();
         greenHistogram = new GreenHistogram();
         blueHistogram = new BlueHistogram();
@@ -65,25 +64,25 @@ class Image implements JSONSerializable {
     }
 
     @Override
-    public void jsonDeserialize(Activity activity, String json) throws Exception {
+    public void jsonDeserialize(Context context, String json) throws Exception {
         JSONObject imageJSON = new JSONObject(json);
 
         uri = Uri.parse(imageJSON.getString("uri"));
-        bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
+        bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
         redHistogram = new RedHistogram();
         greenHistogram = new GreenHistogram();
         blueHistogram = new BlueHistogram();
         grayscaleHistogram = new GrayscaleHistogram();
 
-        if(!imageJSON.isNull("redHistogram")) redHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("redHistogram").toString());
-        if(!imageJSON.isNull("greenHistogram")) greenHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("greenHistogram").toString());
-        if(!imageJSON.isNull("blueHistogram")) blueHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("blueHistogram").toString());
-        if(!imageJSON.isNull("grayscaleHistogram")) grayscaleHistogram.jsonDeserialize(activity, imageJSON.getJSONObject("grayscaleHistogram").toString());
+        if(!imageJSON.isNull("redHistogram")) redHistogram.jsonDeserialize(context, imageJSON.getJSONObject("redHistogram").toString());
+        if(!imageJSON.isNull("greenHistogram")) greenHistogram.jsonDeserialize(context, imageJSON.getJSONObject("greenHistogram").toString());
+        if(!imageJSON.isNull("blueHistogram")) blueHistogram.jsonDeserialize(context, imageJSON.getJSONObject("blueHistogram").toString());
+        if(!imageJSON.isNull("grayscaleHistogram")) grayscaleHistogram.jsonDeserialize(context, imageJSON.getJSONObject("grayscaleHistogram").toString());
     }
 
     // Generate histogram
     void generateHistogramByColorType(Image.ColorType colorType) {
-        int[] valueCount = new int[Image.NUM_COLOR_VALUES];
+        int[] valueCount = new int[256];
         Arrays.fill(valueCount, 0);
 
         int width = bitmap.getWidth();
@@ -106,7 +105,7 @@ class Image implements JSONSerializable {
             }
         }
 
-        for(int val = 0; val < Image.NUM_COLOR_VALUES; val++) {
+        for(int val = 0; val < 256; val++) {
             switch(colorType) {
                 case RED: redHistogram.addDataPoint(val, valueCount[val]); break;
                 case GREEN: greenHistogram.addDataPoint(val, valueCount[val]); break;

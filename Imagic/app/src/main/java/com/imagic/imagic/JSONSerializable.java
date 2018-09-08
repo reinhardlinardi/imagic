@@ -1,6 +1,6 @@
 package com.imagic.imagic;
 
-import android.app.Activity;
+import android.content.Context;
 
 interface JSONSerializable {
 
@@ -8,5 +8,5 @@ interface JSONSerializable {
     String jsonSerialize() throws Exception;
 
     // Deserialize
-    void jsonDeserialize(Activity activity, String json) throws Exception;
+    void jsonDeserialize(Context context, String json) throws Exception;
 }

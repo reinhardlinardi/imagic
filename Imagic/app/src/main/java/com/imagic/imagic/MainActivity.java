@@ -1,6 +1,5 @@
 package com.imagic.imagic;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
@@ -24,22 +23,23 @@ public class MainActivity extends AppCompatActivity {
     private enum RequestCode {
         SELECT_IMAGE(0), CAPTURE_IMAGE(1);
 
-        public int value;
-        RequestCode(int value) { this.value = value; }
+        public int code;
+        RequestCode(int code) { this.code = code; }
     }
 
     // Selected or captured image URI
-    private static Uri externalSharedURI;
+    private static Uri imageURI;
 
-    // Internal shared cached image data URI
-    private static Uri imageDataURI;
+    // Cached image data URI
+    private static Uri cachedImageDataURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MainActivity.imageDataURI = null;
+        cachedImageDataURI = Cache.NO_CACHE_URI;
+
         Button selectImageButton = findViewById(R.id.selectImageButton);
         Button captureImageButton = findViewById(R.id.captureImageButton);
 
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType(Image.MIME_TYPE);
-                startActivityForResult(intent, MainActivity.RequestCode.SELECT_IMAGE.value);
+                startActivityForResult(intent, RequestCode.SELECT_IMAGE.code);
             }
         };
     }
@@ -68,11 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if(intent.resolveActivity(getPackageManager()) != null) {
                     try {
-                        @SuppressLint("SimpleDateFormat") String filename = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                        File externalSharedImageFile = File.createTempFile(filename, ".jpg", getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-                        MainActivity.externalSharedURI = FileProvider.getUriForFile(MainActivity.this, MainActivity.this.getApplicationContext().getPackageName() + ".provider", externalSharedImageFile);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, MainActivity.externalSharedURI);
-                        startActivityForResult(intent, MainActivity.RequestCode.CAPTURE_IMAGE.value);
+                        imageURI = Cache.create(MainActivity.this.getApplicationContext(), new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()), "jpg", true);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageURI);
+                        startActivityForResult(intent, RequestCode.CAPTURE_IMAGE.code);
                     }
                     catch(Exception e) {
                         Log.e("Imagic", "Exception", e);
@@ -85,26 +83,17 @@ public class MainActivity extends AppCompatActivity {
     // Select or capture image result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(MainActivity.imageDataURI != null) {
-            File oldImageDataFile = new File(MainActivity.imageDataURI.getPath());
-            if (oldImageDataFile.exists() && oldImageDataFile.isFile()) oldImageDataFile.delete();
-        }
-
         if(resultCode == RESULT_OK) {
-            if(requestCode == MainActivity.RequestCode.SELECT_IMAGE.value) MainActivity.externalSharedURI = data.getData();
+            Cache.deleteOldCache(cachedImageDataURI);
+            if(requestCode == RequestCode.SELECT_IMAGE.code) imageURI = data.getData();
 
             try {
-                File imageDataFile = File.createTempFile("cache", ".imagic", getApplicationContext().getCacheDir());
-                MainActivity.imageDataURI = Uri.fromFile(imageDataFile);
-                Image image = new Image(this, MainActivity.externalSharedURI);
-                String json = image.jsonSerialize();
-
-                BufferedWriter writer = new BufferedWriter(new FileWriter(imageDataFile));
-                writer.write(json);
-                writer.close();
+                cachedImageDataURI = Cache.create(getApplicationContext(), "imagic", "cache", false);
+                Image image = new Image(getApplicationContext(), imageURI);
+                Cache.write(cachedImageDataURI, JSONSerializer.serialize(image));
 
                 Intent intent = new Intent(this, MenuActivity.class);
-                intent.putExtra("imageData", MainActivity.imageDataURI.toString());
+                intent.putExtra(Cache.INTENT_BUNDLE_NAME, cachedImageDataURI.toString());
                 startActivity(intent);
             }
             catch(Exception e) {

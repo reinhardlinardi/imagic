@@ -18,7 +18,7 @@ class RedHistogram extends Histogram {
             @Override
             public int get(DataPoint data) {
                 float baseSaturation = 0.25f;
-                float extraSaturation = ((float)((int)(data.getX()) + 1) / Image.NUM_COLOR_VALUES) / 2;
+                float extraSaturation = ((float)((int)(data.getX()) + 1) / 256) / 2;
                 float totalSaturation = baseSaturation + extraSaturation;
 
                 return Color.HSVToColor(new float[]{0.0f, totalSaturation, 0.9f});
