@@ -129,12 +129,12 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
-                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+//                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
 
                 ArrayList<String> options = new ArrayList<>();
-                options.add("Stretching");
                 options.add("CDF");
+                options.add("Stretching");
                 options.add("Logarithmic");
 
                 ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
@@ -145,32 +145,37 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         spinnerText = adapterView.getItemAtPosition(i).toString();
+//                        transformedImage = originalImage;
                         transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
                         if(spinnerText.equals("Stretching")) {
-                            transformedImage.redHistogram.linearHistogram();
-                            transformedImage.greenHistogram.linearHistogram();
-                            transformedImage.blueHistogram.linearHistogram();
+                            transformedImage.redHistogram.linearHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.linearHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.linearHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "Stretching");
                         }
                         else if(spinnerText.equals("CDF")) {
-                            transformedImage.redHistogram.cummulativeEqualizeHistogram();
-                            transformedImage.greenHistogram.cummulativeEqualizeHistogram();
-                            transformedImage.blueHistogram.cummulativeEqualizeHistogram();
+                            transformedImage.redHistogram.cummulativeEqualizeHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.cummulativeEqualizeHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.cummulativeEqualizeHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "CDF");
                         }
                         else {
-                            transformedImage.redHistogram.logarithmicHistogram();
-                            transformedImage.greenHistogram.logarithmicHistogram();
-                            transformedImage.blueHistogram.logarithmicHistogram();
+                            transformedImage.redHistogram.logarithmicHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.logarithmicHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.logarithmicHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "Log");
                         }
                         transformedImage.updateBitmap();
 
-                        for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+                        for(DataPoint dp : originalImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
+
+//                        transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
+//                        transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
+//                        transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
 
                         transformedImage.redHistogram.enableValueDependentColor();
                         transformedImage.greenHistogram.enableValueDependentColor();
