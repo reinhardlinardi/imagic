@@ -122,6 +122,17 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 transformedImage.redHistogram.view = findViewById(R.id.contrastEnhancementRedGraphView);
                 transformedImage.greenHistogram.view = findViewById(R.id.contrastEnhancementGreenGraphView);
                 transformedImage.blueHistogram.view = findViewById(R.id.contrastEnhancementBlueGraphView);
+                transformedImage.redHistogram.view.getViewport().setMinX(0f);
+                transformedImage.redHistogram.view.getViewport().setMaxX((double) 255);
+                transformedImage.redHistogram.view.getViewport().setXAxisBoundsManual(true);
+
+                transformedImage.greenHistogram.view.getViewport().setMinX(0f);
+                transformedImage.greenHistogram.view.getViewport().setMaxX((double) 255);
+                transformedImage.greenHistogram.view.getViewport().setXAxisBoundsManual(true);
+
+                transformedImage.blueHistogram.view.getViewport().setMinX(0f);
+                transformedImage.blueHistogram.view.getViewport().setMaxX((double) 255);
+                transformedImage.blueHistogram.view.getViewport().setXAxisBoundsManual(true);
 
                 transformedImage.redHistogram.hide();
                 transformedImage.greenHistogram.hide();
@@ -130,12 +141,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Glide.with(this).load(originalImage.bitmap).into(beforeView);
                 Glide.with(this).load(transformedImage.bitmap).into(afterView);
 
-                for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
-
-
                 ArrayList<String> options = new ArrayList<>();
-                options.add("Stretching");
                 options.add("CDF");
+                options.add("Stretching");
                 options.add("Logarithmic");
 
                 ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.contrast_enhance_spinner_option, options);
@@ -149,29 +157,27 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                         transformedImage.bitmap = originalImage.bitmap.copy(Bitmap.Config.ARGB_8888,true);
 
                         if(spinnerText.equals("Stretching")) {
-                            transformedImage.redHistogram.linearHistogram();
-                            transformedImage.greenHistogram.linearHistogram();
-                            transformedImage.blueHistogram.linearHistogram();
+                            transformedImage.redHistogram.linearHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.linearHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.linearHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "Stretching");
                         }
                         else if(spinnerText.equals("CDF")) {
-                            transformedImage.redHistogram.cummulativeEqualizeHistogram();
-                            transformedImage.greenHistogram.cummulativeEqualizeHistogram();
-                            transformedImage.blueHistogram.cummulativeEqualizeHistogram();
+                            transformedImage.redHistogram.cummulativeEqualizeHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.cummulativeEqualizeHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.cummulativeEqualizeHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "CDF");
                         }
                         else {
-                            transformedImage.redHistogram.logarithmicHistogram();
-                            transformedImage.greenHistogram.logarithmicHistogram();
-                            transformedImage.blueHistogram.logarithmicHistogram();
+                            transformedImage.redHistogram.logarithmicHistogram(originalImage.redHistogram.dataPoints);
+                            transformedImage.greenHistogram.logarithmicHistogram(originalImage.greenHistogram.dataPoints);
+                            transformedImage.blueHistogram.logarithmicHistogram(originalImage.blueHistogram.dataPoints);
 
                             Log.d("Enter", "Log");
                         }
                         transformedImage.updateBitmap();
-
-                        for(DataPoint dp : transformedImage.redHistogram.dataPoints) Log.d("DataPoint", Double.toString(dp.getX()) + " " +  Double.toString(dp.getY()));
 
                         transformedImage.redHistogram.enableValueDependentColor();
                         transformedImage.greenHistogram.enableValueDependentColor();

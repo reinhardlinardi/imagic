@@ -20,26 +20,24 @@ abstract class Histogram implements JSONSerializable {
     protected int viewID;
     protected GraphView view;
     protected BarGraphSeries<DataPoint> series;
-    protected ArrayList<DataPoint> dataPoints;
-    protected ArrayList<DataPoint> newDataPoints;
+    public ArrayList<DataPoint> dataPoints;
 
     private double[] pmf;
     private double[] cdf;
     private int sampleCount = 0;
-    private int[] newEqualizedValue;
+    private int[] newColorValueMap;
     private int[] dataCountNewValue;
 
     // Constructors
     Histogram() {
-        newDataPoints = new ArrayList<>();
         viewID = 0;
-        newEqualizedValue = new int[256];
+        newColorValueMap = new int[256];
         dataCountNewValue = new int[256];
 
         pmf = new double[256];
         cdf = new double[256];
 
-        Arrays.fill(newEqualizedValue, 0);
+        Arrays.fill(newColorValueMap, 0);
         Arrays.fill(dataCountNewValue, 0);
         Arrays.fill(pmf,0.0);
         Arrays.fill(cdf,0.0);
@@ -54,15 +52,14 @@ abstract class Histogram implements JSONSerializable {
 
         series = new BarGraphSeries<>();
         dataPoints = new ArrayList<>();
-        newDataPoints = new ArrayList<>();
 
-        newEqualizedValue = new int[256];
+        newColorValueMap = new int[256];
         dataCountNewValue = new int[this.dataPoints.size()];
 
         pmf = new double[this.dataPoints.size()];
         cdf = new double[this.dataPoints.size()];
 
-        Arrays.fill(newEqualizedValue, 0);
+        Arrays.fill(newColorValueMap, 0);
         Arrays.fill(dataCountNewValue, 0);
         Arrays.fill(pmf,0.0);
         Arrays.fill(cdf,0.0);
@@ -126,7 +123,10 @@ abstract class Histogram implements JSONSerializable {
     protected final void hide() { view.setVisibility(View.INVISIBLE); }
 
     // Render histogram
-    protected final void render() { view.addSeries(series); }
+    protected final void render() {
+        view.removeAllSeries();
+        view.addSeries(series);
+    }
 
     // Add data point
     protected final void addDataPoint(double x, double y) { dataPoints.add(new DataPoint(x, y)); }
@@ -142,106 +142,115 @@ abstract class Histogram implements JSONSerializable {
     protected abstract void enableValueDependentColor();
 
     //Equalization Part
-    protected void cummulativeEqualizeHistogram() {
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
-        }
-        generatePMF();
-        generateCDF();
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newEqualizedValue[it] = (int) (cdf[it] * (double) (this.dataPoints.size() - 1));
+    protected void cummulativeEqualizeHistogram(ArrayList<DataPoint> originalDataPoints) {
+        prepareForTransformation(originalDataPoints);
+        generatePMF(originalDataPoints);
+        generateCDF(originalDataPoints);
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            newColorValueMap[it] = (int) Math.floor(cdf[it] * (double) (originalDataPoints.size() - 1));
         }
 
-        for(int it = 0; it < dataPoints.size(); it++) {
-            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataCountNewValue[newColorValueMap[it]] += originalDataPoints.get(it).getY();
         }
 
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
         }
 
-        dataPoints = newDataPoints;
         setSeriesDataPoints();
     }
 
-    private void generatePMF() {
+    private void generatePMF(ArrayList<DataPoint> dataPoints) {
         for(int it = 0; it < dataPoints.size(); it++) {
-            pmf[it] = (double) dataPoints.get(it).getY() / (double) sampleCount;
+            pmf[it] = dataPoints.get(it).getY() / (double) sampleCount;
         }
     }
 
-    private void generateCDF() {
+    private void generateCDF(ArrayList<DataPoint> dataPoints) {
         for(int it = 0; it < dataPoints.size(); it++) {
             cdf[it] = (it == 0)? pmf[it] : pmf[it] + cdf[it-1];
         }
     }
 
-    public int[] getNewEqualizedValue() {
-        return newEqualizedValue;
+    public int[] getNewColorValueMap() {
+        return newColorValueMap;
     }
 
-    public void linearHistogram(){
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
+    public void linearHistogram(ArrayList<DataPoint> originalDataPoints){
+        prepareForTransformation(originalDataPoints);
+
+        int min = searchMinimumColorValue(originalDataPoints);
+        int max = searchMaximumColorValue(originalDataPoints);
+
+        for(int it = min;it<max;it++){
+            newColorValueMap[it] = 255 * (it - min)/(max - min);
         }
-        int min = 0;
+
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataCountNewValue[newColorValueMap[it]] += originalDataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+
+        setSeriesDataPoints();
+    }
+
+    public void logarithmicHistogram(ArrayList<DataPoint> originalDataPoints){
+        prepareForTransformation(originalDataPoints);
+
+        int max = searchMaximumColorValue(originalDataPoints);
+        double c = 1 / Math.log10((double)(1 + max));
+
+        for(int it = 0;it<max;it++){
+            newColorValueMap[it] = (int) Math.floor(Math.log10((double)(it + 1)) * 255.0 * c);
+        }
+
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataCountNewValue[newColorValueMap[it]] += originalDataPoints.get(it).getY();
+        }
+
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            dataPoints.add(new DataPoint(it,dataCountNewValue[it]));
+        }
+
+        setSeriesDataPoints();
+    }
+
+    private void prepareForTransformation(ArrayList<DataPoint> originalDataPoints) {
+        sampleCount = 0;
+        for(int it = 0; it < originalDataPoints.size(); it++) {
+            sampleCount += originalDataPoints.get(it).getY();
+        }
+        dataPoints = new ArrayList<>();
+        for(int it = 0;it<originalDataPoints.size();it++){
+            newColorValueMap[it] = 0;
+            dataCountNewValue[it] = 0;
+        }
+    }
+
+    private int searchMaximumColorValue(ArrayList<DataPoint> originalDataPoints) {
         int max = 255;
-        for(int it = 0;it<dataPoints.size();it++){
-            if(this.dataPoints.get(it).getY()>0){
+        for(int it = originalDataPoints.size()-1;it>=0;it--){
+            if(originalDataPoints.get(it).getY()>0){
+                max = it;
+                break;
+            }
+        }
+        return max;
+    }
+
+    private int searchMinimumColorValue(ArrayList<DataPoint> originalDataPoints) {
+        int min = 0;
+        for(int it = 0;it<originalDataPoints.size();it++){
+            if(originalDataPoints.get(it).getY()>0){
                 min = it;
                 break;
             }
         }
-        for(int it = dataPoints.size()-1;it>=0;it--){
-            if(this.dataPoints.get(it).getY()>0){
-                max = it;
-                break;
-            }
-        }
-
-        for(int it = min;it<max;it++){
-            newEqualizedValue[it] = 255*Math.abs(it-min)/(max-min);
-            newEqualizedValue[it] = (newEqualizedValue[it] > 255)? 255:newEqualizedValue[it];
-        }
-
-        for(int it = 0; it < dataPoints.size(); it++) {
-            dataCountNewValue[Math.abs(newEqualizedValue[it])] += dataPoints.get(it).getY();
-        }
-
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
-        }
-
-        dataPoints = newDataPoints;
-        setSeriesDataPoints();
-    }
-
-    public void logarithmicHistogram(){
-        for(int it = 0; it < this.dataPoints.size(); it++) {
-            sampleCount += this.dataPoints.get(it).getY();
-        }
-        final int c = 2;
-        int max = 255;
-        for(int it = dataPoints.size()-1;it>=0;it--){
-            if(dataPoints.get(it).getY()>0){
-                max = it;
-                break;
-            }
-        }
-
-        for(int it = 0;it<dataPoints.size();it++){
-            newEqualizedValue[it] = (int) (Math.log10((double)(it+1))*255.0/Math.log10((double)(1+max)));
-        }
-
-        for(int it = 0; it < dataPoints.size(); it++) {
-            dataCountNewValue[newEqualizedValue[it]] += dataPoints.get(it).getY();
-        }
-
-        for(int it = 0; it < dataPoints.size(); it++) {
-            newDataPoints.add(new DataPoint(it,dataCountNewValue[it]));
-        }
-
-        dataPoints = newDataPoints;
-        setSeriesDataPoints();
+        return min;
     }
 }
+
