@@ -10,6 +10,8 @@ class GreenHistogram extends Histogram {
     // Constructors
     GreenHistogram() {}
 
+    GreenHistogram(GreenHistogram greenHistogram) { super(greenHistogram); }
+
     @Override
     protected void enableValueDependentColor() {
         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {

@@ -10,6 +10,8 @@ class BlueHistogram extends Histogram {
     // Constructors
     BlueHistogram() {}
 
+    BlueHistogram(BlueHistogram blueHistogram) { super(blueHistogram); }
+
     @Override
     protected void enableValueDependentColor() {
         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {

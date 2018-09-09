@@ -14,6 +14,12 @@ class RGBHistogram implements JSONSerializable {
     // Constructor
     RGBHistogram() { resetHistogram(); }
 
+    RGBHistogram(RGBHistogram rgbHistogram) {
+        red = new RedHistogram(rgbHistogram.red);
+        green = new GreenHistogram(rgbHistogram.green);
+        blue = new BlueHistogram(rgbHistogram.blue);
+    }
+
     @Override
     public String jsonSerialize() throws Exception {
         JSONObject RGBHistogramJSON = new JSONObject();

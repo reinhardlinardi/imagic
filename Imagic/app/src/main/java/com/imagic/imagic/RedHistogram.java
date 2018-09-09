@@ -10,6 +10,8 @@ class RedHistogram extends Histogram {
     // Constructors
     RedHistogram() {}
 
+    RedHistogram(RedHistogram redHistogram) { super(redHistogram); }
+
     @Override
     protected void enableValueDependentColor() {
         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {

@@ -131,6 +131,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
+            transformedImage = new Image(originalImage);
+
             UI.disable(enhanceButton);
             UI.show(progressBar);
         }
@@ -232,10 +234,10 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
         try {
             originalImage = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
-            transformedImage = originalImage;
+            transformedImage = new Image(originalImage);
 
             UI.updateImageView(this, originalImage.uri, beforeView);
-            UI.updateImageView(this, originalImage.uri, afterView);
+            UI.updateImageView(this, transformedImage.uri, afterView);
 
             redSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(redSeekBarTextView));
             greenSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(greenSeekBarTextView));

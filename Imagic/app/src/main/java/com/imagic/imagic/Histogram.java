@@ -1,7 +1,6 @@
 package com.imagic.imagic;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -20,6 +19,12 @@ abstract class Histogram implements JSONSerializable {
 
     // Constructors
     Histogram() { resetData(); }
+
+    Histogram(Histogram histogram) {
+        resetData();
+        dataPoints.addAll(histogram.dataPoints);
+        updateSeries();
+    }
 
     @Override
     public String jsonSerialize() throws Exception {

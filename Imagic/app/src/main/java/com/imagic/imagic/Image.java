@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -38,6 +37,13 @@ class Image implements JSONSerializable {
         this.uri = uri;
         bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
         resetHistogram();
+    }
+
+    Image(Image image) {
+        uri = image.uri;
+        bitmap = image.bitmap;
+        rgb = new RGBHistogram(image.rgb);
+        grayscale = new GrayscaleHistogram(image.grayscale);
     }
 
     @Override
