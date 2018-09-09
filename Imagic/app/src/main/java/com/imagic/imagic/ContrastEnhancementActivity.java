@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class ContrastEnhancementActivity extends AppCompatActivity {
@@ -83,48 +84,37 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     }
 
     // Contrast enhancement async task
-    private class ContrastEnhancementTask extends AsyncTask<String, Integer, Void> {
+    private class ContrastEnhancementTask extends AsyncTask<ContrastEnhancementOption, Integer, Void> {
 
         @Override
-        protected Void doInBackground(String... strings) {
-            String algorithm = strings[0];
-            publishProgress(countProgress(1, 5));
+        protected Void doInBackground(ContrastEnhancementOption... options) {
+            ContrastEnhancementOption option = options[0];
+            int numTransformations = options.length * 3;
 
-            int[] newRedValue = new int[256];
-            int[] newGreenValue = new int[256];
-            int[] newBlueValue = new int[256];
+            int done = 0;
+            publishProgress(countProgress(done + 1, numTransformations + 2));
 
-            switch(algorithm) {
-                case "Linear" :
-                    newRedValue = transformedImage.rgb.red.stretch();
-                    publishProgress(countProgress(2, 5));
-                    newGreenValue = transformedImage.rgb.green.stretch();
-                    publishProgress(countProgress(3, 5));
-                    newBlueValue = transformedImage.rgb.blue.stretch();
-                    publishProgress(countProgress(4, 5));
-                    break;
-                case "CDF" :
-                    newRedValue = transformedImage.rgb.red.cumulativeFrequencyEqualization();
-                    publishProgress(countProgress(2, 5));
-                    newGreenValue = transformedImage.rgb.green.cumulativeFrequencyEqualization();
-                    publishProgress(countProgress(3, 5));
-                    newBlueValue = transformedImage.rgb.blue.cumulativeFrequencyEqualization();
-                    publishProgress(countProgress(4, 5));
-                    break;
-                case "Logarithmic" :
-                    newRedValue = transformedImage.rgb.red.logarithmicEqualization();
-                    publishProgress(countProgress(2, 5));
-                    newGreenValue = transformedImage.rgb.green.logarithmicEqualization();
-                    publishProgress(countProgress(3, 5));
-                    newBlueValue = transformedImage.rgb.blue.logarithmicEqualization();
-                    publishProgress(countProgress(4, 5));
-                    break;
-                default:
-                    break;
+            try {
+                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(option.executeFunctionOnButtonClick);
+
+                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red);
+                done++;
+                publishProgress(countProgress(done + 1, numTransformations + 2));
+
+                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green);
+                done++;
+                publishProgress(countProgress(done + 1, numTransformations + 2));
+
+                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue);
+                done++;
+                publishProgress(countProgress(done + 1, numTransformations + 2));
+
+                transformedImage.updateBitmap(newRedValue, newGreenValue, newBlueValue);
+                publishProgress(countProgress(done + 2, numTransformations + 2));
             }
-
-            transformedImage.updateBitmap(newRedValue, newGreenValue, newBlueValue);
-            publishProgress(countProgress(5, 5));
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
 
             return null;
         }
@@ -198,8 +188,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     private GraphView blueGraphView;
     private Button enhanceButton;
 
-    // Selected algorithm
-    private String selectedAlgorithm;
+    // Selected option
+    private ContrastEnhancementOption selectedOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -303,8 +293,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                ContrastEnhancementOption selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(position);
-                selectedAlgorithm = selectedOption.algorithm;
+                selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(position);
+                String selectedAlgorithm = selectedOption.algorithm;
 
                 TextView textView = (TextView) view;
                 textView.setText(selectedAlgorithm + "   ▾");
@@ -321,7 +311,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ContrastEnhancementTask contrastEnhancementTask = new ContrastEnhancementTask();
-                contrastEnhancementTask.execute(selectedAlgorithm);
+                contrastEnhancementTask.execute(selectedOption);
             }
         };
     }

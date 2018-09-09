@@ -1,5 +1,14 @@
 [
-  { "algorithm" : "Linear" },
-  { "algorithm" : "CDF" },
-  { "algorithm" : "Logarithmic" }
+  {
+    "algorithm" : "Linear",
+    "executeFunctionOnButtonClick" : "stretch"
+  },
+  {
+    "algorithm" : "CDF",
+    "executeFunctionOnButtonClick" : "cumulativeFrequencyEqualization"
+  },
+  {
+    "algorithm" : "Logarithmic",
+    "executeFunctionOnButtonClick" : "logarithmicEqualization"
+  }
 ]
