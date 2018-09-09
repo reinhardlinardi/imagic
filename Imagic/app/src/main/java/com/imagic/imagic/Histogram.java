@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -73,20 +74,6 @@ abstract class Histogram implements JSONSerializable {
         series = new BarGraphSeries<>(dataPointArray);
     }
 
-    // Get highest existing color value
-    private int getMaxColorValue() {
-        int max = 255;
-
-        for(int idx = 255; idx >= 0; idx--) {
-            if(dataPoints.get(idx).getY() > 0) {
-                max = (int) dataPoints.get(idx).getX();
-                break;
-            }
-        }
-
-        return max;
-    }
-
     // Get lowest existing color value
     private int getMinColorValue() {
         int min = 0;
@@ -99,6 +86,20 @@ abstract class Histogram implements JSONSerializable {
         }
 
         return min;
+    }
+
+    // Get highest existing color value
+    private int getMaxColorValue() {
+        int max = 255;
+
+        for(int idx = 255; idx >= 0; idx--) {
+            if(dataPoints.get(idx).getY() > 0) {
+                max = (int) dataPoints.get(idx).getX();
+                break;
+            }
+        }
+
+        return max;
     }
 
     // Get probability mass function
@@ -131,8 +132,8 @@ abstract class Histogram implements JSONSerializable {
         Arrays.fill(newColorValue, 0);
         Arrays.fill(newValueCount, 0);
 
-        int min = getMaxColorValue();
-        int max = getMinColorValue();
+        int min = getMinColorValue();
+        int max = getMaxColorValue();
 
         for(int val = min; val <= max; val++) newColorValue[val] = 255 * (val - min) / (max - min);
         for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
