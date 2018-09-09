@@ -70,8 +70,7 @@ public class HistogramActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
 
-            UI.hide(progressBar);
-            showToastOnTaskCompletion();
+            UI.setInvisible(progressBar);
         }
 
         // Count progress
@@ -128,8 +127,6 @@ public class HistogramActivity extends AppCompatActivity {
                 UI.renderGraphView(greenGraphView, image.rgb.green.series);
                 UI.renderGraphView(blueGraphView, image.rgb.blue.series);
                 UI.renderGraphView(grayscaleGraphView, image.grayscale.series);
-
-                showToastOnTaskCompletion();
             }
             else {
                 boolean rgbDataNotAvailable = !(rgbDataAvailableInCache());
@@ -168,9 +165,4 @@ public class HistogramActivity extends AppCompatActivity {
 
     // Check if grayscale data is available in cache
     private boolean grayscaleDataAvailableInCache() { return !(image.grayscale.isDataEmpty()); }
-
-    // Show toast on task completion
-    private void showToastOnTaskCompletion() {
-        Toast.makeText(this, "Histogram generated.", Toast.LENGTH_SHORT).show();
-    }
 }

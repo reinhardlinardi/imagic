@@ -78,7 +78,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
 
-            UI.hide(progressBar);
+            UI.setInvisible(progressBar);
             UI.enable(enhanceButton);
         }
     }
@@ -138,9 +138,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
             UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
 
-            UI.hide(progressBar);
+            UI.setInvisible(progressBar);
             UI.enable(enhanceButton);
-            showToastOnTaskCompletion();
         }
     }
 
@@ -334,9 +333,4 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
     // Check if data is available in cache
     private boolean dataAvailableInCache() { return !(originalImage.rgb.isDataEmpty()); }
-
-    // Show toast on task completion
-    private void showToastOnTaskCompletion() {
-        Toast.makeText(this, "Enhancement finished.", Toast.LENGTH_SHORT).show();
-    }
 }

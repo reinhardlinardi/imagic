@@ -19,6 +19,9 @@ class UI {
     // Hide
     static void hide(View view) { view.setVisibility(View.GONE); }
 
+    // Set invisible
+    static void setInvisible(View view) { view.setVisibility(View.INVISIBLE); }
+
     // Enable
     static void enable(View view) { view.setEnabled(true); }
 
