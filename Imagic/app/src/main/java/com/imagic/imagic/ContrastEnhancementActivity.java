@@ -107,7 +107,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 done++;
                 publishProgress(countProgress(done + 1, numTransformations + 2));
 
-                transformedImage.updateBitmap(newRedValue, newGreenValue, newBlueValue);
+                transformedImage.updateBitmap(getApplicationContext(), newRedValue, newGreenValue, newBlueValue);
                 publishProgress(countProgress(done + 2, numTransformations + 2));
             }
             catch(Exception e) {

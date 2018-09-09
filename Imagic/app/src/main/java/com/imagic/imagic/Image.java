@@ -3,7 +3,10 @@ package com.imagic.imagic;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 
 import org.json.JSONObject;
@@ -70,9 +73,53 @@ class Image implements JSONSerializable {
     }
 
     // Reset all histogram
-    void resetHistogram() {
+    private void resetHistogram() {
         rgb = new RGBHistogram();
         grayscale = new GrayscaleHistogram();
+    }
+
+    // Get rotation matrix
+    private Matrix getRotationMatrix(Context context) throws Exception {
+        Matrix matrix = new Matrix();
+        ExifInterface exif = new ExifInterface(Cache.openInputStream(context, uri));
+
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        int degree;
+
+        switch (rotation) {
+            case ExifInterface.ORIENTATION_ROTATE_90: degree = 90; break;
+            case ExifInterface.ORIENTATION_ROTATE_180: degree = 180; break;
+            case ExifInterface.ORIENTATION_ROTATE_270: degree = 270 ; break;
+            default: degree = 0; break;
+        }
+
+        if(rotation != 0f) matrix.preRotate(degree);
+        return matrix;
+    }
+
+    // Update bitmap
+    public void updateBitmap(Context context, int[] newRedValue, int[] newGreenValue, int[] newBlueValue) throws Exception {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                int pixel = pixels[row * width + col];
+                pixels[row * width + col] = Color.rgb(newRedValue[Color.red(pixel)], newGreenValue[Color.green(pixel)], newBlueValue[Color.blue(pixel)]);
+            }
+        }
+
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        newBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        if(Build.VERSION.SDK_INT >= 24) {
+            Bitmap rotatedBitmap = Bitmap.createBitmap(newBitmap, 0, 0, width, height, getRotationMatrix(context), true);
+            bitmap = rotatedBitmap;
+        }
+        else bitmap = newBitmap;
     }
 
     // Generate histogram
@@ -117,25 +164,5 @@ class Image implements JSONSerializable {
             case GRAYSCALE: grayscale.updateSeries(); break;
             default: break;
         }
-    }
-
-    // Update bitmap
-    public void updateBitmap(int[] newRedValue, int[] newGreenValue, int[] newBlueValue) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        int[] pixels = new int[width * height];
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-
-        for(int row = 0; row < height; row++) {
-            for(int col = 0; col < width; col++) {
-                int pixel = pixels[row * width + col];
-                pixels[row * width + col] = Color.rgb(newRedValue[Color.red(pixel)], newGreenValue[Color.green(pixel)], newBlueValue[Color.blue(pixel)]);
-            }
-        }
-
-        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        newBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-        bitmap = newBitmap;
     }
 }

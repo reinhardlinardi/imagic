@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.support.v4.content.FileProvider;
 
 import java.io.File;
+import java.io.InputStream;
 
 class Cache {
 
@@ -16,14 +17,14 @@ class Cache {
     // Check if cache available
     private static boolean isCacheAvailable(Uri uri) { return uri != NO_CACHE_URI; }
 
-    // Get cache file
-    private static File getCacheFile(Uri uri) { return new File(uri.getPath()); }
-
     // Check if cache exists
     private static boolean isCacheExists(Uri uri) {
         File file = getCacheFile(uri);
         return file.isFile() && file.exists();
     }
+
+    // Get cache file
+    private static File getCacheFile(Uri uri) { return new File(uri.getPath()); }
 
     // Create cache
     static Uri create(Context appContext, String filename, String extension, boolean shareWithExternal) throws Exception {
@@ -48,4 +49,7 @@ class Cache {
 
     // Write cache
     static void write(Uri uri, String content) throws Exception { Text.writeFile(uri, content); }
+
+    // Open input stream
+    static InputStream openInputStream(Context context, Uri uri) throws Exception { return context.getContentResolver().openInputStream(uri); }
 }
