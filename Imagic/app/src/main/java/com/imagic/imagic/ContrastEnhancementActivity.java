@@ -84,28 +84,26 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     }
 
     // Contrast enhancement async task
-    private class ContrastEnhancementTask extends AsyncTask<ContrastEnhancementOption, Integer, Void> {
+    private class ContrastEnhancementTask extends AsyncTask<Void, Integer, Void> {
 
         @Override
-        protected Void doInBackground(ContrastEnhancementOption... options) {
-            ContrastEnhancementOption option = options[0];
-            int numTransformations = options.length * 3;
-
+        protected Void doInBackground(Void... voids) {
+            int numTransformations = 3;
             int done = 0;
             publishProgress(countProgress(done + 1, numTransformations + 2));
 
             try {
-                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(option.executeFunctionOnButtonClick);
+                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(selectedOption.executeFunctionOnButtonClick, double.class);
 
-                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red);
+                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red, (double)(redPercentage)/100);
                 done++;
                 publishProgress(countProgress(done + 1, numTransformations + 2));
 
-                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green);
+                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green, (double)(greenPercentage)/100);
                 done++;
                 publishProgress(countProgress(done + 1, numTransformations + 2));
 
-                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue);
+                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue, (double)(bluePercentage)/100);
                 done++;
                 publishProgress(countProgress(done + 1, numTransformations + 2));
 
@@ -186,7 +184,15 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     private GraphView redGraphView;
     private GraphView greenGraphView;
     private GraphView blueGraphView;
+    private SeekBar redSeekBar;
+    private SeekBar greenSeekBar;
+    private SeekBar blueSeekBar;
     private Button enhanceButton;
+
+    // SeekBar percentage value
+    private int redPercentage;
+    private int greenPercentage;
+    private int bluePercentage;
 
     // Selected option
     private ContrastEnhancementOption selectedOption;
@@ -203,9 +209,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         beforeView = findViewById(R.id.contrastEnhancementImageBefore);
         afterView = findViewById(R.id.contrastEnhancementImageAfter);
 
-        SeekBar redSeekBar = findViewById(R.id.redConstantEqualizationSeekBar);
-        SeekBar greenSeekBar = findViewById(R.id.greenConstantEqualizationSeekBar);
-        SeekBar blueSeekBar = findViewById(R.id.blueConstantEqualizationSeekBar);
+        redSeekBar = findViewById(R.id.redConstantEqualizationSeekBar);
+        greenSeekBar = findViewById(R.id.greenConstantEqualizationSeekBar);
+        blueSeekBar = findViewById(R.id.blueConstantEqualizationSeekBar);
 
         TextView redSeekBarTextView = findViewById(R.id.redConstantEqualizationTextView);
         TextView greenSeekBarTextView = findViewById(R.id.greenConstantEqualizationTextView);
@@ -228,6 +234,10 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
             UI.updateImageView(this, originalImage.uri, beforeView);
             UI.updateImageView(this, transformedImage.uri, afterView);
+
+            redPercentage = 100;
+            greenPercentage = 100;
+            bluePercentage = 100;
 
             redSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(redSeekBarTextView));
             greenSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(greenSeekBarTextView));
@@ -277,7 +287,13 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         return new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser) textView.setText(Integer.toString(progress) + "%");
+                if(fromUser) {
+                    if(seekBar == redSeekBar) redPercentage = progress;
+                    else if(seekBar == greenSeekBar) greenPercentage = progress;
+                    else if(seekBar == blueSeekBar) bluePercentage = progress;
+
+                    textView.setText(Integer.toString(progress) + "%");
+                }
             }
 
             @Override
@@ -311,7 +327,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ContrastEnhancementTask contrastEnhancementTask = new ContrastEnhancementTask();
-                contrastEnhancementTask.execute(selectedOption);
+                contrastEnhancementTask.execute();
             }
         };
     }

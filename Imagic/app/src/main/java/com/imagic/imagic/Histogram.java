@@ -131,7 +131,7 @@ abstract class Histogram implements JSONSerializable {
     }
 
     // Linear stretching equalization
-    protected int[] stretch() {
+    protected int[] stretch(final double multiplier) {
         int[] newColorValue = new int[256];
         int[] newValueCount = new int[256];
         Arrays.fill(newColorValue, 0);
@@ -140,7 +140,7 @@ abstract class Histogram implements JSONSerializable {
         int min = getMinColorValue();
         int max = getMaxColorValue();
 
-        for(int val = min; val <= max; val++) newColorValue[val] = 255 * (val - min) / (max - min);
+        for(int val = min; val <= max; val++) newColorValue[val] = (int)((255 * (val - min) / (max - min)) * multiplier);
         for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
 
         resetData();
@@ -151,7 +151,7 @@ abstract class Histogram implements JSONSerializable {
     }
 
     // Cumulative frequency equalization
-    protected int[] cumulativeFrequencyEqualization() {
+    protected int[] cumulativeFrequencyEqualization(final double multiplier) {
         int[] newColorValue = new int[256];
         int[] cumulativeValueCount = new int[256];
         Arrays.fill(newColorValue, 0);
@@ -159,7 +159,7 @@ abstract class Histogram implements JSONSerializable {
 
         double[] CDF = getCDF();
 
-        for(int val = 0; val < 256; val++) newColorValue[val] = (int) Math.floor(CDF[val] * (double) 255);
+        for(int val = 0; val < 256; val++) newColorValue[val] = (int)((Math.floor(CDF[val] * (double) 255)) * multiplier);
         for(int idx = 0; idx < 256; idx++) cumulativeValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
 
         resetData();
@@ -170,7 +170,7 @@ abstract class Histogram implements JSONSerializable {
     }
 
     // Logarithmic equalization
-    protected int[] logarithmicEqualization() {
+    protected int[] logarithmicEqualization(final double multiplier) {
         int[] newColorValue = new int[256];
         int[] newValueCount = new int[256];
         Arrays.fill(newColorValue, 0);
@@ -179,7 +179,7 @@ abstract class Histogram implements JSONSerializable {
         int max = getMaxColorValue();
         double c = 1 / Math.log10((double)(1 + max));
 
-        for(int val = 0; val <= max; val++) newColorValue[val] = (int) Math.floor(Math.log10((double)(val + 1)) * 255.0 * c);
+        for(int val = 0; val <= max; val++) newColorValue[val] = (int)(Math.floor(Math.log10((double)(val + 1)) * 255.0 * c) * multiplier);
         for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
 
         resetData();

@@ -84,7 +84,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="100" />
+                        android:max="100"
+                        android:progress="100" />
 
                     <TextView
                         android:id="@+id/redConstantEqualizationTextView"
@@ -120,7 +121,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="100" />
+                        android:max="100"
+                        android:progress="100" />
 
                     <TextView
                         android:id="@+id/greenConstantEqualizationTextView"
@@ -156,7 +158,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="100" />
+                        android:max="100"
+                        android:progress="100" />
 
                     <TextView
                         android:id="@+id/blueConstantEqualizationTextView"

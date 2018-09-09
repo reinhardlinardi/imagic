@@ -17,7 +17,7 @@
     <string name="original_image_content_description">Original Image</string>
     <string name="transformed_image_content_description">Transformed Image</string>
     <string name="contrast_enhance_button_text">Enhance</string>
-    <string name="seek_bar_text_view_initial_value">0%</string>
+    <string name="seek_bar_text_view_initial_value">100%</string>
     <string name="seek_bar_red_color_description">R</string>
     <string name="seek_bar_green_color_description">G</string>
     <string name="seek_bar_blue_color_description">B</string>
