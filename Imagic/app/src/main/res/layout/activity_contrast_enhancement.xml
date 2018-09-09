@@ -196,7 +196,7 @@
                     android:layout_marginEnd="@dimen/contrast_enhance_button_side_margin"
                     android:layout_marginStart="@dimen/contrast_enhance_button_side_margin"
                     android:layout_weight="1"
-                    android:background="@color/colorAccent"
+                    android:background="@drawable/button_color"
                     android:text="@string/contrast_enhance_button_text"
                     android:textColor="@android:color/white" />
             </LinearLayout>
