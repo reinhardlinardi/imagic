@@ -11,15 +11,15 @@ import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 
+import java.util.ArrayList;
+
 public class HistogramActivity extends AppCompatActivity {
 
     // Async task
-    private class HistogramGenerationTask extends AsyncTask<Void, Integer, Void> {
+    private class HistogramGenerationTask extends AsyncTask<Image.ColorType, Integer, Void> {
         @Override
-        protected Void doInBackground(Void... voids) {
-            Image.ColorType[] colorTypes = Image.ColorType.values();
+        protected Void doInBackground(Image.ColorType... colorTypes) {
             int numColors = colorTypes.length;
-
             int done = 0;
             publishProgress(countProgress(done + 1, numColors + 1));
 
@@ -132,8 +132,21 @@ public class HistogramActivity extends AppCompatActivity {
                 showToastOnTaskCompletion();
             }
             else {
+                boolean rgbDataNotAvailable = !(rgbDataAvailableInCache());
+                boolean grayscaleDataNotAvailable = !(grayscaleDataAvailableInCache());
+
+                ArrayList<Image.ColorType> missingColorTypeData = new ArrayList<>();
+
+                if(rgbDataNotAvailable) {
+                    missingColorTypeData.add(Image.ColorType.RED);
+                    missingColorTypeData.add(Image.ColorType.GREEN);
+                    missingColorTypeData.add(Image.ColorType.BLUE);
+                }
+
+                if(grayscaleDataNotAvailable) missingColorTypeData.add(Image.ColorType.GRAYSCALE);
+
                 HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
-                histogramGenerationTask.execute();
+                histogramGenerationTask.execute(missingColorTypeData.toArray(new Image.ColorType[missingColorTypeData.size()]));
             }
         }
         catch(Exception e) {
@@ -148,7 +161,13 @@ public class HistogramActivity extends AppCompatActivity {
     }
 
     // Check if data is available in cache
-    private boolean dataAvailableInCache() { return !(image.rgb.isDataEmpty() || image.grayscale.isDataEmpty()); }
+    private boolean dataAvailableInCache() { return rgbDataAvailableInCache() && grayscaleDataAvailableInCache(); }
+
+    // Check if rgb data is available in cache
+    private boolean rgbDataAvailableInCache() { return !(image.rgb.isDataEmpty()); }
+
+    // Check if grayscale data is available in cache
+    private boolean grayscaleDataAvailableInCache() { return !(image.grayscale.isDataEmpty()); }
 
     // Show toast on task completion
     private void showToastOnTaskCompletion() {
