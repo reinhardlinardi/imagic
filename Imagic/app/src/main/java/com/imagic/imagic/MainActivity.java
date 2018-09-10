@@ -23,10 +23,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Selected or captured image URI
-    private static Uri imageURI;
+    private Uri imageURI;
 
     // Cached image data URI
-    private static Uri cachedImageDataURI;
+    private Uri cachedImageDataURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(intent.resolveActivity(getPackageManager()) != null) {
                     try {
-                        imageURI = Cache.create(MainActivity.this.getApplicationContext(), new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()), "jpg", true);
+                        imageURI = Cache.create(MainActivity.this, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()), "jpg", true);
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageURI);
                         startActivityForResult(intent, RequestCode.CAPTURE_IMAGE.code);
                     }
@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
             if(requestCode == RequestCode.SELECT_IMAGE.code) imageURI = data.getData();
 
             try {
-                cachedImageDataURI = Cache.create(getApplicationContext(), "imagic", "cache", false);
-                Image image = new Image(getApplicationContext(), imageURI);
+                cachedImageDataURI = Cache.create(this, "imagic", "cache", false);
+                Image image = new Image(this, imageURI);
                 Cache.write(cachedImageDataURI, JSONSerializer.serialize(image));
 
                 Intent intent = new Intent(this, MenuActivity.class);

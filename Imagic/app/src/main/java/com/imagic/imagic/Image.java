@@ -2,15 +2,19 @@ package com.imagic.imagic;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -34,17 +38,20 @@ class Image implements JSONSerializable {
     GrayscaleHistogram grayscale;
     
     // Constructors
-    Image() { resetHistogram(); }
+    Image() { resetData(); }
 
-    Image(Context context, Uri uri) throws IOException {
+    Image(Context context, Uri uri) throws Exception {
+        resetData();
         this.uri = uri;
-        bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-        resetHistogram();
     }
 
-    Image(Image image) {
+    Image(Context context, Image image, boolean reloadBitmap) throws Exception {
         uri = image.uri;
-        bitmap = image.bitmap;
+        recycleBitmap();
+
+        if(reloadBitmap) bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+        else bitmap = image.bitmap;
+
         rgb = new RGBHistogram(image.rgb);
         grayscale = new GrayscaleHistogram(image.grayscale);
     }
@@ -62,10 +69,12 @@ class Image implements JSONSerializable {
 
     @Override
     public void jsonDeserialize(Context context, String json) throws Exception {
-        resetHistogram();
+        resetData();
 
         JSONObject imageJSON = new JSONObject(json);
         uri = Uri.parse(imageJSON.getString("uri"));
+
+        recycleBitmap();
         bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
 
         rgb.jsonDeserialize(context, imageJSON.getJSONObject("rgb").toString());
@@ -73,15 +82,25 @@ class Image implements JSONSerializable {
     }
 
     // Reset all histogram
-    private void resetHistogram() {
+    private void resetData() {
+        uri = Cache.NO_CACHE_URI;
+        recycleBitmap();
+
         rgb = new RGBHistogram();
         grayscale = new GrayscaleHistogram();
+    }
+
+    // Recycle bitmap
+    private void recycleBitmap() {
+        if(bitmap != null) {
+            if(!bitmap.isRecycled()) bitmap.recycle();
+        }
     }
 
     // Get rotation matrix
     private Matrix getRotationMatrix(Context context) throws Exception {
         Matrix matrix = new Matrix();
-        ExifInterface exif = new ExifInterface(Cache.openInputStream(context, uri));
+        ExifInterface exif = new ExifInterface(Cache.openAsInputStream(context, uri));
 
         int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         int degree;

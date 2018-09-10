@@ -27,13 +27,13 @@ class Cache {
     private static File getCacheFile(Uri uri) { return new File(uri.getPath()); }
 
     // Create cache
-    static Uri create(Context appContext, String filename, String extension, boolean shareWithExternal) throws Exception {
+    static Uri create(Context context, String filename, String extension, boolean shareWithExternal) throws Exception {
         if(shareWithExternal) {
-            File file = File.createTempFile(filename, "." + extension, appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES));
-            return FileProvider.getUriForFile(appContext, appContext.getPackageName() + ".provider", file);
+            File file = File.createTempFile(filename, "." + extension, context.getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+            return FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
         }
         else {
-            File file = File.createTempFile(filename, "." + extension, appContext.getCacheDir());
+            File file = File.createTempFile(filename, "." + extension, context.getCacheDir());
             return Uri.fromFile(file);
         }
     }
@@ -51,5 +51,5 @@ class Cache {
     static void write(Uri uri, String content) throws Exception { Text.writeFile(uri, content); }
 
     // Open input stream
-    static InputStream openInputStream(Context context, Uri uri) throws Exception { return context.getContentResolver().openInputStream(uri); }
+    static InputStream openAsInputStream(Context context, Uri uri) throws Exception { return context.getContentResolver().openInputStream(uri); }
 }

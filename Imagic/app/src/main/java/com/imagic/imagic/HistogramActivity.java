@@ -15,7 +15,80 @@ import java.util.ArrayList;
 
 public class HistogramActivity extends AppCompatActivity {
 
-    // Async task
+    // Image load async task
+    private class ImageLoadTask extends AsyncTask<Uri, Integer, Void> {
+        @Override
+        protected Void doInBackground(Uri... URIs) {
+            int numImages = URIs.length;
+            int done = 0;
+            publishProgress(countProgress(done + 1, numImages + 1));
+
+            for(Uri URI : URIs) {
+                try {
+                    Image noBitmapImage = JSONSerializer.deserialize(HistogramActivity.this, Cache.read(URI), Image.class);
+                    image = new Image(HistogramActivity.this, noBitmapImage, true);
+                    publishProgress(countProgress((++done) + 1, numImages + 1));
+
+                    if(isCancelled()) break;
+                }
+                catch(Exception e) {
+                    Log.e("Imagic", "Exception", e);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            UI.updateImageView(HistogramActivity.this, image.uri, imageView);
+            UI.clearImageViewMemory(HistogramActivity.this);
+            UI.setInvisible(progressBar);
+
+            if(dataAvailableInCache()) {
+                image.rgb.enableValueDependentColor();
+                image.grayscale.enableValueDependentColor();
+
+                UI.show(redGraphView);
+                UI.show(greenGraphView);
+                UI.show(blueGraphView);
+                UI.show(grayscaleGraphView);
+
+                UI.renderGraphView(redGraphView, image.rgb.red.series);
+                UI.renderGraphView(greenGraphView, image.rgb.green.series);
+                UI.renderGraphView(blueGraphView, image.rgb.blue.series);
+                UI.renderGraphView(grayscaleGraphView, image.grayscale.series);
+            }
+            else {
+                boolean rgbDataNotAvailable = !(rgbDataAvailableInCache());
+                boolean grayscaleDataNotAvailable = !(grayscaleDataAvailableInCache());
+
+                ArrayList<Image.ColorType> missingColorTypeData = new ArrayList<>();
+
+                if(rgbDataNotAvailable) {
+                    missingColorTypeData.add(Image.ColorType.RED);
+                    missingColorTypeData.add(Image.ColorType.GREEN);
+                    missingColorTypeData.add(Image.ColorType.BLUE);
+                }
+
+                if(grayscaleDataNotAvailable) missingColorTypeData.add(Image.ColorType.GRAYSCALE);
+
+                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
+                histogramGenerationTask.execute(missingColorTypeData.toArray(new Image.ColorType[missingColorTypeData.size()]));
+            }
+        }
+    }
+
+    // Histogram async task
     private class HistogramGenerationTask extends AsyncTask<Image.ColorType, Integer, Void> {
         @Override
         protected Void doInBackground(Image.ColorType... colorTypes) {
@@ -25,9 +98,7 @@ public class HistogramActivity extends AppCompatActivity {
 
             for(Image.ColorType colorType : colorTypes) {
                 image.generateHistogramByColorType(colorType);
-
-                done++;
-                publishProgress(countProgress(done + 1, numColors + 1));
+                publishProgress(countProgress((++done) + 1, numColors + 1));
 
                 if(isCancelled()) break;
             }
@@ -42,6 +113,7 @@ public class HistogramActivity extends AppCompatActivity {
             UI.hide(blueGraphView);
             UI.hide(grayscaleGraphView);
 
+            progressBar.setProgress(0);
             UI.show(progressBar);
         }
 
@@ -72,22 +144,17 @@ public class HistogramActivity extends AppCompatActivity {
 
             UI.setInvisible(progressBar);
         }
-
-        // Count progress
-        private int countProgress(int numTaskDone, int totalNumTask) {
-            float taskDoneFraction = (float) numTaskDone / totalNumTask;
-            return (int)(taskDoneFraction * 100);
-        }
     }
 
     // Cached image data URI
-    private static Uri cachedImageDataURI;
+    private Uri cachedImageDataURI;
 
     // Image
     private Image image;
 
     // UI components
     private ProgressBar progressBar;
+    private ImageView imageView;
 
     private GraphView redGraphView;
     private GraphView greenGraphView;
@@ -103,58 +170,37 @@ public class HistogramActivity extends AppCompatActivity {
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
         progressBar = findViewById(R.id.histogramProgressBar);
-        ImageView imageView = findViewById(R.id.histogramImageView);
+        imageView = findViewById(R.id.histogramImageView);
 
         redGraphView = findViewById(R.id.redGraphView);
         greenGraphView = findViewById(R.id.greenGraphView);
         blueGraphView = findViewById(R.id.blueGraphView);
         grayscaleGraphView = findViewById(R.id.grayscaleGraphView);
 
+        UI.hide(redGraphView);
+        UI.hide(greenGraphView);
+        UI.hide(blueGraphView);
+        UI.hide(grayscaleGraphView);
+
         UI.showAllXGraphView(redGraphView);
         UI.showAllXGraphView(greenGraphView);
         UI.showAllXGraphView(blueGraphView);
         UI.showAllXGraphView(grayscaleGraphView);
 
-        try {
-            image = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
-            UI.updateImageView(this, image.uri, imageView);
-
-            if(dataAvailableInCache()) {
-                image.rgb.enableValueDependentColor();
-                image.grayscale.enableValueDependentColor();
-
-                UI.renderGraphView(redGraphView, image.rgb.red.series);
-                UI.renderGraphView(greenGraphView, image.rgb.green.series);
-                UI.renderGraphView(blueGraphView, image.rgb.blue.series);
-                UI.renderGraphView(grayscaleGraphView, image.grayscale.series);
-            }
-            else {
-                boolean rgbDataNotAvailable = !(rgbDataAvailableInCache());
-                boolean grayscaleDataNotAvailable = !(grayscaleDataAvailableInCache());
-
-                ArrayList<Image.ColorType> missingColorTypeData = new ArrayList<>();
-
-                if(rgbDataNotAvailable) {
-                    missingColorTypeData.add(Image.ColorType.RED);
-                    missingColorTypeData.add(Image.ColorType.GREEN);
-                    missingColorTypeData.add(Image.ColorType.BLUE);
-                }
-
-                if(grayscaleDataNotAvailable) missingColorTypeData.add(Image.ColorType.GRAYSCALE);
-
-                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
-                histogramGenerationTask.execute(missingColorTypeData.toArray(new Image.ColorType[missingColorTypeData.size()]));
-            }
-        }
-        catch(Exception e) {
-            Log.e("Imagic", "Exception", e);
-        }
+        ImageLoadTask imageLoadTask = new ImageLoadTask();
+        imageLoadTask.execute(cachedImageDataURI);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         UI.clearImageViewMemory(this);
+    }
+
+    // Count progress
+    private int countProgress(int numTaskDone, int totalNumTask) {
+        float taskDoneFraction = (float) numTaskDone / totalNumTask;
+        return (int)(taskDoneFraction * 100);
     }
 
     // Check if data is available in cache

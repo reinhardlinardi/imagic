@@ -59,7 +59,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     // Cached image data URI
-    private static Uri cachedImageDataURI;
+    private Uri cachedImageDataURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class MenuActivity extends AppCompatActivity {
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
         try{
-            ArrayList<MenuOption> options = JSONSerializer.arrayDeserialize(getApplicationContext(), Text.readRawResource(getApplicationContext(), R.raw.menu), MenuOption.class);
+            ArrayList<MenuOption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.menu), MenuOption.class);
             MenuAdapter menuAdapter = new MenuAdapter(options);
             ListView menuListView = findViewById(R.id.menuListView);
             menuListView.setAdapter(menuAdapter);

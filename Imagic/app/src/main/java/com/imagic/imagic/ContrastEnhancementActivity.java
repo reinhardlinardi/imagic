@@ -26,6 +26,70 @@ import java.util.ArrayList;
 
 public class ContrastEnhancementActivity extends AppCompatActivity {
 
+    // Image load async task
+    private class ImageLoadTask extends AsyncTask<Uri, Integer, Void> {
+        @Override
+        protected Void doInBackground(Uri... URIs) {
+            int numImages = URIs.length * 2;
+            int done = 0;
+            publishProgress(countProgress(done + 1, numImages + 1));
+
+            for(Uri URI : URIs) {
+                try {
+                    Image noBitmapImage = JSONSerializer.deserialize(ContrastEnhancementActivity.this, Cache.read(URI), Image.class);
+
+                    originalImage = new Image(ContrastEnhancementActivity.this, noBitmapImage, true);
+                    publishProgress(countProgress((++done) + 1, numImages + 1));
+
+                    transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
+                    publishProgress(countProgress((++done) + 1, numImages + 1));
+
+                    if(isCancelled()) break;
+                }
+                catch(Exception e) {
+                    Log.e("Imagic", "Exception", e);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            UI.updateImageView(ContrastEnhancementActivity.this, originalImage.uri, beforeView);
+            UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.uri, afterView);
+            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
+            UI.setInvisible(progressBar);
+
+            if(dataAvailableInCache()) {
+                originalImage.rgb.enableValueDependentColor();
+
+                UI.show(redGraphView);
+                UI.show(greenGraphView);
+                UI.show(blueGraphView);
+
+                UI.renderGraphView(redGraphView, originalImage.rgb.red.series);
+                UI.renderGraphView(greenGraphView, originalImage.rgb.green.series);
+                UI.renderGraphView(blueGraphView, originalImage.rgb.blue.series);
+
+                UI.enable(enhanceButton);
+            }
+            else {
+                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
+                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
+            }
+        }
+    }
+
     // Histogram async task
     private class HistogramGenerationTask extends AsyncTask<Image.ColorType, Integer, Void> {
         @Override
@@ -36,9 +100,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
             for(Image.ColorType colorType : colorTypes) {
                 originalImage.generateHistogramByColorType(colorType);
-
-                done++;
-                publishProgress(countProgress(done + 1, numColors + 1));
+                publishProgress(countProgress((++done) + 1, numColors + 1));
 
                 if(isCancelled()) break;
             }
@@ -52,6 +114,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             UI.hide(greenGraphView);
             UI.hide(blueGraphView);
 
+            progressBar.setProgress(0);
             UI.show(progressBar);
         }
 
@@ -60,7 +123,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void results) {
-            transformedImage = originalImage;
             originalImage.rgb.enableValueDependentColor();
 
             UI.show(redGraphView);
@@ -85,7 +147,6 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
     // Contrast enhancement async task
     private class ContrastEnhancementTask extends AsyncTask<Void, Integer, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
             int numTransformations = 3;
@@ -96,19 +157,18 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(selectedOption.executeFunctionOnButtonClick, double.class);
 
                 int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red, (double)(redPercentage)/100);
-                done++;
-                publishProgress(countProgress(done + 1, numTransformations + 2));
+                publishProgress(countProgress((++done) + 1, numTransformations + 2));
 
                 int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green, (double)(greenPercentage)/100);
-                done++;
-                publishProgress(countProgress(done + 1, numTransformations + 2));
+                publishProgress(countProgress((++done) + 1, numTransformations + 2));
 
                 int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue, (double)(bluePercentage)/100);
-                done++;
-                publishProgress(countProgress(done + 1, numTransformations + 2));
+                publishProgress(countProgress((++done) + 1, numTransformations + 2));
 
-                transformedImage.updateBitmap(getApplicationContext(), newRedValue, newGreenValue, newBlueValue);
-                publishProgress(countProgress(done + 2, numTransformations + 2));
+                transformedImage.updateBitmap(ContrastEnhancementActivity.this, newRedValue, newGreenValue, newBlueValue);
+                publishProgress(countProgress((++done) + 2, numTransformations + 2));
+
+                if(isCancelled()) return null;
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
@@ -119,9 +179,15 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            transformedImage = new Image(originalImage);
+            try {
+                transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
 
             UI.disable(enhanceButton);
+            progressBar.setProgress(0);
             UI.show(progressBar);
         }
 
@@ -137,6 +203,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             UI.renderGraphView(blueGraphView, transformedImage.rgb.blue.series);
 
             UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
+            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
 
             UI.setInvisible(progressBar);
             UI.enable(enhanceButton);
@@ -170,7 +237,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     }
 
     // Cached image data URI
-    private static Uri cachedImageDataURI;
+    private Uri cachedImageDataURI;
 
     // Image
     private Image originalImage;
@@ -208,6 +275,10 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         beforeView = findViewById(R.id.contrastEnhancementImageBefore);
         afterView = findViewById(R.id.contrastEnhancementImageAfter);
 
+        redPercentage = 100;
+        greenPercentage = 100;
+        bluePercentage = 100;
+
         redSeekBar = findViewById(R.id.redConstantEqualizationSeekBar);
         greenSeekBar = findViewById(R.id.greenConstantEqualizationSeekBar);
         blueSeekBar = findViewById(R.id.blueConstantEqualizationSeekBar);
@@ -216,57 +287,40 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         TextView greenSeekBarTextView = findViewById(R.id.greenConstantEqualizationTextView);
         TextView blueSeekBarTextView = findViewById(R.id.blueConstantEqualizationTextView);
 
-        Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
+        redSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(redSeekBarTextView));
+        greenSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(greenSeekBarTextView));
+        blueSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(blueSeekBarTextView));
+
+        try {
+            ArrayList<ContrastEnhancementOption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.contrast_enhancement_options), ContrastEnhancementOption.class);
+            ContrastEnhancementAdapter adapter = new ContrastEnhancementAdapter(options);
+
+            Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
+            spinner.setAdapter(adapter);
+            spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
+        }
+        catch(Exception e) {
+            Log.e("Imagic", "Exception", e);
+        }
+
         enhanceButton = findViewById(R.id.enhanceContrastButton);
+        enhanceButton.setOnClickListener(getButtonOnClickListener());
+        UI.disable(enhanceButton);
 
         redGraphView = findViewById(R.id.contrastEnhancementRedGraphView);
         greenGraphView = findViewById(R.id.contrastEnhancementGreenGraphView);
         blueGraphView = findViewById(R.id.contrastEnhancementBlueGraphView);
 
+        UI.hide(redGraphView);
+        UI.hide(greenGraphView);
+        UI.hide(blueGraphView);
+
         UI.showAllXGraphView(redGraphView);
         UI.showAllXGraphView(greenGraphView);
         UI.showAllXGraphView(blueGraphView);
 
-        try {
-            originalImage = JSONSerializer.deserialize(getApplicationContext(), Cache.read(cachedImageDataURI), Image.class);
-            transformedImage = new Image(originalImage);
-
-            UI.updateImageView(this, originalImage.uri, beforeView);
-            UI.updateImageView(this, transformedImage.uri, afterView);
-
-            redPercentage = 100;
-            greenPercentage = 100;
-            bluePercentage = 100;
-
-            redSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(redSeekBarTextView));
-            greenSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(greenSeekBarTextView));
-            blueSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(blueSeekBarTextView));
-
-            ArrayList<ContrastEnhancementOption> options = JSONSerializer.arrayDeserialize(getApplicationContext(), Text.readRawResource(getApplicationContext(), R.raw.contrast_enhancement_options), ContrastEnhancementOption.class);
-            ContrastEnhancementAdapter adapter = new ContrastEnhancementAdapter(options);
-            spinner.setAdapter(adapter);
-            spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
-
-            UI.disable(enhanceButton);
-            enhanceButton.setOnClickListener(getButtonOnClickListener());
-
-            if(dataAvailableInCache()) {
-                originalImage.rgb.enableValueDependentColor();
-
-                UI.renderGraphView(redGraphView, originalImage.rgb.red.series);
-                UI.renderGraphView(greenGraphView, originalImage.rgb.green.series);
-                UI.renderGraphView(blueGraphView, originalImage.rgb.blue.series);
-
-                UI.enable(enhanceButton);
-            }
-            else {
-                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
-                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
-            }
-        }
-        catch(Exception e) {
-            Log.e("Imagic", "Exception", e);
-        }
+        ImageLoadTask imageLoadTask = new ImageLoadTask();
+        imageLoadTask.execute(cachedImageDataURI);
     }
 
     @Override
