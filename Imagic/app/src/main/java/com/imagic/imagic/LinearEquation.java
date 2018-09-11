@@ -1,7 +1,5 @@
 package com.imagic.imagic;
 
-import android.util.Log;
-
 class LinearEquation {
 
     // Properties
