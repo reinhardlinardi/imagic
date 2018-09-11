@@ -26,4 +26,8 @@
     <string name="seek_bar_second_point_description">P2</string>
     <string name="seek_bar_third_point_description">P3</string>
     <string name="seek_bar_fourth_point_description">P4</string>
+    <string name="textView_before">Before</string>
+    <string name="textView_after">After</string>
+    <string name="textView_x">X</string>
+    <string name="textView_y">Y</string>
 </resources>

@@ -61,7 +61,39 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/all_seek_bar_linear_layout_margin_all"
                 android:orientation="vertical"
-                android:weightSum="4">
+                android:weightSum="5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="20">
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/textViewXAxis"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:textAlignment="center"
+                        android:text="@string/textView_x" />
+
+                    <TextView
+                        android:id="@+id/textViewYAxis"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:layout_weight="9"
+                        android:text="@string/textView_y" />
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -286,65 +318,143 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <Space
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_layout_height" />
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/spinner_and_button_linear_layout_side_margin"
+                android:layout_marginStart="@dimen/spinner_and_button_linear_layout_side_margin"
+                android:layout_marginTop="@dimen/spinner_and_button_linear_layout_top_margin"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/before_redGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_layout_height"
-                app:seriesData="@string/graph_series_no_data" />
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_layout_height" />
+                <!--<Spinner-->
+                    <!--android:id="@+id/equalizationAlgorithmSpinner"-->
+                    <!--android:layout_width="@dimen/spinner_layout_width"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginEnd="@dimen/contrast_enhance_spinner_side_margin"-->
+                    <!--android:layout_marginStart="@dimen/contrast_enhance_spinner_side_margin"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:background="@android:color/holo_blue_dark"-->
+                    <!--android:popupBackground="@android:color/holo_blue_dark" />-->
 
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/after_redGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_layout_height"
-                app:seriesData="@string/graph_series_no_data" />
+                <Button
+                    android:id="@+id/enhanceContrastButton"
+                    android:layout_width="@dimen/contrast_enhance_button_layout_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/contrast_enhance_button_side_margin"
+                    android:layout_marginStart="@dimen/contrast_enhance_button_side_margin"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_color"
+                    android:text="@string/contrast_enhance_button_text"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
 
-            <Space
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_layout_height" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/before_greenGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_layout_height"
-                app:seriesData="@string/graph_series_no_data" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_layout_height" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_layout_height" />
+                <TextView
+                    android:id="@+id/textViewBeforeRed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textView_before" />
 
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/after_greenGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_layout_height"
-                app:seriesData="@string/graph_series_no_data" />
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/before_redGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_layout_height" />
+                <!--<Space-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="@dimen/graph_space_layout_height" />-->
 
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/before_blueGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_layout_height"
-                app:seriesData="@string/graph_series_no_data" />
+                <TextView
+                    android:id="@+id/textViewAfterRed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textView_after" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_layout_height" />
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/after_redGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
 
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/after_blueGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_layout_height"
-                app:seriesData="@string/graph_series_no_data" />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_layout_height" />
+
+                <TextView
+                    android:id="@+id/textViewBeforeGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textView_before" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/before_greenGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <!--<Space-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="@dimen/graph_space_layout_height" />-->
+                <TextView
+                    android:id="@+id/textViewAfterGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textView_after" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/after_greenGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_layout_height" />
+
+                <TextView
+                    android:id="@+id/textViewBeforeBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textView_before" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/before_blueGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <!--<Space-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="@dimen/graph_space_layout_height" />-->
+
+                <TextView
+                    android:id="@+id/textViewAfterBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/textView_after" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/after_blueGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+            </LinearLayout>
 
         </LinearLayout>
 
