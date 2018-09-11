@@ -22,4 +22,8 @@
     <string name="seek_bar_green_color_description">G</string>
     <string name="seek_bar_blue_color_description">B</string>
     <string name="equalizer_activity_title">Equalizer</string>
+    <string name="seek_bar_first_point_description">P1</string>
+    <string name="seek_bar_second_point_description">P2</string>
+    <string name="seek_bar_third_point_description">P3</string>
+    <string name="seek_bar_fourth_point_description">P4</string>
 </resources>
