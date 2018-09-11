@@ -1,5 +1,6 @@
 package com.imagic.imagic;
 
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,9 @@ import com.jjoe64.graphview.GraphView;
 
 public class EqualizerActivity extends AppCompatActivity {
 
+    //PROPERTIES
+    // Cached image data URI
+    private Uri cachedImageDataURI;
 
     // UI components
     private ProgressBar progressBar;
@@ -104,7 +108,16 @@ public class EqualizerActivity extends AppCompatActivity {
         return new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //Implement plz
+                if(fromUser) {
+                    if(seekBar == firstPointSeekBar_y) firstPointPercentage_y = progress;
+                    else if(seekBar == secondPointSeekBar_x) secondPointPercentage_x = progress;
+                    else if(seekBar == secondPointSeekBar_y) secondPointPercentage_y = progress;
+                    else if(seekBar == thirdPointSeekBar_x) thirdPointPercentage_x = progress;
+                    else if(seekBar == thirdPointSeekBar_y) thirdPointPercentage_y = progress;
+                    else if(seekBar == fourthPointSeekBar_y) fourthPointPercentage_y = progress;
+
+                    textView.setText(Integer.toString(progress) + "%");
+                }
             }
 
             @Override
