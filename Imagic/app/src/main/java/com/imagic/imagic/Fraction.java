@@ -47,6 +47,13 @@ class Fraction {
         denominator /= GCD;
     }
 
+    // Reverse fraction
+    void reverse() {
+        int temp = numerator;
+        numerator = denominator;
+        denominator = temp;
+    }
+
     // Add
     void add(Fraction fraction) {
         int LCM = getLCM(denominator, fraction.denominator);
@@ -81,4 +88,13 @@ class Fraction {
 
         simplify();
     }
+
+    // Divide
+    void divide(Fraction fraction) {
+        Fraction reversedFraction = new Fraction(fraction, false);
+        reversedFraction.reverse();
+        multiply(reversedFraction);
+    }
+
+    void divide(int number) { divide(new Fraction(number)); }
 }
