@@ -12,7 +12,6 @@ class GrayscaleHistogram extends Histogram {
 
     GrayscaleHistogram(GrayscaleHistogram grayscaleHistogram) { super(grayscaleHistogram); }
 
-    @Override
     protected void enableValueDependentColor() {
         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
             @Override

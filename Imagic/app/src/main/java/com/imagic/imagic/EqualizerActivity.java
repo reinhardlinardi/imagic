@@ -13,6 +13,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
 
 public class EqualizerActivity extends AppCompatActivity {
 
@@ -77,7 +78,7 @@ public class EqualizerActivity extends AppCompatActivity {
                 UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
                 UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
 
-                //UI.enable(enhanceButton);
+                UI.enable(enhanceButton);
             }
             else {
                 HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
@@ -146,76 +147,81 @@ public class EqualizerActivity extends AppCompatActivity {
             }
 
             UI.setInvisible(progressBar);
-            //UI.enable(enhanceButton);
+            UI.enable(enhanceButton);
         }
     }
 
-    // Contrast enhancement async task
-//    private class ContrastEnhancementTask extends AsyncTask<Void, Integer, Void> {
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            int numTransformations = 3;
-//            int done = 0;
-//            publishProgress(countProgress(done + 1, numTransformations + 2));
-//
-//            try {
-//                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(selectedOption.executeFunctionOnButtonClick, double.class);
-//
-//                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red, (double)(redPercentage)/100);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//
-//                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green, (double)(greenPercentage)/100);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//
-//                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue, (double)(bluePercentage)/100);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//
-//                transformedImage.updateBitmap(ContrastEnhancementActivity.this, newRedValue, newGreenValue, newBlueValue);
-//                publishProgress(countProgress((++done) + 2, numTransformations + 2));
-//
-//                if(isCancelled()) return null;
-//            }
-//            catch(Exception e) {
-//                Log.e("Imagic", "Exception", e);
-//            }
-//
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            try {
-//                transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
-//            }
-//            catch(Exception e) {
-//                Log.e("Imagic", "Exception", e);
-//            }
-//
-//            UI.disable(enhanceButton);
-//            progressBar.setProgress(0);
-//            UI.show(progressBar);
-//        }
-//
-//        @Override
-//        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
-//
-//        @Override
-//        protected void onPostExecute(Void results) {
-//            transformedImage.rgb.enableValueDependentColor();
-//
-//            UI.renderGraphView(redGraphView, transformedImage.rgb.red.series);
-//            UI.renderGraphView(greenGraphView, transformedImage.rgb.green.series);
-//            UI.renderGraphView(blueGraphView, transformedImage.rgb.blue.series);
-//
-//            UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
-//            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
-//
-//            UI.setInvisible(progressBar);
-//            UI.enable(enhanceButton);
-//        }
-//    }
+    // Equalizer async task
+    private class EqualizerTask extends AsyncTask<Void, Integer, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            int[][] coefficients = new int[3][3];
+            int[] rightHandSide = new int[3];
 
-    //PROPERTIES
+            coefficients[0][0] = secondPointPercentageX * secondPointPercentageX * secondPointPercentageX;
+            coefficients[0][1] = secondPointPercentageX * secondPointPercentageX;
+            coefficients[0][2] = secondPointPercentageX;
+            coefficients[1][0] = thirdPointPercentageX * thirdPointPercentageX * thirdPointPercentageX;
+            coefficients[1][1] = thirdPointPercentageX * thirdPointPercentageX;
+            coefficients[1][2] = thirdPointPercentageX;
+            coefficients[2][0] = 255 * 255 * 255;
+            coefficients[2][1] = 255 * 255;
+            coefficients[2][2] = 255;
+
+            rightHandSide[0] = secondPointPercentageY - firstPointPercentageY;
+            rightHandSide[1] = thirdPointPercentageY - firstPointPercentageY;
+            rightHandSide[2] = fourthPointPercentageY - firstPointPercentageY;
+
+            LinearEquation linearEquation = new LinearEquation(3);
+            linearEquation.setCoefficients(coefficients);
+            linearEquation.setRightHandSide(rightHandSide);
+            linearEquation.solve();
+
+            Histogram histogram = new Histogram();
+            for(int idx = 0; idx < 256; idx++) histogram.addDataPoint(idx, linearEquation.compute(idx));
+
+            for(DataPoint dp : histogram.dataPoints) {
+                Log.d("Data", Double.toString(dp.getX()) + " " + Double.toString(dp.getY()));
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            /*
+            try {
+                transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
+            */
+            UI.disable(enhanceButton);
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            /*
+            transformedImage.rgb.enableValueDependentColor();
+
+            UI.renderGraphView(redGraphView, transformedImage.rgb.red.series);
+            UI.renderGraphView(greenGraphView, transformedImage.rgb.green.series);
+            UI.renderGraphView(blueGraphView, transformedImage.rgb.blue.series);
+
+            UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
+            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
+            */
+            UI.setInvisible(progressBar);
+            UI.enable(enhanceButton);
+        }
+    }
+
     // Cached image data URI
     private Uri cachedImageDataURI;
 
@@ -359,7 +365,8 @@ public class EqualizerActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Implement here
+                EqualizerTask equalizerTask = new EqualizerTask();
+                equalizerTask.execute();
             }
         };
     }

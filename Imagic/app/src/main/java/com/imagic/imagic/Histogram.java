@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-abstract class Histogram implements JSONSerializable {
+class Histogram implements JSONSerializable {
 
     // Properties
     protected BarGraphSeries<DataPoint> series;
@@ -56,9 +56,6 @@ abstract class Histogram implements JSONSerializable {
 
         updateSeries();
     }
-
-    // Enable value dependent color
-    protected abstract void enableValueDependentColor();
 
     // Is histogram data empty
     protected final boolean isDataEmpty() { return dataPoints.size() == 0; }

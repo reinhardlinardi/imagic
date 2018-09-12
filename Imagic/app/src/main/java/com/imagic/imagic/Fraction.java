@@ -22,8 +22,7 @@ class Fraction {
         simplify();
     }
 
-    Fraction(Fraction fraction, boolean complement) {
-        negative = complement != fraction.negative;
+    Fraction(Fraction fraction) {
         numerator = fraction.numerator;
         denominator = fraction.denominator;
     }
@@ -48,11 +47,14 @@ class Fraction {
     }
 
     // Reverse fraction
-    void reverse() {
+    private void reverse() {
         int temp = numerator;
         numerator = denominator;
         denominator = temp;
     }
+
+    // Complement
+    private void complement() { negative = !negative; }
 
     // Add
     void add(Fraction fraction) {
@@ -72,7 +74,11 @@ class Fraction {
     void add(int number) { add(new Fraction(number)); }
 
     // Subtract
-    void subtract(Fraction fraction) { add(new Fraction(fraction, true)); }
+    void subtract(Fraction fraction) {
+        Fraction complementedFraction = new Fraction(fraction);
+        complementedFraction.complement();
+        add(complementedFraction);
+    }
 
     void subtract(int number) { subtract(new Fraction(number)); }
 
@@ -91,7 +97,7 @@ class Fraction {
 
     // Divide
     void divide(Fraction fraction) {
-        Fraction reversedFraction = new Fraction(fraction, false);
+        Fraction reversedFraction = new Fraction(fraction);
         reversedFraction.reverse();
         multiply(reversedFraction);
     }
