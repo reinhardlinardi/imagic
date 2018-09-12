@@ -287,7 +287,9 @@ public class EqualizerActivity extends AppCompatActivity {
         fourthPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextViewY));
 
         // Percentage Assignment
-        for(int idx = 0; idx < 2; idx++) percentageX[idx] = 255;
+        percentageX[0] = 86;
+        percentageX[1] = 172;
+
         for(int idx = 0; idx < 4; idx++) percentageY[idx] = 100;
 
         UI.hide(redGraphViewBefore);
@@ -332,8 +334,8 @@ public class EqualizerActivity extends AppCompatActivity {
                         textView.setText(Integer.toString(progress + 1));
                     }
                     else if(seekBar == thirdPointSeekBarX) {
-                        percentageX[1] = progress + 2;
-                        textView.setText(Integer.toString(progress + 2));
+                        percentageX[1] = progress + 128;
+                        textView.setText(Integer.toString(progress + 128));
                     }
                 }
             }
@@ -343,10 +345,8 @@ public class EqualizerActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                /*
                 EqualizerTask equalizerTask = new EqualizerTask();
                 equalizerTask.execute();
-                */
             }
         };
     }

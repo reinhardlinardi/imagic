@@ -167,8 +167,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="252"
-                        android:progress="85" />
+                        android:max="126"
+                        android:progress="126" />
 
                     <TextView
                         android:id="@+id/secondPointEqualizerTextViewX"
@@ -221,8 +221,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="252"
-                        android:progress="170" />
+                        android:max="126"
+                        android:progress="126" />
 
                     <TextView
                         android:id="@+id/thirdPointEqualizerTextViewX"

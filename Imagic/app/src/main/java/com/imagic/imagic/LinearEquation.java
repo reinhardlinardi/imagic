@@ -21,6 +21,7 @@ class LinearEquation {
     LinearEquation(int degree) {
         this.degree = degree;
         fractionResult = new Fraction[degree];
+        result = new double[degree];
     }
 
     // Get variable coefficients in fraction
