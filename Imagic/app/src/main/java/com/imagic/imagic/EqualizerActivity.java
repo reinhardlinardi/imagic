@@ -63,20 +63,90 @@ public class EqualizerActivity extends AppCompatActivity {
             if(dataAvailableInCache()) {
                 originalImage.rgb.enableValueDependentColor();
 
-//                UI.show(redGraphView);
-//                UI.show(greenGraphView);
-//                UI.show(blueGraphView);
-//
-//                UI.renderGraphView(redGraphView, originalImage.rgb.red.series);
-//                UI.renderGraphView(greenGraphView, originalImage.rgb.green.series);
-//                UI.renderGraphView(blueGraphView, originalImage.rgb.blue.series);
+                UI.show(redGraphViewBefore);
+                UI.show(redGraphViewAfter);
+                UI.show(greenGraphViewBefore);
+                UI.show(greenGraphViewAfter);
+                UI.show(blueGraphViewBefore);
+                UI.show(blueGraphViewAfter);
 
-                UI.enable(enhanceButton);
+                UI.renderGraphView(redGraphViewBefore, originalImage.rgb.red.series);
+                UI.renderGraphView(redGraphViewAfter, originalImage.rgb.red.series);
+                UI.renderGraphView(greenGraphViewBefore, originalImage.rgb.green.series);
+                UI.renderGraphView(greenGraphViewAfter, originalImage.rgb.green.series);
+                UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
+                UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
+
+                //UI.enable(enhanceButton);
             }
             else {
-//                ContrastEnhancementActivity.HistogramGenerationTask histogramGenerationTask = new ContrastEnhancementActivity.HistogramGenerationTask();
-//                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
+                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
+                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
             }
+        }
+    }
+
+    // Histogram async task
+    private class HistogramGenerationTask extends AsyncTask<Image.ColorType, Integer, Void> {
+        @Override
+        protected Void doInBackground(Image.ColorType... colorTypes) {
+            int numColors = colorTypes.length;
+            int done = 0;
+            publishProgress(countProgress(done + 1, numColors + 1));
+
+            for(Image.ColorType colorType : colorTypes) {
+                originalImage.generateHistogramByColorType(colorType);
+                publishProgress(countProgress((++done) + 1, numColors + 1));
+
+                if(isCancelled()) break;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            UI.hide(redGraphViewBefore);
+            UI.hide(redGraphViewAfter);
+            UI.hide(greenGraphViewBefore);
+            UI.hide(greenGraphViewAfter);
+            UI.hide(blueGraphViewBefore);
+            UI.hide(blueGraphViewAfter);
+
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            originalImage.rgb.enableValueDependentColor();
+
+            UI.show(redGraphViewBefore);
+            UI.show(redGraphViewAfter);
+            UI.show(greenGraphViewBefore);
+            UI.show(greenGraphViewAfter);
+            UI.show(blueGraphViewBefore);
+            UI.show(blueGraphViewAfter);
+
+            UI.renderGraphView(redGraphViewBefore, originalImage.rgb.red.series);
+            UI.renderGraphView(redGraphViewAfter, originalImage.rgb.red.series);
+            UI.renderGraphView(greenGraphViewBefore, originalImage.rgb.green.series);
+            UI.renderGraphView(greenGraphViewAfter, originalImage.rgb.green.series);
+            UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
+            UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
+
+            try {
+                Cache.write(cachedImageDataURI, JSONSerializer.serialize(originalImage));
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
+
+            UI.setInvisible(progressBar);
+            //UI.enable(enhanceButton);
         }
     }
 
@@ -205,13 +275,15 @@ public class EqualizerActivity extends AppCompatActivity {
         fourthPointSeekBarY = findViewById(R.id.y_fourthPointEqualizerSeekBar);
 
         enhanceButton = findViewById(R.id.enhanceContrastButton);
+        enhanceButton.setOnClickListener(getButtonOnClickListener());
+        UI.disable(enhanceButton);
 
-        TextView firstPointTextView_y = findViewById(R.id.y_firstPointEqualizerTextView);
-        TextView secondPointTextView_x = findViewById(R.id.x_secondPointEqualizerTextView);
-        TextView secondPointTextView_y = findViewById(R.id.y_secondPointEqualizerTextView);
-        TextView thirdPointTextView_x = findViewById(R.id.x_thirdPointEqualizerTextView);
-        TextView thirdPointTextView_y = findViewById(R.id.y_thirdPointEqualizerTextView);
-        TextView fourthPointTextView_y = findViewById(R.id.y_fourthPointEqualizerTextView);
+        TextView firstPointTextViewY = findViewById(R.id.y_firstPointEqualizerTextView);
+        TextView secondPointTextViewX = findViewById(R.id.x_secondPointEqualizerTextView);
+        TextView secondPointTextViewY = findViewById(R.id.y_secondPointEqualizerTextView);
+        TextView thirdPointTextViewX = findViewById(R.id.x_thirdPointEqualizerTextView);
+        TextView thirdPointTextViewY = findViewById(R.id.y_thirdPointEqualizerTextView);
+        TextView fourthPointTextViewY = findViewById(R.id.y_fourthPointEqualizerTextView);
 
         redGraphViewBefore = findViewById(R.id.before_redGraphView);
         redGraphViewAfter = findViewById(R.id.after_redGraphView);
@@ -220,17 +292,12 @@ public class EqualizerActivity extends AppCompatActivity {
         blueGraphViewBefore = findViewById(R.id.before_blueGraphView);
         blueGraphViewAfter = findViewById(R.id.after_blueGraphView);
 
-        //Setting On Click Listener
-        enhanceButton.setOnClickListener(getButtonOnClickListener());
-
-        firstPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(firstPointTextView_y));
-        secondPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextView_x));
-        secondPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextView_y));
-        thirdPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextView_x));
-        thirdPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextView_y));
-        fourthPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextView_y));
-
-
+        firstPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(firstPointTextViewY));
+        secondPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextViewX));
+        secondPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextViewY));
+        thirdPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextViewX));
+        thirdPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextViewY));
+        fourthPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextViewY));
 
         //Percentage Assignment
         firstPointPercentageY = 100;
@@ -239,6 +306,20 @@ public class EqualizerActivity extends AppCompatActivity {
         thirdPointPercentageX = 100;
         thirdPointPercentageY = 100;
         fourthPointPercentageY = 100;
+
+        UI.hide(redGraphViewBefore);
+        UI.hide(redGraphViewAfter);
+        UI.hide(greenGraphViewBefore);
+        UI.hide(greenGraphViewAfter);
+        UI.hide(blueGraphViewBefore);
+        UI.hide(blueGraphViewAfter);
+
+        UI.showAllXGraphView(redGraphViewBefore);
+        UI.showAllXGraphView(redGraphViewAfter);
+        UI.showAllXGraphView(greenGraphViewBefore);
+        UI.showAllXGraphView(greenGraphViewAfter);
+        UI.showAllXGraphView(blueGraphViewBefore);
+        UI.showAllXGraphView(blueGraphViewAfter);
 
         ImageLoadTask imageLoadTask = new ImageLoadTask();
         imageLoadTask.execute(cachedImageDataURI);
