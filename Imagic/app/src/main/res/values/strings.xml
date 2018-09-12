@@ -19,17 +19,20 @@
     <string name="contrast_enhance_button_text">Enhance</string>
     <string name="seek_bar_text_view_initial_value">100%</string>
     <string name="seek_bar_text_view_initial_value_no_percent">100</string>
-    <string name="seek_bar_text_view_initial_value_255">255</string>
     <string name="seek_bar_red_color_description">R</string>
     <string name="seek_bar_green_color_description">G</string>
     <string name="seek_bar_blue_color_description">B</string>
     <string name="equalizer_activity_title">Equalizer</string>
     <string name="seek_bar_first_point_description">1</string>
     <string name="seek_bar_second_point_description">2</string>
+    <string name="seek_bar_second_point_x_initial_value">86</string>
     <string name="seek_bar_third_point_description">3</string>
+    <string name="seek_bar_third_point_x_initial_value">172</string>
     <string name="seek_bar_fourth_point_description">4</string>
     <string name="textView_before">Before</string>
     <string name="textView_after">After</string>
     <string name="textView_x">X</string>
     <string name="textView_y">Y</string>
+    <string name="equalizer_first_point_x_value">0</string>
+    <string name="equalizer_fourth_point_x_value">255</string>
 </resources>

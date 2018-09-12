@@ -154,32 +154,29 @@ public class EqualizerActivity extends AppCompatActivity {
             int[][] coefficients = new int[3][3];
             int[] rightHandSide = new int[3];
 
-            coefficients[0][0] = secondPointPercentageX * secondPointPercentageX * secondPointPercentageX;
-            coefficients[0][1] = secondPointPercentageX * secondPointPercentageX;
-            coefficients[0][2] = secondPointPercentageX;
-            coefficients[1][0] = thirdPointPercentageX * thirdPointPercentageX * thirdPointPercentageX;
-            coefficients[1][1] = thirdPointPercentageX * thirdPointPercentageX;
-            coefficients[1][2] = thirdPointPercentageX;
-            coefficients[2][0] = 255 * 255 * 255;
-            coefficients[2][1] = 255 * 255;
-            coefficients[2][2] = 255;
+            for(int row = 0; row < 3; row++) {
+                for(int col = 0; col < 3; col++) {
+                    int XValue = (col == 2)? 255 : percentageX[col];
+                    coefficients[row][col] = (int) Math.pow(XValue, 3 - row);
+                }
+            }
 
-            rightHandSide[0] = secondPointPercentageY - firstPointPercentageY;
-            rightHandSide[1] = thirdPointPercentageY - firstPointPercentageY;
-            rightHandSide[2] = fourthPointPercentageY - firstPointPercentageY;
+            for(int row = 0; row < 3; row++) rightHandSide[row] = percentageY[row + 1] - percentageY[0];
 
             LinearEquation linearEquation = new LinearEquation(3);
             linearEquation.setCoefficients(coefficients);
             linearEquation.setRightHandSide(rightHandSide);
             linearEquation.solve();
 
+            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
+            /*
             Histogram histogram = new Histogram();
             for(int idx = 0; idx < 256; idx++) histogram.addDataPoint(idx, linearEquation.compute(idx));
 
             for(DataPoint dp : histogram.dataPoints) {
                 Log.d("Data", Double.toString(dp.getX()) + " " + Double.toString(dp.getY()));
             }
-
+            */
             return null;
         }
 
@@ -244,12 +241,8 @@ public class EqualizerActivity extends AppCompatActivity {
     private SeekBar fourthPointSeekBarY;
 
     // SeekBar percentage value
-    private int firstPointPercentageY;
-    private int secondPointPercentageX;
-    private int secondPointPercentageY;
-    private int thirdPointPercentageX;
-    private int thirdPointPercentageY;
-    private int fourthPointPercentageY;
+    private int[] percentageX = new int[2];
+    private int[] percentageY = new int[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,32 +252,32 @@ public class EqualizerActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
-        //Initialize UI Component
+        // Initialize UI Component
         progressBar = findViewById(R.id.equalizerProgressBar);
 
         beforeView = findViewById(R.id.equalizerImageBefore);
         afterView = findViewById(R.id.equalizerImageAfter);
 
-        firstPointSeekBarY = findViewById(R.id.y_firstPointEqualizerSeekBar);
-        secondPointSeekBarX = findViewById(R.id.x_secondPointEqualizerSeekBar);
-        secondPointSeekBarY = findViewById(R.id.y_secondPointEqualizerSeekBar);
-        thirdPointSeekBarX = findViewById(R.id.x_thirdPointEqualizerSeekBar);
-        thirdPointSeekBarY = findViewById(R.id.y_thirdPointEqualizerSeekBar);
-        fourthPointSeekBarY = findViewById(R.id.y_fourthPointEqualizerSeekBar);
+        firstPointSeekBarY = findViewById(R.id.firstPointEqualizerSeekBarY);
+        secondPointSeekBarX = findViewById(R.id.secondPointEqualizerSeekBarX);
+        secondPointSeekBarY = findViewById(R.id.secondPointEqualizerSeekBarY);
+        thirdPointSeekBarX = findViewById(R.id.thirdPointEqualizerSeekBarX);
+        thirdPointSeekBarY = findViewById(R.id.thirdPointEqualizerSeekBarY);
+        fourthPointSeekBarY = findViewById(R.id.fourthPointEqualizerSeekBarY);
 
-        TextView firstPointTextViewY = findViewById(R.id.y_firstPointEqualizerTextView);
-        TextView secondPointTextViewX = findViewById(R.id.x_secondPointEqualizerTextView);
-        TextView secondPointTextViewY = findViewById(R.id.y_secondPointEqualizerTextView);
-        TextView thirdPointTextViewX = findViewById(R.id.x_thirdPointEqualizerTextView);
-        TextView thirdPointTextViewY = findViewById(R.id.y_thirdPointEqualizerTextView);
-        TextView fourthPointTextViewY = findViewById(R.id.y_fourthPointEqualizerTextView);
+        TextView firstPointTextViewY = findViewById(R.id.firstPointEqualizerTextViewY);
+        TextView secondPointTextViewX = findViewById(R.id.secondPointEqualizerTextViewX);
+        TextView secondPointTextViewY = findViewById(R.id.secondPointEqualizerTextViewY);
+        TextView thirdPointTextViewX = findViewById(R.id.thirdPointEqualizerTextViewX);
+        TextView thirdPointTextViewY = findViewById(R.id.thirdPointEqualizerTextViewY);
+        TextView fourthPointTextViewY = findViewById(R.id.fourthPointEqualizerTextViewY);
 
-        redGraphViewBefore = findViewById(R.id.before_redGraphView);
-        redGraphViewAfter = findViewById(R.id.after_redGraphView);
-        greenGraphViewBefore = findViewById(R.id.before_greenGraphView);
-        greenGraphViewAfter = findViewById(R.id.after_greenGraphView);
-        blueGraphViewBefore = findViewById(R.id.before_blueGraphView);
-        blueGraphViewAfter = findViewById(R.id.after_blueGraphView);
+        redGraphViewBefore = findViewById(R.id.redGraphViewBefore);
+        redGraphViewAfter = findViewById(R.id.redGraphViewAfter);
+        greenGraphViewBefore = findViewById(R.id.greenGraphViewBefore);
+        greenGraphViewAfter = findViewById(R.id.greenGraphViewAfter);
+        blueGraphViewBefore = findViewById(R.id.blueGraphViewBefore);
+        blueGraphViewAfter = findViewById(R.id.blueGraphViewAfter);
 
         firstPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(firstPointTextViewY));
         secondPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextViewX));
@@ -293,13 +286,9 @@ public class EqualizerActivity extends AppCompatActivity {
         thirdPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextViewY));
         fourthPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextViewY));
 
-        //Percentage Assignment
-        firstPointPercentageY = 100;
-        secondPointPercentageX = 255;
-        secondPointPercentageY = 100;
-        thirdPointPercentageX = 255;
-        thirdPointPercentageY = 100;
-        fourthPointPercentageY = 100;
+        // Percentage Assignment
+        for(int idx = 0; idx < 2; idx++) percentageX[idx] = 255;
+        for(int idx = 0; idx < 4; idx++) percentageY[idx] = 100;
 
         UI.hide(redGraphViewBefore);
         UI.hide(redGraphViewAfter);
@@ -330,14 +319,22 @@ public class EqualizerActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
-                    if(seekBar == firstPointSeekBarY) firstPointPercentageY = progress;
-                    else if(seekBar == secondPointSeekBarX) secondPointPercentageX = progress;
-                    else if(seekBar == secondPointSeekBarY) secondPointPercentageY = progress;
-                    else if(seekBar == thirdPointSeekBarX) thirdPointPercentageX = progress;
-                    else if(seekBar == thirdPointSeekBarY) thirdPointPercentageY = progress;
-                    else if(seekBar == fourthPointSeekBarY) fourthPointPercentageY = progress;
+                    if(seekBar == firstPointSeekBarY || seekBar == secondPointSeekBarY || seekBar == thirdPointSeekBarY || seekBar == fourthPointSeekBarY) {
+                        if(seekBar == firstPointSeekBarY) percentageY[0] = progress;
+                        else if(seekBar == secondPointSeekBarY) percentageY[1] = progress;
+                        else if(seekBar == thirdPointSeekBarY) percentageY[2] = progress;
+                        else percentageY[3] = progress;
 
-                    textView.setText(Integer.toString(progress));
+                        textView.setText(Integer.toString(progress));
+                    }
+                    else if(seekBar == secondPointSeekBarX) {
+                        percentageX[0] = progress + 1;
+                        textView.setText(Integer.toString(progress + 1));
+                    }
+                    else if(seekBar == thirdPointSeekBarX) {
+                        percentageX[1] = progress + 2;
+                        textView.setText(Integer.toString(progress + 2));
+                    }
                 }
             }
 
@@ -345,16 +342,11 @@ public class EqualizerActivity extends AppCompatActivity {
             public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        };
-    }
-
-    public View.OnClickListener getButtonOnClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                /*
                 EqualizerTask equalizerTask = new EqualizerTask();
                 equalizerTask.execute();
+                */
             }
         };
     }

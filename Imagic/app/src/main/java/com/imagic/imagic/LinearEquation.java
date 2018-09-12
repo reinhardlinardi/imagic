@@ -18,7 +18,10 @@ class LinearEquation {
     private Fraction[] fractionResult;
 
     // Constructor
-    LinearEquation(int degree) { this.degree = degree; }
+    LinearEquation(int degree) {
+        this.degree = degree;
+        fractionResult = new Fraction[degree];
+    }
 
     // Get variable coefficients in fraction
     private Fraction[][] getCoefficientsInFraction() {
