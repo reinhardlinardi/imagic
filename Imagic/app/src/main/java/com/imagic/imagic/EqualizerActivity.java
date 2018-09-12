@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 
-import java.lang.reflect.Method;
-
 public class EqualizerActivity extends AppCompatActivity {
 
     // Image load async task
@@ -65,20 +63,90 @@ public class EqualizerActivity extends AppCompatActivity {
             if(dataAvailableInCache()) {
                 originalImage.rgb.enableValueDependentColor();
 
-//                UI.show(redGraphView);
-//                UI.show(greenGraphView);
-//                UI.show(blueGraphView);
-//
-//                UI.renderGraphView(redGraphView, originalImage.rgb.red.series);
-//                UI.renderGraphView(greenGraphView, originalImage.rgb.green.series);
-//                UI.renderGraphView(blueGraphView, originalImage.rgb.blue.series);
+                UI.show(redGraphViewBefore);
+                UI.show(redGraphViewAfter);
+                UI.show(greenGraphViewBefore);
+                UI.show(greenGraphViewAfter);
+                UI.show(blueGraphViewBefore);
+                UI.show(blueGraphViewAfter);
 
-                UI.enable(enhanceButton);
+                UI.renderGraphView(redGraphViewBefore, originalImage.rgb.red.series);
+                UI.renderGraphView(redGraphViewAfter, originalImage.rgb.red.series);
+                UI.renderGraphView(greenGraphViewBefore, originalImage.rgb.green.series);
+                UI.renderGraphView(greenGraphViewAfter, originalImage.rgb.green.series);
+                UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
+                UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
+
+                //UI.enable(enhanceButton);
             }
             else {
-//                ContrastEnhancementActivity.HistogramGenerationTask histogramGenerationTask = new ContrastEnhancementActivity.HistogramGenerationTask();
-//                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
+                HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
+                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
             }
+        }
+    }
+
+    // Histogram async task
+    private class HistogramGenerationTask extends AsyncTask<Image.ColorType, Integer, Void> {
+        @Override
+        protected Void doInBackground(Image.ColorType... colorTypes) {
+            int numColors = colorTypes.length;
+            int done = 0;
+            publishProgress(countProgress(done + 1, numColors + 1));
+
+            for(Image.ColorType colorType : colorTypes) {
+                originalImage.generateHistogramByColorType(colorType);
+                publishProgress(countProgress((++done) + 1, numColors + 1));
+
+                if(isCancelled()) break;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            UI.hide(redGraphViewBefore);
+            UI.hide(redGraphViewAfter);
+            UI.hide(greenGraphViewBefore);
+            UI.hide(greenGraphViewAfter);
+            UI.hide(blueGraphViewBefore);
+            UI.hide(blueGraphViewAfter);
+
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            originalImage.rgb.enableValueDependentColor();
+
+            UI.show(redGraphViewBefore);
+            UI.show(redGraphViewAfter);
+            UI.show(greenGraphViewBefore);
+            UI.show(greenGraphViewAfter);
+            UI.show(blueGraphViewBefore);
+            UI.show(blueGraphViewAfter);
+
+            UI.renderGraphView(redGraphViewBefore, originalImage.rgb.red.series);
+            UI.renderGraphView(redGraphViewAfter, originalImage.rgb.red.series);
+            UI.renderGraphView(greenGraphViewBefore, originalImage.rgb.green.series);
+            UI.renderGraphView(greenGraphViewAfter, originalImage.rgb.green.series);
+            UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
+            UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
+
+            try {
+                Cache.write(cachedImageDataURI, JSONSerializer.serialize(originalImage));
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
+
+            UI.setInvisible(progressBar);
+            //UI.enable(enhanceButton);
         }
     }
 
@@ -161,34 +229,37 @@ public class EqualizerActivity extends AppCompatActivity {
     private ImageView beforeView;
     private ImageView afterView;
 
-    private GraphView redGraphView_before;
-    private GraphView greenGraphView_after;
-    private GraphView blueGraphView_before;
-    private GraphView redGraphView_after;
-    private GraphView greenGraphView_before;
-    private GraphView blueGraphView_after;
+    private GraphView redGraphViewBefore;
+    private GraphView greenGraphViewAfter;
+    private GraphView blueGraphViewBefore;
+    private GraphView redGraphViewAfter;
+    private GraphView greenGraphViewBefore;
+    private GraphView blueGraphViewAfter;
 
-    private SeekBar firstPointSeekBar_y;
-    private SeekBar secondPointSeekBar_x;
-    private SeekBar secondPointSeekBar_y;
-    private SeekBar thirdPointSeekBar_x;
-    private SeekBar thirdPointSeekBar_y;
-    private SeekBar fourthPointSeekBar_y;
+    private SeekBar firstPointSeekBarY;
+    private SeekBar secondPointSeekBarX;
+    private SeekBar secondPointSeekBarY;
+    private SeekBar thirdPointSeekBarX;
+    private SeekBar thirdPointSeekBarY;
+    private SeekBar fourthPointSeekBarY;
 
     private Button enhanceButton;
 
     // SeekBar percentage value
-    private int firstPointPercentage_y;
-    private int secondPointPercentage_x;
-    private int secondPointPercentage_y;
-    private int thirdPointPercentage_x;
-    private int thirdPointPercentage_y;
-    private int fourthPointPercentage_y;
+    private int firstPointPercentageY;
+    private int secondPointPercentageX;
+    private int secondPointPercentageY;
+    private int thirdPointPercentageX;
+    private int thirdPointPercentageY;
+    private int fourthPointPercentageY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equalizer);
+
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
         //Initialize UI Component
         progressBar = findViewById(R.id.equalizerProgressBar);
@@ -196,48 +267,62 @@ public class EqualizerActivity extends AppCompatActivity {
         beforeView = findViewById(R.id.equalizerImageBefore);
         afterView = findViewById(R.id.equalizerImageAfter);
 
-        firstPointSeekBar_y = findViewById(R.id.y_firstPointEqualizerSeekBar);
-        secondPointSeekBar_x = findViewById(R.id.x_secondPointEqualizerSeekBar);
-        secondPointSeekBar_y = findViewById(R.id.y_secondPointEqualizerSeekBar);
-        thirdPointSeekBar_x = findViewById(R.id.x_thirdPointEqualizerSeekBar);
-        thirdPointSeekBar_y = findViewById(R.id.y_thirdPointEqualizerSeekBar);
-        fourthPointSeekBar_y = findViewById(R.id.y_fourthPointEqualizerSeekBar);
+        firstPointSeekBarY = findViewById(R.id.y_firstPointEqualizerSeekBar);
+        secondPointSeekBarX = findViewById(R.id.x_secondPointEqualizerSeekBar);
+        secondPointSeekBarY = findViewById(R.id.y_secondPointEqualizerSeekBar);
+        thirdPointSeekBarX = findViewById(R.id.x_thirdPointEqualizerSeekBar);
+        thirdPointSeekBarY = findViewById(R.id.y_thirdPointEqualizerSeekBar);
+        fourthPointSeekBarY = findViewById(R.id.y_fourthPointEqualizerSeekBar);
 
         enhanceButton = findViewById(R.id.enhanceContrastButton);
-
-        TextView firstPointTextView_y = findViewById(R.id.y_firstPointEqualizerTextView);
-        TextView secondPointTextView_x = findViewById(R.id.x_secondPointEqualizerTextView);
-        TextView secondPointTextView_y = findViewById(R.id.y_secondPointEqualizerTextView);
-        TextView thirdPointTextView_x = findViewById(R.id.x_thirdPointEqualizerTextView);
-        TextView thirdPointTextView_y = findViewById(R.id.y_thirdPointEqualizerTextView);
-        TextView fourthPointTextView_y = findViewById(R.id.y_fourthPointEqualizerTextView);
-
-        redGraphView_before = findViewById(R.id.before_redGraphView);
-        redGraphView_after = findViewById(R.id.after_redGraphView);
-        greenGraphView_before = findViewById(R.id.before_greenGraphView);
-        greenGraphView_after = findViewById(R.id.after_greenGraphView);
-        blueGraphView_before = findViewById(R.id.before_blueGraphView);
-        blueGraphView_after = findViewById(R.id.after_blueGraphView);
-
-        //Setting On Click Listener
         enhanceButton.setOnClickListener(getButtonOnClickListener());
+        UI.disable(enhanceButton);
 
-        firstPointSeekBar_y.setOnSeekBarChangeListener(getSeekBarOnChangeListener(firstPointTextView_y));
-        secondPointSeekBar_x.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextView_x));
-        secondPointSeekBar_y.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextView_y));
-        thirdPointSeekBar_x.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextView_x));
-        thirdPointSeekBar_y.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextView_y));
-        fourthPointSeekBar_y.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextView_y));
+        TextView firstPointTextViewY = findViewById(R.id.y_firstPointEqualizerTextView);
+        TextView secondPointTextViewX = findViewById(R.id.x_secondPointEqualizerTextView);
+        TextView secondPointTextViewY = findViewById(R.id.y_secondPointEqualizerTextView);
+        TextView thirdPointTextViewX = findViewById(R.id.x_thirdPointEqualizerTextView);
+        TextView thirdPointTextViewY = findViewById(R.id.y_thirdPointEqualizerTextView);
+        TextView fourthPointTextViewY = findViewById(R.id.y_fourthPointEqualizerTextView);
 
+        redGraphViewBefore = findViewById(R.id.before_redGraphView);
+        redGraphViewAfter = findViewById(R.id.after_redGraphView);
+        greenGraphViewBefore = findViewById(R.id.before_greenGraphView);
+        greenGraphViewAfter = findViewById(R.id.after_greenGraphView);
+        blueGraphViewBefore = findViewById(R.id.before_blueGraphView);
+        blueGraphViewAfter = findViewById(R.id.after_blueGraphView);
 
+        firstPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(firstPointTextViewY));
+        secondPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextViewX));
+        secondPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(secondPointTextViewY));
+        thirdPointSeekBarX.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextViewX));
+        thirdPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thirdPointTextViewY));
+        fourthPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextViewY));
 
         //Percentage Assignment
-        firstPointPercentage_y = 100;
-        secondPointPercentage_x = 100;
-        secondPointPercentage_y = 100;
-        thirdPointPercentage_x = 100;
-        thirdPointPercentage_y = 100;
-        fourthPointPercentage_y = 100;
+        firstPointPercentageY = 100;
+        secondPointPercentageX = 100;
+        secondPointPercentageY = 100;
+        thirdPointPercentageX = 100;
+        thirdPointPercentageY = 100;
+        fourthPointPercentageY = 100;
+
+        UI.hide(redGraphViewBefore);
+        UI.hide(redGraphViewAfter);
+        UI.hide(greenGraphViewBefore);
+        UI.hide(greenGraphViewAfter);
+        UI.hide(blueGraphViewBefore);
+        UI.hide(blueGraphViewAfter);
+
+        UI.showAllXGraphView(redGraphViewBefore);
+        UI.showAllXGraphView(redGraphViewAfter);
+        UI.showAllXGraphView(greenGraphViewBefore);
+        UI.showAllXGraphView(greenGraphViewAfter);
+        UI.showAllXGraphView(blueGraphViewBefore);
+        UI.showAllXGraphView(blueGraphViewAfter);
+
+        ImageLoadTask imageLoadTask = new ImageLoadTask();
+        imageLoadTask.execute(cachedImageDataURI);
     }
 
     @Override
@@ -251,14 +336,14 @@ public class EqualizerActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
-                    if(seekBar == firstPointSeekBar_y) firstPointPercentage_y = progress;
-                    else if(seekBar == secondPointSeekBar_x) secondPointPercentage_x = progress;
-                    else if(seekBar == secondPointSeekBar_y) secondPointPercentage_y = progress;
-                    else if(seekBar == thirdPointSeekBar_x) thirdPointPercentage_x = progress;
-                    else if(seekBar == thirdPointSeekBar_y) thirdPointPercentage_y = progress;
-                    else if(seekBar == fourthPointSeekBar_y) fourthPointPercentage_y = progress;
+                    if(seekBar == firstPointSeekBarY) firstPointPercentageY = progress;
+                    else if(seekBar == secondPointSeekBarX) secondPointPercentageX = progress;
+                    else if(seekBar == secondPointSeekBarY) secondPointPercentageY = progress;
+                    else if(seekBar == thirdPointSeekBarX) thirdPointPercentageX = progress;
+                    else if(seekBar == thirdPointSeekBarY) thirdPointPercentageY = progress;
+                    else if(seekBar == fourthPointSeekBarY) fourthPointPercentageY = progress;
 
-                    textView.setText(Integer.toString(progress) + "%");
+                    textView.setText(Integer.toString(progress));
                 }
             }
 
