@@ -151,24 +151,93 @@ public class EqualizerActivity extends AppCompatActivity {
     private class EqualizerTask extends AsyncTask<Void, Integer, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            int[][] coefficients = new int[3][3];
-            int[] rightHandSide = new int[3];
-
+            double[][] coefficients = new double[3][3];
+            double[] rightHandSide = new double[3];
+            /*
             for(int row = 0; row < 3; row++) {
                 for(int col = 0; col < 3; col++) {
-                    int XValue = (col == 2)? 255 : percentageX[col];
+                    double XValue = (col == 2)? 255 : percentageX[col];
                     coefficients[row][col] = (int) Math.pow(XValue, 3 - row);
                 }
             }
 
             for(int row = 0; row < 3; row++) rightHandSide[row] = percentageY[row + 1] - percentageY[0];
+            */
 
             LinearEquation linearEquation = new LinearEquation(3);
+
+            coefficients[0][0] = 1;
+            coefficients[0][1] = 1;
+            coefficients[0][2] = 1;
+            coefficients[1][0] = 6;
+            coefficients[1][1] = -4;
+            coefficients[1][2] = 5;
+            coefficients[2][0] = 5;
+            coefficients[2][1] = 2;
+            coefficients[2][2] = 2;
+            rightHandSide[0] = 2;
+            rightHandSide[1] = 31;
+            rightHandSide[2] = 13;
+
             linearEquation.setCoefficients(coefficients);
             linearEquation.setRightHandSide(rightHandSide);
             linearEquation.solve();
-
             Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
+
+            coefficients[0][0] = 1;
+            coefficients[0][1] = -2;
+            coefficients[0][2] = 3;
+            coefficients[1][0] = -1;
+            coefficients[1][1] = 3;
+            coefficients[1][2] = -1;
+            coefficients[2][0] = 2;
+            coefficients[2][1] = -5;
+            coefficients[2][2] = 5;
+            rightHandSide[0] = 9;
+            rightHandSide[1] = -6;
+            rightHandSide[2] = 17;
+
+            linearEquation.setCoefficients(coefficients);
+            linearEquation.setRightHandSide(rightHandSide);
+            linearEquation.solve();
+            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
+
+            coefficients[0][0] = 2;
+            coefficients[0][1] = 1;
+            coefficients[0][2] = -2;
+            coefficients[1][0] = 3;
+            coefficients[1][1] = -3;
+            coefficients[1][2] = -1;
+            coefficients[2][0] = 1;
+            coefficients[2][1] = -2;
+            coefficients[2][2] = 3;
+            rightHandSide[0] = -1;
+            rightHandSide[1] = 5;
+            rightHandSide[2] = 6;
+
+            linearEquation.setCoefficients(coefficients);
+            linearEquation.setRightHandSide(rightHandSide);
+            linearEquation.solve();
+            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
+
+            coefficients[0][0] = -5;
+            coefficients[0][1] = 5;
+            coefficients[0][2] = 2;
+            coefficients[1][0] = -10;
+            coefficients[1][1] = -5;
+            coefficients[1][2] = -3;
+            coefficients[2][0] = 20;
+            coefficients[2][1] = -5;
+            coefficients[2][2] = 1;
+            rightHandSide[0] = 1;
+            rightHandSide[1] = -64;
+            rightHandSide[2] = 68;
+
+            linearEquation.setCoefficients(coefficients);
+            linearEquation.setRightHandSide(rightHandSide);
+            linearEquation.solve();
+            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
+
             /*
             Histogram histogram = new Histogram();
             for(int idx = 0; idx < 256; idx++) histogram.addDataPoint(idx, linearEquation.compute(idx));
