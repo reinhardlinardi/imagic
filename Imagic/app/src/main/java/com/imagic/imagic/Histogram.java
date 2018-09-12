@@ -185,5 +185,33 @@ class Histogram implements JSONSerializable {
 
         return newColorValue;
     }
+
+    public int[] matchHistogram(double[] cdfUserDefinedHistogram) {
+        double[] cdfOriginalImage = getCDF();
+        int[] newColorValue = new int[256];
+        int[] newValueCount = new int[256];
+        Arrays.fill(newColorValue, 0);
+        Arrays.fill(newValueCount, 0);
+
+        for(int i = 0; i < 256; i++) {
+            for(int j = 0; j < 256; j++) {
+                if(cdfOriginalImage[i] < cdfUserDefinedHistogram[j]) {
+                    double d1 = cdfOriginalImage[i] - cdfUserDefinedHistogram[j-1];
+                    double d2 = cdfUserDefinedHistogram[j] - cdfOriginalImage[i];
+                    newColorValue[i] = (d1 > d2) ? j : j-1;
+                } else if(cdfOriginalImage[i] == cdfUserDefinedHistogram[j]){
+                    newColorValue[i] = j;
+                }
+            }
+        }
+
+        for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
+
+        resetData();
+        for(int idx = 0; idx < 256; idx++) addDataPoint(idx, newValueCount[idx]);
+        updateSeries();
+
+        return newColorValue;
+    }
 }
 

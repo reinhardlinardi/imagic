@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -77,8 +76,6 @@ public class EqualizerActivity extends AppCompatActivity {
                 UI.renderGraphView(greenGraphViewAfter, originalImage.rgb.green.series);
                 UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
                 UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
-
-                UI.enable(enhanceButton);
             }
             else {
                 HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
@@ -147,7 +144,6 @@ public class EqualizerActivity extends AppCompatActivity {
             }
 
             UI.setInvisible(progressBar);
-            UI.enable(enhanceButton);
         }
     }
 
@@ -197,7 +193,6 @@ public class EqualizerActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
             */
-            UI.disable(enhanceButton);
             progressBar.setProgress(0);
             UI.show(progressBar);
         }
@@ -218,7 +213,6 @@ public class EqualizerActivity extends AppCompatActivity {
             UI.clearImageViewMemory(ContrastEnhancementActivity.this);
             */
             UI.setInvisible(progressBar);
-            UI.enable(enhanceButton);
         }
     }
 
@@ -249,8 +243,6 @@ public class EqualizerActivity extends AppCompatActivity {
     private SeekBar thirdPointSeekBarY;
     private SeekBar fourthPointSeekBarY;
 
-    private Button enhanceButton;
-
     // SeekBar percentage value
     private int firstPointPercentageY;
     private int secondPointPercentageX;
@@ -280,10 +272,6 @@ public class EqualizerActivity extends AppCompatActivity {
         thirdPointSeekBarY = findViewById(R.id.y_thirdPointEqualizerSeekBar);
         fourthPointSeekBarY = findViewById(R.id.y_fourthPointEqualizerSeekBar);
 
-        enhanceButton = findViewById(R.id.enhanceContrastButton);
-        enhanceButton.setOnClickListener(getButtonOnClickListener());
-        UI.disable(enhanceButton);
-
         TextView firstPointTextViewY = findViewById(R.id.y_firstPointEqualizerTextView);
         TextView secondPointTextViewX = findViewById(R.id.x_secondPointEqualizerTextView);
         TextView secondPointTextViewY = findViewById(R.id.y_secondPointEqualizerTextView);
@@ -307,9 +295,9 @@ public class EqualizerActivity extends AppCompatActivity {
 
         //Percentage Assignment
         firstPointPercentageY = 100;
-        secondPointPercentageX = 100;
+        secondPointPercentageX = 255;
         secondPointPercentageY = 100;
-        thirdPointPercentageX = 100;
+        thirdPointPercentageX = 255;
         thirdPointPercentageY = 100;
         fourthPointPercentageY = 100;
 

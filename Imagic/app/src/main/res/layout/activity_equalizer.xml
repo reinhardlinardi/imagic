@@ -82,16 +82,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
-                        android:textAlignment="center"
-                        android:text="@string/textView_x" />
+                        android:text="@string/textView_x"
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/textViewYAxis"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAlignment="center"
                         android:layout_weight="9"
-                        android:text="@string/textView_y" />
+                        android:text="@string/textView_y"
+                        android:textAlignment="center" />
 
                 </LinearLayout>
 
@@ -112,12 +112,12 @@
                         android:text="@string/seek_bar_first_point_description" />
 
                     <!--<SeekBar-->
-                        <!--android:id="@+id/redConstantEqualizationSeekBar"-->
-                        <!--android:layout_width="@dimen/seek_bar_layout_width"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:layout_weight="7"-->
-                        <!--android:max="100"-->
-                        <!--android:progress="100" />-->
+                    <!--android:id="@+id/redConstantEqualizationSeekBar"-->
+                    <!--android:layout_width="@dimen/seek_bar_layout_width"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="7"-->
+                    <!--android:max="100"-->
+                    <!--android:progress="100" />-->
 
 
                     <Space
@@ -126,12 +126,12 @@
                         android:layout_weight="9" />
 
                     <!--<TextView-->
-                        <!--android:id="@+id/redConstantEqualizationTextView"-->
-                        <!--android:layout_width="@dimen/seek_bar_layout_width"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:layout_weight="2"-->
-                        <!--android:gravity="center_vertical|center_horizontal"-->
-                        <!--android:text="@string/seek_bar_text_view_initial_value" />-->
+                    <!--android:id="@+id/redConstantEqualizationTextView"-->
+                    <!--android:layout_width="@dimen/seek_bar_layout_width"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="2"-->
+                    <!--android:gravity="center_vertical|center_horizontal"-->
+                    <!--android:text="@string/seek_bar_text_view_initial_value" />-->
 
                     <SeekBar
                         android:id="@+id/y_firstPointEqualizerSeekBar"
@@ -176,8 +176,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="100"
-                        android:progress="100" />
+                        android:max="255"
+                        android:progress="255" />
 
                     <TextView
                         android:id="@+id/x_secondPointEqualizerTextView"
@@ -185,7 +185,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
+                        android:text="@string/seek_bar_text_view_initial_value_255" />
 
                     <SeekBar
                         android:id="@+id/y_secondPointEqualizerSeekBar"
@@ -230,8 +230,8 @@
                         android:layout_width="@dimen/seek_bar_layout_width"
                         android:layout_height="match_parent"
                         android:layout_weight="7"
-                        android:max="100"
-                        android:progress="100" />
+                        android:max="255"
+                        android:progress="255" />
 
                     <TextView
                         android:id="@+id/x_thirdPointEqualizerTextView"
@@ -239,7 +239,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
+                        android:text="@string/seek_bar_text_view_initial_value_255" />
 
                     <SeekBar
                         android:id="@+id/y_thirdPointEqualizerSeekBar"
@@ -258,6 +258,7 @@
                         android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                 </LinearLayout>
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/contrast_enhance_space_layout_height" />
@@ -279,12 +280,12 @@
                         android:text="@string/seek_bar_fourth_point_description" />
 
                     <!--<SeekBar-->
-                        <!--android:id="@+id/greenConstantEqualizationSeekBar"-->
-                        <!--android:layout_width="@dimen/seek_bar_layout_width"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:layout_weight="7"-->
-                        <!--android:max="100"-->
-                        <!--android:progress="100" />-->
+                    <!--android:id="@+id/greenConstantEqualizationSeekBar"-->
+                    <!--android:layout_width="@dimen/seek_bar_layout_width"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="7"-->
+                    <!--android:max="100"-->
+                    <!--android:progress="100" />-->
 
                     <Space
                         android:layout_width="wrap_content"
@@ -292,12 +293,12 @@
                         android:layout_weight="9" />
 
                     <!--<TextView-->
-                        <!--android:id="@+id/greenConstantEqualizationTextView"-->
-                        <!--android:layout_width="@dimen/seek_bar_layout_width"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:layout_weight="2"-->
-                        <!--android:gravity="center_vertical|center_horizontal"-->
-                        <!--android:text="@string/seek_bar_text_view_initial_value" />-->
+                    <!--android:id="@+id/greenConstantEqualizationTextView"-->
+                    <!--android:layout_width="@dimen/seek_bar_layout_width"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="2"-->
+                    <!--android:gravity="center_vertical|center_horizontal"-->
+                    <!--android:text="@string/seek_bar_text_view_initial_value" />-->
 
                     <SeekBar
                         android:id="@+id/y_fourthPointEqualizerSeekBar"
@@ -316,43 +317,6 @@
                         android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                 </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/spinner_and_button_linear_layout_side_margin"
-                android:layout_marginStart="@dimen/spinner_and_button_linear_layout_side_margin"
-                android:layout_marginTop="@dimen/spinner_and_button_linear_layout_top_margin"
-                android:gravity="center_vertical|center_horizontal"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <!--<Spinner-->
-                    <!--android:id="@+id/equalizationAlgorithmSpinner"-->
-                    <!--android:layout_width="@dimen/spinner_layout_width"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="@dimen/contrast_enhance_spinner_side_margin"-->
-                    <!--android:layout_marginStart="@dimen/contrast_enhance_spinner_side_margin"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@android:color/holo_blue_dark"-->
-                    <!--android:popupBackground="@android:color/holo_blue_dark" />-->
-
-                <Button
-                    android:id="@+id/enhanceContrastButton"
-                    android:layout_width="@dimen/contrast_enhance_button_layout_width"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/contrast_enhance_button_side_margin"
-                    android:layout_marginStart="@dimen/contrast_enhance_button_side_margin"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_color"
-                    android:text="@string/contrast_enhance_button_text"
-                    android:textColor="@android:color/white" />
             </LinearLayout>
 
             <LinearLayout
