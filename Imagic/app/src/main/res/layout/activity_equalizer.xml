@@ -147,7 +147,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value" />
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                 </LinearLayout>
 
@@ -185,7 +185,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value" />
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                     <SeekBar
                         android:id="@+id/y_secondPointEqualizerSeekBar"
@@ -201,7 +201,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value" />
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                 </LinearLayout>
 
@@ -239,7 +239,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value" />
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                     <SeekBar
                         android:id="@+id/y_thirdPointEqualizerSeekBar"
@@ -255,7 +255,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value" />
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                 </LinearLayout>
                 <Space
@@ -313,7 +313,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/seek_bar_text_view_initial_value" />
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
 
                 </LinearLayout>
             </LinearLayout>

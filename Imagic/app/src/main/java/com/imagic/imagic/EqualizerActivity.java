@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,11 +14,146 @@ import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 
+import java.lang.reflect.Method;
+
 public class EqualizerActivity extends AppCompatActivity {
+
+    // Image load async task
+    private class ImageLoadTask extends AsyncTask<Uri, Integer, Void> {
+        @Override
+        protected Void doInBackground(Uri... URIs) {
+            int numImages = URIs.length * 2;
+            int done = 0;
+            publishProgress(countProgress(done + 1, numImages + 1));
+
+            for(Uri URI : URIs) {
+                try {
+                    Image noBitmapImage = JSONSerializer.deserialize(EqualizerActivity.this, Cache.read(URI), Image.class);
+
+                    originalImage = new Image(EqualizerActivity.this, noBitmapImage, true);
+                    publishProgress(countProgress((++done) + 1, numImages + 1));
+
+                    transformedImage = new Image(EqualizerActivity.this, originalImage, false);
+                    publishProgress(countProgress((++done) + 1, numImages + 1));
+
+                    if(isCancelled()) break;
+                }
+                catch(Exception e) {
+                    Log.e("Imagic", "Exception", e);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            UI.updateImageView(EqualizerActivity.this, originalImage.uri, beforeView);
+            UI.updateImageView(EqualizerActivity.this, transformedImage.uri, afterView);
+            UI.clearImageViewMemory(EqualizerActivity.this);
+            UI.setInvisible(progressBar);
+
+            if(dataAvailableInCache()) {
+                originalImage.rgb.enableValueDependentColor();
+
+//                UI.show(redGraphView);
+//                UI.show(greenGraphView);
+//                UI.show(blueGraphView);
+//
+//                UI.renderGraphView(redGraphView, originalImage.rgb.red.series);
+//                UI.renderGraphView(greenGraphView, originalImage.rgb.green.series);
+//                UI.renderGraphView(blueGraphView, originalImage.rgb.blue.series);
+
+                UI.enable(enhanceButton);
+            }
+            else {
+//                ContrastEnhancementActivity.HistogramGenerationTask histogramGenerationTask = new ContrastEnhancementActivity.HistogramGenerationTask();
+//                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
+            }
+        }
+    }
+
+    // Contrast enhancement async task
+//    private class ContrastEnhancementTask extends AsyncTask<Void, Integer, Void> {
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            int numTransformations = 3;
+//            int done = 0;
+//            publishProgress(countProgress(done + 1, numTransformations + 2));
+//
+//            try {
+//                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(selectedOption.executeFunctionOnButtonClick, double.class);
+//
+//                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red, (double)(redPercentage)/100);
+//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
+//
+//                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green, (double)(greenPercentage)/100);
+//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
+//
+//                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue, (double)(bluePercentage)/100);
+//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
+//
+//                transformedImage.updateBitmap(ContrastEnhancementActivity.this, newRedValue, newGreenValue, newBlueValue);
+//                publishProgress(countProgress((++done) + 2, numTransformations + 2));
+//
+//                if(isCancelled()) return null;
+//            }
+//            catch(Exception e) {
+//                Log.e("Imagic", "Exception", e);
+//            }
+//
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            try {
+//                transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
+//            }
+//            catch(Exception e) {
+//                Log.e("Imagic", "Exception", e);
+//            }
+//
+//            UI.disable(enhanceButton);
+//            progressBar.setProgress(0);
+//            UI.show(progressBar);
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+//
+//        @Override
+//        protected void onPostExecute(Void results) {
+//            transformedImage.rgb.enableValueDependentColor();
+//
+//            UI.renderGraphView(redGraphView, transformedImage.rgb.red.series);
+//            UI.renderGraphView(greenGraphView, transformedImage.rgb.green.series);
+//            UI.renderGraphView(blueGraphView, transformedImage.rgb.blue.series);
+//
+//            UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
+//            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
+//
+//            UI.setInvisible(progressBar);
+//            UI.enable(enhanceButton);
+//        }
+//    }
 
     //PROPERTIES
     // Cached image data URI
     private Uri cachedImageDataURI;
+
+    // Image
+    private Image originalImage;
+    private Image transformedImage;
 
     // UI components
     private ProgressBar progressBar;
@@ -104,6 +240,12 @@ public class EqualizerActivity extends AppCompatActivity {
         fourthPointPercentage_y = 100;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        UI.clearImageViewMemory(this);
+    }
+
     private SeekBar.OnSeekBarChangeListener getSeekBarOnChangeListener(final TextView textView) {
         return new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -136,4 +278,13 @@ public class EqualizerActivity extends AppCompatActivity {
             }
         };
     }
+
+    // Count progress
+    private int countProgress(int numTaskDone, int totalNumTask) {
+        float taskDoneFraction = (float) numTaskDone / totalNumTask;
+        return (int)(taskDoneFraction * 100);
+    }
+
+    // Check if data is available in cache
+    private boolean dataAvailableInCache() { return !(originalImage.rgb.isDataEmpty()); }
 }
