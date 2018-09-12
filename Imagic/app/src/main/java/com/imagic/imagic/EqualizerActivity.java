@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -76,8 +75,6 @@ public class EqualizerActivity extends AppCompatActivity {
                 UI.renderGraphView(greenGraphViewAfter, originalImage.rgb.green.series);
                 UI.renderGraphView(blueGraphViewBefore, originalImage.rgb.blue.series);
                 UI.renderGraphView(blueGraphViewAfter, originalImage.rgb.blue.series);
-
-                //UI.enable(enhanceButton);
             }
             else {
                 HistogramGenerationTask histogramGenerationTask = new HistogramGenerationTask();
@@ -146,74 +143,8 @@ public class EqualizerActivity extends AppCompatActivity {
             }
 
             UI.setInvisible(progressBar);
-            //UI.enable(enhanceButton);
         }
     }
-
-    // Contrast enhancement async task
-//    private class ContrastEnhancementTask extends AsyncTask<Void, Integer, Void> {
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            int numTransformations = 3;
-//            int done = 0;
-//            publishProgress(countProgress(done + 1, numTransformations + 2));
-//
-//            try {
-//                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(selectedOption.executeFunctionOnButtonClick, double.class);
-//
-//                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red, (double)(redPercentage)/100);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//
-//                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green, (double)(greenPercentage)/100);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//
-//                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue, (double)(bluePercentage)/100);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//
-//                transformedImage.updateBitmap(ContrastEnhancementActivity.this, newRedValue, newGreenValue, newBlueValue);
-//                publishProgress(countProgress((++done) + 2, numTransformations + 2));
-//
-//                if(isCancelled()) return null;
-//            }
-//            catch(Exception e) {
-//                Log.e("Imagic", "Exception", e);
-//            }
-//
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            try {
-//                transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
-//            }
-//            catch(Exception e) {
-//                Log.e("Imagic", "Exception", e);
-//            }
-//
-//            UI.disable(enhanceButton);
-//            progressBar.setProgress(0);
-//            UI.show(progressBar);
-//        }
-//
-//        @Override
-//        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
-//
-//        @Override
-//        protected void onPostExecute(Void results) {
-//            transformedImage.rgb.enableValueDependentColor();
-//
-//            UI.renderGraphView(redGraphView, transformedImage.rgb.red.series);
-//            UI.renderGraphView(greenGraphView, transformedImage.rgb.green.series);
-//            UI.renderGraphView(blueGraphView, transformedImage.rgb.blue.series);
-//
-//            UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
-//            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
-//
-//            UI.setInvisible(progressBar);
-//            UI.enable(enhanceButton);
-//        }
-//    }
 
     //PROPERTIES
     // Cached image data URI
@@ -243,8 +174,6 @@ public class EqualizerActivity extends AppCompatActivity {
     private SeekBar thirdPointSeekBarY;
     private SeekBar fourthPointSeekBarY;
 
-    private Button enhanceButton;
-
     // SeekBar percentage value
     private int firstPointPercentageY;
     private int secondPointPercentageX;
@@ -273,10 +202,6 @@ public class EqualizerActivity extends AppCompatActivity {
         thirdPointSeekBarX = findViewById(R.id.x_thirdPointEqualizerSeekBar);
         thirdPointSeekBarY = findViewById(R.id.y_thirdPointEqualizerSeekBar);
         fourthPointSeekBarY = findViewById(R.id.y_fourthPointEqualizerSeekBar);
-
-        enhanceButton = findViewById(R.id.enhanceContrastButton);
-        enhanceButton.setOnClickListener(getButtonOnClickListener());
-        UI.disable(enhanceButton);
 
         TextView firstPointTextViewY = findViewById(R.id.y_firstPointEqualizerTextView);
         TextView secondPointTextViewX = findViewById(R.id.x_secondPointEqualizerTextView);
@@ -352,15 +277,6 @@ public class EqualizerActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
-        };
-    }
-
-    public View.OnClickListener getButtonOnClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Implement here
-            }
         };
     }
 
