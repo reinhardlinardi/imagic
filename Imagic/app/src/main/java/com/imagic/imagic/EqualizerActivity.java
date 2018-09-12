@@ -226,9 +226,9 @@ public class EqualizerActivity extends AppCompatActivity {
 
         //Percentage Assignment
         firstPointPercentageY = 100;
-        secondPointPercentageX = 100;
+        secondPointPercentageX = 255;
         secondPointPercentageY = 100;
-        thirdPointPercentageX = 100;
+        thirdPointPercentageX = 255;
         thirdPointPercentageY = 100;
         fourthPointPercentageY = 100;
 
