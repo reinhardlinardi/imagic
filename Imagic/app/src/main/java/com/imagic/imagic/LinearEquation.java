@@ -1,7 +1,5 @@
 package com.imagic.imagic;
 
-import android.util.Log;
-
 class LinearEquation {
 
     // Properties
@@ -40,7 +38,7 @@ class LinearEquation {
 
     // Solve equation using Gauss-Jordan elimination
     void solve() {
-        for(int col = 0; col < degree - 1; col++) {
+        for(int col = 0; col < degree; col++) {
             rowDivide(col, coefficients[col][col]);
             for(int row = col + 1; row < degree; row++) rowSubtract(row, col, coefficients[row][col] / coefficients[col][col]);
         }
@@ -49,8 +47,11 @@ class LinearEquation {
             for(int row = col - 1; row >= 0; row--) rowSubtract(row, col, coefficients[row][col] / coefficients[col][col]);
         }
 
-        for(int row = 0; row < degree; row++) result[row] = rightHandSide[row];
+        for(int row = 0; row < degree; row++) result[row] = Math.round(rightHandSide[row] * 1e8) / 1e8;
     }
+
+    // Get result
+    double[] getResult() { return result; }
 
     // Compute equation
     double compute(int x) {

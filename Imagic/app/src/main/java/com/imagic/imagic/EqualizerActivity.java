@@ -5,14 +5,12 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
 
 public class EqualizerActivity extends AppCompatActivity {
 
@@ -153,90 +151,21 @@ public class EqualizerActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             double[][] coefficients = new double[3][3];
             double[] rightHandSide = new double[3];
-            /*
+
             for(int row = 0; row < 3; row++) {
-                for(int col = 0; col < 3; col++) {
-                    double XValue = (col == 2)? 255 : percentageX[col];
-                    coefficients[row][col] = (int) Math.pow(XValue, 3 - row);
-                }
+                double value = (row == 2)? 255 : XSeekBarValue[row];
+                for(int col = 0; col < 3; col++) coefficients[row][col] = Math.pow(value, 3 - col);
+
+                rightHandSide[row] = YSeekBarValue[row + 1] - YSeekBarValue[0];
             }
 
-            for(int row = 0; row < 3; row++) rightHandSide[row] = percentageY[row + 1] - percentageY[0];
-            */
-
             LinearEquation linearEquation = new LinearEquation(3);
-
-            coefficients[0][0] = 1;
-            coefficients[0][1] = 1;
-            coefficients[0][2] = 1;
-            coefficients[1][0] = 6;
-            coefficients[1][1] = -4;
-            coefficients[1][2] = 5;
-            coefficients[2][0] = 5;
-            coefficients[2][1] = 2;
-            coefficients[2][2] = 2;
-            rightHandSide[0] = 2;
-            rightHandSide[1] = 31;
-            rightHandSide[2] = 13;
-
             linearEquation.setCoefficients(coefficients);
             linearEquation.setRightHandSide(rightHandSide);
             linearEquation.solve();
-            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
 
-            coefficients[0][0] = 1;
-            coefficients[0][1] = -2;
-            coefficients[0][2] = 3;
-            coefficients[1][0] = -1;
-            coefficients[1][1] = 3;
-            coefficients[1][2] = -1;
-            coefficients[2][0] = 2;
-            coefficients[2][1] = -5;
-            coefficients[2][2] = 5;
-            rightHandSide[0] = 9;
-            rightHandSide[1] = -6;
-            rightHandSide[2] = 17;
-
-            linearEquation.setCoefficients(coefficients);
-            linearEquation.setRightHandSide(rightHandSide);
-            linearEquation.solve();
-            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
-
-            coefficients[0][0] = 2;
-            coefficients[0][1] = 1;
-            coefficients[0][2] = -2;
-            coefficients[1][0] = 3;
-            coefficients[1][1] = -3;
-            coefficients[1][2] = -1;
-            coefficients[2][0] = 1;
-            coefficients[2][1] = -2;
-            coefficients[2][2] = 3;
-            rightHandSide[0] = -1;
-            rightHandSide[1] = 5;
-            rightHandSide[2] = 6;
-
-            linearEquation.setCoefficients(coefficients);
-            linearEquation.setRightHandSide(rightHandSide);
-            linearEquation.solve();
-            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
-
-            coefficients[0][0] = -5;
-            coefficients[0][1] = 5;
-            coefficients[0][2] = 2;
-            coefficients[1][0] = -10;
-            coefficients[1][1] = -5;
-            coefficients[1][2] = -3;
-            coefficients[2][0] = 20;
-            coefficients[2][1] = -5;
-            coefficients[2][2] = 1;
-            rightHandSide[0] = 1;
-            rightHandSide[1] = -64;
-            rightHandSide[2] = 68;
-
-            linearEquation.setCoefficients(coefficients);
-            linearEquation.setRightHandSide(rightHandSide);
-            linearEquation.solve();
-            Log.d("Equation", Double.toString(linearEquation.result[0]) + " " + Double.toString(linearEquation.result[1]) + " " + Double.toString(linearEquation.result[2]));
+            double[] result = linearEquation.getResult();
+            Log.d("Equation", Double.toString(result[0]) + " x^3 + " + Double.toString(result[1]) + " x^2 + " + Double.toString(result[2]) + " x + " + Double.toString(YSeekBarValue[0]));
 
             /*
             Histogram histogram = new Histogram();
@@ -309,9 +238,9 @@ public class EqualizerActivity extends AppCompatActivity {
     private SeekBar thirdPointSeekBarY;
     private SeekBar fourthPointSeekBarY;
 
-    // SeekBar percentage value
-    private int[] percentageX = new int[2];
-    private int[] percentageY = new int[4];
+    // SeekBar value
+    private int[] XSeekBarValue = new int[2];
+    private int[] YSeekBarValue = new int[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,10 +285,10 @@ public class EqualizerActivity extends AppCompatActivity {
         fourthPointSeekBarY.setOnSeekBarChangeListener(getSeekBarOnChangeListener(fourthPointTextViewY));
 
         // Percentage Assignment
-        percentageX[0] = 86;
-        percentageX[1] = 172;
+        XSeekBarValue[0] = 86;
+        XSeekBarValue[1] = 172;
 
-        for(int idx = 0; idx < 4; idx++) percentageY[idx] = 100;
+        for(int idx = 0; idx < 4; idx++) YSeekBarValue[idx] = 100;
 
         UI.hide(redGraphViewBefore);
         UI.hide(redGraphViewAfter);
@@ -391,19 +320,19 @@ public class EqualizerActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
                     if(seekBar == firstPointSeekBarY || seekBar == secondPointSeekBarY || seekBar == thirdPointSeekBarY || seekBar == fourthPointSeekBarY) {
-                        if(seekBar == firstPointSeekBarY) percentageY[0] = progress;
-                        else if(seekBar == secondPointSeekBarY) percentageY[1] = progress;
-                        else if(seekBar == thirdPointSeekBarY) percentageY[2] = progress;
-                        else percentageY[3] = progress;
+                        if(seekBar == firstPointSeekBarY) YSeekBarValue[0] = progress;
+                        else if(seekBar == secondPointSeekBarY) YSeekBarValue[1] = progress;
+                        else if(seekBar == thirdPointSeekBarY) YSeekBarValue[2] = progress;
+                        else YSeekBarValue[3] = progress;
 
                         textView.setText(Integer.toString(progress));
                     }
                     else if(seekBar == secondPointSeekBarX) {
-                        percentageX[0] = progress + 1;
+                        XSeekBarValue[0] = progress + 1;
                         textView.setText(Integer.toString(progress + 1));
                     }
                     else if(seekBar == thirdPointSeekBarX) {
-                        percentageX[1] = progress + 128;
+                        XSeekBarValue[1] = progress + 128;
                         textView.setText(Integer.toString(progress + 128));
                     }
                 }
