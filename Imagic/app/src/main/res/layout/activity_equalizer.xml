@@ -316,14 +316,6 @@
                     android:layout_marginTop="10dp"
                     android:text="@string/textView_userDefined" />
 
-                <TextView
-                    android:id="@+id/textViewPercentageError"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/text_view_same_percentage_error"
-                    android:textColor="@android:color/holo_red_dark" />
-
                 <com.jjoe64.graphview.helper.GraphViewXML
                     android:id="@+id/graphViewUserDefined"
                     android:layout_width="match_parent"

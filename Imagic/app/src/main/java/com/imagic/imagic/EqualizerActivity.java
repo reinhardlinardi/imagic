@@ -240,7 +240,6 @@ public class EqualizerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void results) {
-            UI.show(userDefinedGraphView);
             UI.renderGraphView(userDefinedGraphView, userDefinedHistogram.series);
 
             transformedImage.rgb.enableValueDependentColor();
@@ -276,8 +275,6 @@ public class EqualizerActivity extends AppCompatActivity {
 
     private ImageView beforeView;
     private ImageView afterView;
-
-    private TextView percentageErrorTextView;
 
     private GraphView userDefinedGraphView;
     private GraphView redGraphViewBefore;
@@ -327,8 +324,6 @@ public class EqualizerActivity extends AppCompatActivity {
         TextView fourthPointTextViewY = findViewById(R.id.fourthPointEqualizerTextViewY);
 
         userDefinedGraphView = findViewById(R.id.graphViewUserDefined);
-        percentageErrorTextView = findViewById(R.id.textViewPercentageError);
-
         redGraphViewBefore = findViewById(R.id.redGraphViewBefore);
         redGraphViewAfter = findViewById(R.id.redGraphViewAfter);
         greenGraphViewBefore = findViewById(R.id.greenGraphViewBefore);
@@ -350,7 +345,7 @@ public class EqualizerActivity extends AppCompatActivity {
         for(int idx = 0; idx < 4; idx++) YSeekBarValue[idx] = 100;
 
         UI.hide(userDefinedGraphView);
-        UI.show(percentageErrorTextView);
+        UI.setYAsPercentageGraphView(userDefinedGraphView);
 
         UI.hide(redGraphViewBefore);
         UI.hide(redGraphViewAfter);
@@ -366,6 +361,13 @@ public class EqualizerActivity extends AppCompatActivity {
         UI.showAllXGraphView(greenGraphViewAfter);
         UI.showAllXGraphView(blueGraphViewBefore);
         UI.showAllXGraphView(blueGraphViewAfter);
+
+        userDefinedHistogram = new Histogram();
+        for(int idx = 0; idx < 256; idx++) userDefinedHistogram.addDataPoint(idx, 100);
+        userDefinedHistogram.updateSeries();
+
+        UI.renderGraphView(userDefinedGraphView, userDefinedHistogram.series);
+        UI.show(userDefinedGraphView);
 
         ImageLoadTask imageLoadTask = new ImageLoadTask();
         imageLoadTask.execute(cachedImageDataURI);
@@ -406,16 +408,8 @@ public class EqualizerActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(YSeekBarValue[0] == YSeekBarValue[1] && YSeekBarValue[0] == YSeekBarValue[2] && YSeekBarValue[0] == YSeekBarValue[3]) {
-                    UI.hide(userDefinedGraphView);
-                    UI.show(percentageErrorTextView);
-                }
-                else {
-                    UI.hide(percentageErrorTextView);
-
-                    EqualizerTask equalizerTask = new EqualizerTask();
-                    equalizerTask.execute();
-                }
+                EqualizerTask equalizerTask = new EqualizerTask();
+                equalizerTask.execute();
             }
         };
     }
