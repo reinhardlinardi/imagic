@@ -31,9 +31,10 @@
     <string name="seek_bar_fourth_point_description">4</string>
     <string name="textView_before">Before</string>
     <string name="textView_after">After</string>
-    <string name="textView_userDefined">User Defined</string>
-    <string name="textView_x">X</string>
-    <string name="textView_y">Y</string>
+    <string name="textView_userDefined">User Defined Histogram</string>
+    <string name="textView_x">Color</string>
+    <string name="textView_y">Percentage (%)</string>
     <string name="equalizer_first_point_x_value">0</string>
     <string name="equalizer_fourth_point_x_value">255</string>
+    <string name="text_view_same_percentage_error">Cannot use the same percentage value for all colors.</string>
 </resources>

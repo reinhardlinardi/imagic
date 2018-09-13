@@ -52,17 +52,10 @@ class LinearEquation {
         for(int row = 0; row < degree; row++) result[row] = Math.round(rightHandSide[row] * 1e8) / 1e8;
     }
 
-    // Get result
-    double[] getResult() { return result; }
-
     // Compute equation
     double compute(int x) {
         double total = 0;
-        int i = 0;
-        for(int power = degree; power > 0; power--) {
-            total += result[i] * Math.pow(x, power);
-            i++;
-        }
+        for(int power = degree; power > 0; power--) total += result[degree - power] * Math.pow(x, power);
 
         return total + equationConstant;
     }

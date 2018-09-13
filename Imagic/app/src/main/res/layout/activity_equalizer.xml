@@ -73,13 +73,13 @@
                     android:weightSum="20">
 
                     <Space
-                        android:layout_width="wrap_content"
+                        android:layout_width="@dimen/seek_bar_field_description_width"
                         android:layout_height="wrap_content"
                         android:layout_weight="1" />
 
                     <TextView
                         android:id="@+id/textViewXAxis"
-                        android:layout_width="wrap_content"
+                        android:layout_width="@dimen/seek_bar_field_description_width"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:text="@string/textView_x"
@@ -87,7 +87,7 @@
 
                     <TextView
                         android:id="@+id/textViewYAxis"
-                        android:layout_width="wrap_content"
+                        android:layout_width="@dimen/seek_bar_field_description_width"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:text="@string/textView_y"
@@ -307,10 +307,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!--<Space
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/graph_space_layout_height" />-->
-
                 <TextView
                     android:id="@+id/textViewUserDefined"
                     android:layout_width="match_parent"
@@ -319,6 +315,14 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:text="@string/textView_userDefined" />
+
+                <TextView
+                    android:id="@+id/textViewPercentageError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/text_view_same_percentage_error"
+                    android:textColor="@android:color/holo_red_dark" />
 
                 <com.jjoe64.graphview.helper.GraphViewXML
                     android:id="@+id/graphViewUserDefined"

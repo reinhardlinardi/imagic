@@ -11,7 +11,7 @@
   },
   {
     "title" : "Equalizer",
-    "description" : "Equalize your image using histogram specification",
+    "description" : "Transform your image by creating your own histogram",
     "activityOnClick" : "Equalizer"
   }
 ]
