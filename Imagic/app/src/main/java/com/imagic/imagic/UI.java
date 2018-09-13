@@ -44,13 +44,6 @@ class UI {
         view.getViewport().setXAxisBoundsManual(true);
     }
 
-    // Set Y as percentage
-    static void setYAsPercentageGraphView(GraphView view) {
-        view.getViewport().setMinY(0);
-        view.getViewport().setMaxY(100);
-        view.getViewport().setYAxisBoundsManual(true);
-    }
-
     // Render graph view
     static void renderGraphView(GraphView view, BarGraphSeries<DataPoint> series) {
         view.removeAllSeries();

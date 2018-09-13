@@ -324,6 +324,10 @@ public class EqualizerActivity extends AppCompatActivity {
         TextView fourthPointTextViewY = findViewById(R.id.fourthPointEqualizerTextViewY);
 
         userDefinedGraphView = findViewById(R.id.graphViewUserDefined);
+        userDefinedGraphView.getViewport().setMinY(0);
+        userDefinedGraphView.getViewport().setMaxY(200);
+        userDefinedGraphView.getViewport().setYAxisBoundsManual(true);
+
         redGraphViewBefore = findViewById(R.id.redGraphViewBefore);
         redGraphViewAfter = findViewById(R.id.redGraphViewAfter);
         greenGraphViewBefore = findViewById(R.id.greenGraphViewBefore);
@@ -345,8 +349,6 @@ public class EqualizerActivity extends AppCompatActivity {
         for(int idx = 0; idx < 4; idx++) YSeekBarValue[idx] = 100;
 
         UI.hide(userDefinedGraphView);
-        UI.setYAsPercentageGraphView(userDefinedGraphView);
-
         UI.hide(redGraphViewBefore);
         UI.hide(redGraphViewAfter);
         UI.hide(greenGraphViewBefore);
