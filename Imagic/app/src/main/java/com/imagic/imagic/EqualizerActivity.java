@@ -175,15 +175,20 @@ public class EqualizerActivity extends AppCompatActivity {
 
             userDefinedHistogram = new Histogram();
             for(int idx = 0; idx < 256; idx++) {
-                Log.d("Result", Double.toString(linearEquation.compute(idx)));
-                userDefinedHistogram.addDataPoint(idx, linearEquation.compute(idx));
+                double value = linearEquation.compute(idx);
+                userDefinedHistogram.addDataPoint(idx, value);
             }
             userDefinedHistogram.updateSeries();
+            double[] userDefinedCDF = userDefinedHistogram.getCDF();
 
-//            for(DataPoint dp : histogram.dataPoints) {
-//                Log.d("Data", Double.toString(dp.getX()) + " " + Double.toString(dp.getY()));
-//            }
-
+            int[] newRedValue = transformedImage.rgb.red.matchHistogram(userDefinedCDF);
+            int[] newGreenValue = transformedImage.rgb.green.matchHistogram(userDefinedCDF);
+            int[] newBlueValue = transformedImage.rgb.blue.matchHistogram(userDefinedCDF);
+            try {
+                transformedImage.updateBitmap(EqualizerActivity.this, newRedValue, newGreenValue, newBlueValue);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -208,16 +213,16 @@ public class EqualizerActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void results) {
             UI.renderGraphView(userDefinedGraphView, userDefinedHistogram.series);
-            /*
+
             transformedImage.rgb.enableValueDependentColor();
 
-            UI.renderGraphView(redGraphView, transformedImage.rgb.red.series);
-            UI.renderGraphView(greenGraphView, transformedImage.rgb.green.series);
-            UI.renderGraphView(blueGraphView, transformedImage.rgb.blue.series);
+            UI.renderGraphView(redGraphViewAfter, transformedImage.rgb.red.series);
+            UI.renderGraphView(greenGraphViewAfter, transformedImage.rgb.green.series);
+            UI.renderGraphView(blueGraphViewAfter, transformedImage.rgb.blue.series);
 
-            UI.updateImageView(ContrastEnhancementActivity.this, transformedImage.bitmap, afterView);
-            UI.clearImageViewMemory(ContrastEnhancementActivity.this);
-            */
+            UI.updateImageView(EqualizerActivity.this, transformedImage.bitmap, afterView);
+            UI.clearImageViewMemory(EqualizerActivity.this);
+
             UI.setInvisible(progressBar);
         }
     }
