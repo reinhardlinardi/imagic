@@ -159,8 +159,6 @@ public class EqualizerActivity extends AppCompatActivity {
                 double value = (row == 2)? 255 : XSeekBarValue[row];
                 for(int col = 0; col < 3; col++) coefficients[row][col] = Math.pow(value, 3 - col);
 
-                // y = ax^3 + bx^2 + cx + d
-                // d = YSeekBarValue[0]
                 rightHandSide[row] = YSeekBarValue[row + 1] - YSeekBarValue[0];
             }
 
@@ -171,7 +169,6 @@ public class EqualizerActivity extends AppCompatActivity {
 
             double[] result = linearEquation.getResult();
             Log.d("Equation", Double.toString(result[0]) + " x^3 + " + Double.toString(result[1]) + " x^2 + " + Double.toString(result[2]) + " x + " + Double.toString(YSeekBarValue[0]));
-
 
             userDefinedHistogram = new Histogram();
             for(int idx = 0; idx < 256; idx++) {

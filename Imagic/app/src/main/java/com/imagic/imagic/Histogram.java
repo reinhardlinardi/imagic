@@ -1,7 +1,6 @@
 package com.imagic.imagic;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -196,7 +195,6 @@ class Histogram implements JSONSerializable {
 
         for(int i = 0; i < 256; i++) {
             for(int j = 0; j < 256; j++) {
-                Log.d("ori VS user def", Double.toString(cdfOriginalImage[i]) + " " + Double.toString(cdfUserDefinedHistogram[j]));
                 if(cdfOriginalImage[i] > cdfUserDefinedHistogram[j]) {
                     double d1 = (j > 0) ? cdfOriginalImage[i] - cdfUserDefinedHistogram[j-1] : 99999.0;
                     double d2 = cdfUserDefinedHistogram[j] - cdfOriginalImage[i];
@@ -207,7 +205,6 @@ class Histogram implements JSONSerializable {
             }
         }
 
-        for(int idx = 0; idx < 256; idx++) Log.d("newVal", Integer.toString(newColorValue[idx]));
         for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
 
         resetData();
