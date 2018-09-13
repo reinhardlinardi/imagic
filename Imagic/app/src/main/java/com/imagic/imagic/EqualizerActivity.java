@@ -192,8 +192,7 @@ public class EqualizerActivity extends AppCompatActivity {
             userDefinedHistogram = new Histogram();
 
             for(int idx = 0; idx < 256; idx++) {
-                double value = linearEquation.compute(idx);
-                userDefinedHistogram.addDataPoint(idx, value);
+                userDefinedHistogram.addDataPoint(idx, Math.abs(linearEquation.compute(idx)));
             }
 
             userDefinedHistogram.updateSeries();
