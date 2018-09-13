@@ -217,8 +217,6 @@ public class EqualizerActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            UI.show(userDefinedGraphView);
-
             UI.disable(firstPointSeekBarY);
             UI.disable(secondPointSeekBarX);
             UI.disable(secondPointSeekBarY);
@@ -242,6 +240,7 @@ public class EqualizerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void results) {
+            UI.show(userDefinedGraphView);
             UI.renderGraphView(userDefinedGraphView, userDefinedHistogram.series);
 
             transformedImage.rgb.enableValueDependentColor();
