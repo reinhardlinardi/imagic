@@ -312,6 +312,21 @@
                     android:layout_height="@dimen/graph_space_layout_height" />-->
 
                 <TextView
+                    android:id="@+id/textViewUserDefined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_userDefined" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/graphViewUserDefined"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <TextView
                     android:id="@+id/textViewBeforeRed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

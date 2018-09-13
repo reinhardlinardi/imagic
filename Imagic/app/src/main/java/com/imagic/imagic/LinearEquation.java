@@ -11,11 +11,13 @@ class LinearEquation {
     double[][] coefficients;
     double[] rightHandSide;
     double[] result;
+    double equationConstant;
 
     // Constructor
-    LinearEquation(int degree) {
+    LinearEquation(int degree, double constant) {
         this.degree = degree;
         result = new double[degree];
+        this.equationConstant = constant;
     }
 
     // Set coefficients
@@ -56,8 +58,12 @@ class LinearEquation {
     // Compute equation
     double compute(int x) {
         double total = 0;
-        for(int power = 1; power <= degree; power++) total += result[power - 1] * Math.pow(x, power);
+        int i = 0;
+        for(int power = degree; power > 0; power--) {
+            total += result[i] * Math.pow(x, power);
+            i++;
+        }
 
-        return total;
+        return total + equationConstant;
     }
 }

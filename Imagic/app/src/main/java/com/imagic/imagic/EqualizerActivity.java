@@ -11,6 +11,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
 
 public class EqualizerActivity extends AppCompatActivity {
 
@@ -61,6 +62,7 @@ public class EqualizerActivity extends AppCompatActivity {
             if(dataAvailableInCache()) {
                 originalImage.rgb.enableValueDependentColor();
 
+//                UI.show(userDefinedGraphView);
                 UI.show(redGraphViewBefore);
                 UI.show(redGraphViewAfter);
                 UI.show(greenGraphViewBefore);
@@ -68,6 +70,7 @@ public class EqualizerActivity extends AppCompatActivity {
                 UI.show(blueGraphViewBefore);
                 UI.show(blueGraphViewAfter);
 
+//                UI.renderGraphView(userDefinedGraphView, originalImage.rgb.red.series);
                 UI.renderGraphView(redGraphViewBefore, originalImage.rgb.red.series);
                 UI.renderGraphView(redGraphViewAfter, originalImage.rgb.red.series);
                 UI.renderGraphView(greenGraphViewBefore, originalImage.rgb.green.series);
@@ -156,10 +159,12 @@ public class EqualizerActivity extends AppCompatActivity {
                 double value = (row == 2)? 255 : XSeekBarValue[row];
                 for(int col = 0; col < 3; col++) coefficients[row][col] = Math.pow(value, 3 - col);
 
+                // y = ax^3 + bx^2 + cx + d
+                // d = YSeekBarValue[0]
                 rightHandSide[row] = YSeekBarValue[row + 1] - YSeekBarValue[0];
             }
 
-            LinearEquation linearEquation = new LinearEquation(3);
+            LinearEquation linearEquation = new LinearEquation(3, YSeekBarValue[0]);
             linearEquation.setCoefficients(coefficients);
             linearEquation.setRightHandSide(rightHandSide);
             linearEquation.solve();
@@ -167,27 +172,32 @@ public class EqualizerActivity extends AppCompatActivity {
             double[] result = linearEquation.getResult();
             Log.d("Equation", Double.toString(result[0]) + " x^3 + " + Double.toString(result[1]) + " x^2 + " + Double.toString(result[2]) + " x + " + Double.toString(YSeekBarValue[0]));
 
-            /*
-            Histogram histogram = new Histogram();
-            for(int idx = 0; idx < 256; idx++) histogram.addDataPoint(idx, linearEquation.compute(idx));
 
-            for(DataPoint dp : histogram.dataPoints) {
-                Log.d("Data", Double.toString(dp.getX()) + " " + Double.toString(dp.getY()));
+            userDefinedHistogram = new Histogram();
+            for(int idx = 0; idx < 256; idx++) {
+                Log.d("Result", Double.toString(linearEquation.compute(idx)));
+                userDefinedHistogram.addDataPoint(idx, linearEquation.compute(idx));
             }
-            */
+            userDefinedHistogram.updateSeries();
+
+//            for(DataPoint dp : histogram.dataPoints) {
+//                Log.d("Data", Double.toString(dp.getX()) + " " + Double.toString(dp.getY()));
+//            }
+
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-            /*
+            UI.show(userDefinedGraphView);
+
             try {
-                transformedImage = new Image(ContrastEnhancementActivity.this, originalImage, false);
+                transformedImage = new Image(EqualizerActivity.this, originalImage, false);
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
             }
-            */
+
             progressBar.setProgress(0);
             UI.show(progressBar);
         }
@@ -197,6 +207,7 @@ public class EqualizerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void results) {
+            UI.renderGraphView(userDefinedGraphView, userDefinedHistogram.series);
             /*
             transformedImage.rgb.enableValueDependentColor();
 
@@ -217,7 +228,7 @@ public class EqualizerActivity extends AppCompatActivity {
     // Image
     private Image originalImage;
     private Image transformedImage;
-
+    private Histogram userDefinedHistogram;
     // UI components
     private ProgressBar progressBar;
 
@@ -230,6 +241,7 @@ public class EqualizerActivity extends AppCompatActivity {
     private GraphView redGraphViewAfter;
     private GraphView greenGraphViewBefore;
     private GraphView blueGraphViewAfter;
+    private GraphView userDefinedGraphView;
 
     private SeekBar firstPointSeekBarY;
     private SeekBar secondPointSeekBarX;
@@ -270,6 +282,7 @@ public class EqualizerActivity extends AppCompatActivity {
         TextView thirdPointTextViewY = findViewById(R.id.thirdPointEqualizerTextViewY);
         TextView fourthPointTextViewY = findViewById(R.id.fourthPointEqualizerTextViewY);
 
+        userDefinedGraphView = findViewById(R.id.graphViewUserDefined);
         redGraphViewBefore = findViewById(R.id.redGraphViewBefore);
         redGraphViewAfter = findViewById(R.id.redGraphViewAfter);
         greenGraphViewBefore = findViewById(R.id.greenGraphViewBefore);
@@ -290,6 +303,7 @@ public class EqualizerActivity extends AppCompatActivity {
 
         for(int idx = 0; idx < 4; idx++) YSeekBarValue[idx] = 100;
 
+        UI.hide(userDefinedGraphView);
         UI.hide(redGraphViewBefore);
         UI.hide(redGraphViewAfter);
         UI.hide(greenGraphViewBefore);
@@ -297,6 +311,7 @@ public class EqualizerActivity extends AppCompatActivity {
         UI.hide(blueGraphViewBefore);
         UI.hide(blueGraphViewAfter);
 
+        UI.showAllXGraphView(userDefinedGraphView);
         UI.showAllXGraphView(redGraphViewBefore);
         UI.showAllXGraphView(redGraphViewAfter);
         UI.showAllXGraphView(greenGraphViewBefore);
