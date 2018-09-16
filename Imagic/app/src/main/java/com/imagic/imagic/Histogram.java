@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-abstract class Histogram implements JSONSerializable {
+class Histogram implements JSONSerializable {
 
     // Properties
     protected BarGraphSeries<DataPoint> series;
@@ -56,9 +56,6 @@ abstract class Histogram implements JSONSerializable {
 
         updateSeries();
     }
-
-    // Enable value dependent color
-    protected abstract void enableValueDependentColor();
 
     // Is histogram data empty
     protected final boolean isDataEmpty() { return dataPoints.size() == 0; }
@@ -121,7 +118,7 @@ abstract class Histogram implements JSONSerializable {
     }
 
     // Get cumulative distribution function
-    private double[] getCDF() {
+    public double[] getCDF() {
         double[] PMF = getPMF();
         double[] CDF = new double[256];
         Arrays.fill(CDF, 0.0);
@@ -180,6 +177,34 @@ abstract class Histogram implements JSONSerializable {
         double c = 1 / Math.log10((double)(1 + max));
 
         for(int val = 0; val <= max; val++) newColorValue[val] = (int)(Math.floor(Math.log10((double)(val + 1)) * 255.0 * c) * multiplier);
+        for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
+
+        resetData();
+        for(int idx = 0; idx < 256; idx++) addDataPoint(idx, newValueCount[idx]);
+        updateSeries();
+
+        return newColorValue;
+    }
+
+    public int[] matchHistogram(double[] cdfUserDefinedHistogram) {
+        double[] cdfOriginalImage = getCDF();
+        int[] newColorValue = new int[256];
+        int[] newValueCount = new int[256];
+        Arrays.fill(newColorValue, 0);
+        Arrays.fill(newValueCount, 0);
+
+        for(int i = 0; i < 256; i++) {
+            for(int j = 0; j < 256; j++) {
+                if(cdfOriginalImage[i] > cdfUserDefinedHistogram[j]) {
+                    double d1 = (j > 0) ? cdfOriginalImage[i] - cdfUserDefinedHistogram[j-1] : 99999.0;
+                    double d2 = cdfUserDefinedHistogram[j] - cdfOriginalImage[i];
+                    newColorValue[i] = (d1 > d2) ? j : j-1;
+                } else if(cdfOriginalImage[i] == cdfUserDefinedHistogram[j]){
+                    newColorValue[i] = j;
+                }
+            }
+        }
+
         for(int idx = 0; idx < 256; idx++) newValueCount[newColorValue[idx]] += dataPoints.get(idx).getY();
 
         resetData();

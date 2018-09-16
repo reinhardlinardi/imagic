@@ -8,5 +8,10 @@
     "title" : "Contrast Enhancement",
     "description" : "Enhance contrast using various histogram equalization algorithms",
     "activityOnClick" : "ContrastEnhancement"
+  },
+  {
+    "title" : "Equalizer",
+    "description" : "Transform your image by creating your own histogram",
+    "activityOnClick" : "Equalizer"
   }
 ]

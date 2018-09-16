@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".EqualizerActivity">
+
+    <ProgressBar
+        android:id="@+id/equalizerProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:maxHeight="@dimen/progressbar_max_height"
+        android:minHeight="@dimen/progressbar_min_height" />
+
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/graph_linear_layout_vertical_padding"
+            android:paddingEnd="@dimen/graph_linear_layout_side_padding"
+            android:paddingStart="@dimen/graph_linear_layout_side_padding"
+            android:paddingTop="@dimen/graph_linear_layout_vertical_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/image_compare_linear_layout_margin_top_bottom"
+                android:layout_marginTop="@dimen/image_compare_linear_layout_margin_top_bottom"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <ImageView
+                    android:id="@+id/equalizerImageBefore"
+                    android:layout_width="@dimen/image_compare_layout_width"
+                    android:layout_height="@dimen/image_compare_layout_height"
+                    android:layout_margin="@dimen/image_compare_margin_all"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/original_image_content_description" />
+
+                <ImageView
+                    android:id="@+id/equalizerImageAfter"
+                    android:layout_width="@dimen/image_compare_layout_width"
+                    android:layout_height="@dimen/image_compare_layout_height"
+                    android:layout_margin="@dimen/image_compare_margin_all"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/transformed_image_content_description" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/all_seek_bar_linear_layout_margin_all"
+                android:orientation="vertical"
+                android:weightSum="5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="20">
+
+                    <Space
+                        android:layout_width="@dimen/seek_bar_field_description_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/textViewXAxis"
+                        android:layout_width="@dimen/seek_bar_field_description_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:text="@string/textView_x"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/textViewYAxis"
+                        android:layout_width="@dimen/seek_bar_field_description_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:text="@string/textView_y"
+                        android:textAlignment="center" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="20">
+
+                    <TextView
+                        android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_first_point_description" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:text="@string/equalizer_first_point_x_value" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/firstPointEqualizerSeekBarY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:max="100"
+                        android:progress="100" />
+
+                    <TextView
+                        android:id="@+id/firstPointEqualizerTextViewY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="20">
+
+                    <TextView
+                        android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_second_point_description" />
+
+                    <SeekBar
+                        android:id="@+id/secondPointEqualizerSeekBarX"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:max="126"
+                        android:progress="126" />
+
+                    <TextView
+                        android:id="@+id/secondPointEqualizerTextViewX"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_second_point_x_initial_value" />
+
+                    <SeekBar
+                        android:id="@+id/secondPointEqualizerSeekBarY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:max="100"
+                        android:progress="100" />
+
+                    <TextView
+                        android:id="@+id/secondPointEqualizerTextViewY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="20">
+
+                    <TextView
+                        android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_third_point_description" />
+
+                    <SeekBar
+                        android:id="@+id/thirdPointEqualizerSeekBarX"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:max="126"
+                        android:progress="126" />
+
+                    <TextView
+                        android:id="@+id/thirdPointEqualizerTextViewX"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_third_point_x_initial_value" />
+
+                    <SeekBar
+                        android:id="@+id/thirdPointEqualizerSeekBarY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:max="100"
+                        android:progress="100" />
+
+                    <TextView
+                        android:id="@+id/thirdPointEqualizerTextViewY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/contrast_enhance_space_layout_height" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:layout_marginTop="@dimen/seek_bar_linear_layout_margin_top_bottom"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="20">
+
+                    <TextView
+                        android:layout_width="@dimen/seek_bar_color_description_layout_width"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_fourth_point_description" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:text="@string/equalizer_fourth_point_x_value" />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/fourthPointEqualizerSeekBarY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:max="100"
+                        android:progress="100" />
+
+                    <TextView
+                        android:id="@+id/fourthPointEqualizerTextViewY"
+                        android:layout_width="@dimen/seek_bar_layout_width"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/seek_bar_text_view_initial_value_no_percent" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textViewUserDefined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_userDefined" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/graphViewUserDefined"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <TextView
+                    android:id="@+id/textViewBeforeRed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_before" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/redGraphViewBefore"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <TextView
+                    android:id="@+id/textViewAfterRed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_after" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/redGraphViewAfter"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_layout_height" />
+
+                <TextView
+                    android:id="@+id/textViewBeforeGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_before" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/greenGraphViewBefore"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <TextView
+                    android:id="@+id/textViewAfterGreen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_after" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/greenGraphViewAfter"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_layout_height" />
+
+                <TextView
+                    android:id="@+id/textViewBeforeBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_before" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/blueGraphViewBefore"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+
+                <TextView
+                    android:id="@+id/textViewAfterBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/textView_after" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/blueGraphViewAfter"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_layout_height"
+                    app:seriesData="@string/graph_series_no_data" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -134,10 +134,7 @@ class Image implements JSONSerializable {
         Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         newBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
 
-        if(Build.VERSION.SDK_INT >= 24) {
-            Bitmap rotatedBitmap = Bitmap.createBitmap(newBitmap, 0, 0, width, height, getRotationMatrix(context), true);
-            bitmap = rotatedBitmap;
-        }
+        if(Build.VERSION.SDK_INT >= 24) bitmap = Bitmap.createBitmap(newBitmap, 0, 0, width, height, getRotationMatrix(context), true);
         else bitmap = newBitmap;
     }
 

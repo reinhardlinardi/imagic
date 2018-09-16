@@ -153,22 +153,42 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             int done = 0;
             publishProgress(countProgress(done + 1, numTransformations + 2));
 
+            int[] newRedValue = new int[256];
+            int[] newGreenValue = new int[256];
+            int[] newBlueValue = new int[256];
+
+            switch(selectedOption.algorithm) {
+                case "Linear":
+                    newRedValue = transformedImage.rgb.red.stretch((double) redPercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    newGreenValue = transformedImage.rgb.green.stretch((double) greenPercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    newBlueValue = transformedImage.rgb.blue.stretch((double) bluePercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    break;
+                case "CDF":
+                    newRedValue = transformedImage.rgb.red.cumulativeFrequencyEqualization((double) redPercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    newGreenValue = transformedImage.rgb.green.cumulativeFrequencyEqualization((double) greenPercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    newBlueValue = transformedImage.rgb.blue.cumulativeFrequencyEqualization((double) bluePercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    break;
+                case "Logarithmic":
+                    newRedValue = transformedImage.rgb.red.logarithmicEqualization((double) redPercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    newGreenValue = transformedImage.rgb.green.logarithmicEqualization((double) greenPercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    newBlueValue = transformedImage.rgb.blue.logarithmicEqualization((double) bluePercentage / 100);
+                    publishProgress(countProgress((++done) + 1, numTransformations + 2));
+                    break;
+                default:
+                    break;
+            }
+
             try {
-                Method method = transformedImage.rgb.red.getClass().getSuperclass().getMethod(selectedOption.executeFunctionOnButtonClick, double.class);
-
-                int[] newRedValue = (int[]) method.invoke(transformedImage.rgb.red, (double)(redPercentage)/100);
-                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-
-                int[] newGreenValue = (int[]) method.invoke(transformedImage.rgb.green, (double)(greenPercentage)/100);
-                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-
-                int[] newBlueValue = (int[]) method.invoke(transformedImage.rgb.blue, (double)(bluePercentage)/100);
-                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-
                 transformedImage.updateBitmap(ContrastEnhancementActivity.this, newRedValue, newGreenValue, newBlueValue);
-                publishProgress(countProgress((++done) + 2, numTransformations + 2));
-
-                if(isCancelled()) return null;
+                publishProgress(countProgress((++done) + 1, numTransformations + 2));
             }
             catch(Exception e) {
                 Log.e("Imagic", "Exception", e);
