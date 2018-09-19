@@ -11,6 +11,8 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import java.util.Arrays;
+
 public class ShapeIdentificationActivity extends AppCompatActivity{
 
     // Image load async task
@@ -81,6 +83,20 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
     private class ChromaticTask extends AsyncTask<Void, Integer, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
+            ChainCode chainCode = new ChainCode();
+//            int[][] test = new int[][]{
+//                    {0, 0, 0, 0, 0, 0, 0, 0},
+//                    {0, 0, 1, 0, 0, 0, 0, 0},
+//                    {0, 0, 1, 1, 1, 1, 0, 0},
+//                    {0, 0, 1, 1, 1, 0, 0, 0},
+//                    {0, 1, 1, 1, 1, 0, 0, 0},
+//                    {0, 0, 0, 0, 1, 0, 0, 0},
+//                    {0, 0, 0, 0, 0, 0, 0, 0},
+//                    {0, 0, 0, 0, 0, 0, 0, 0},
+//            };
+            int[][] matrix = originalImage.getChromaticMatrix();
+            Log.v("res", Arrays.deepToString(matrix));
+            chainCode.countDirectionCode(matrix);
 //            int numTransformations = 3;
 //            int done = 0;
 //            publishProgress(countProgress(done + 1, numTransformations + 2));

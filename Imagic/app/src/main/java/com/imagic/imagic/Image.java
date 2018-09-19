@@ -142,6 +142,7 @@ class Image implements JSONSerializable {
     public int[][] getChromaticMatrix(){
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
+        Log.v("image size", Integer.toString(width) + " " + Integer.toString(height));
         int[][] chromaticPixels = new int[width][height];
         int[] pixels = new int[width*height];
 
