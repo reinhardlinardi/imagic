@@ -143,7 +143,7 @@ class Image implements JSONSerializable {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Log.v("image size", Integer.toString(width) + " " + Integer.toString(height));
-        int[][] chromaticPixels = new int[width][height];
+        int[][] chromaticPixels = new int[height][width];
         int[] pixels = new int[width*height];
 
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
@@ -152,6 +152,7 @@ class Image implements JSONSerializable {
             for(int col = 0; col < width; col++) {
                 int pixel = pixels[row * width + col];
 //                Log.v("color", Double.toString((double)(Color.red(pixel)+Color.green(pixel)+Color.blue(pixel)) / 3.0));
+                Log.v("Coordinate", Integer.toString(row) + " " + Integer.toString(col));
                 if(((double)(Color.red(pixel)+Color.green(pixel)+Color.blue(pixel)) / 3.0) > 128.0){
                     chromaticPixels[row][col] =  0;
                 } else {
