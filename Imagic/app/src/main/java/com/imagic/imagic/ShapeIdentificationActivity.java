@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.Arrays;
 
@@ -97,6 +98,8 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
             int[][] matrix = originalImage.getChromaticMatrix();
             Log.v("res", Arrays.deepToString(matrix));
             chainCode.countDirectionCode(matrix);
+            prediction = chainCode.predict();
+
 //            int numTransformations = 3;
 //            int done = 0;
 //            publishProgress(countProgress(done + 1, numTransformations + 2));
@@ -146,7 +149,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 ////
 //            UI.updateImageView(ShapeIdentificationActivity.this, transformedImage.bitmap, afterView);
 //            UI.clearImageViewMemory(ShapeIdentificationActivity.this);
-
+            predictionResultView.setText(Integer.toString(prediction));
             UI.setInvisible(progressBar);
         }
     }
@@ -161,8 +164,9 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
     private ProgressBar progressBar;
     private ImageView beforeView;
     private ImageView afterView;
+    private TextView predictionResultView;
 
-
+    int prediction;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -175,6 +179,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         progressBar = findViewById(R.id.shapeIdentificationProgressBar);
         beforeView = findViewById(R.id.shapeIdentificationImageBefore);
         afterView = findViewById(R.id.shapeIdentificationImageAfter);
+        predictionResultView = findViewById(R.id.shapeIdentificationVerdict);
 
         ShapeIdentificationActivity.ImageLoadTask imageLoadTask = new ShapeIdentificationActivity.ImageLoadTask();
         imageLoadTask.execute(cachedImageDataURI);
