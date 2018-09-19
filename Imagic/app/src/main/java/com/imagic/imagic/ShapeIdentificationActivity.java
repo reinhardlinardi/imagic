@@ -1,5 +1,7 @@
 package com.imagic.imagic;
 
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -75,6 +77,64 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         }
     }
 
+    // Contrast enhancement async task
+    private class ChromaticTask extends AsyncTask<Void, Integer, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+//            int numTransformations = 3;
+//            int done = 0;
+//            publishProgress(countProgress(done + 1, numTransformations + 2));
+//
+//            int[] newRedValue = new int[256];
+//            int[] newGreenValue = new int[256];
+//            int[] newBlueValue = new int[256];
+//
+//            newRedValue = transformedImage.rgb.red.chromaticEqualization();
+//            publishProgress(countProgress((++done) + 1, numTransformations + 2));
+//            newGreenValue = transformedImage.rgb.green.chromaticEqualization();
+//            publishProgress(countProgress((++done) + 1, numTransformations + 2));
+//            newBlueValue = transformedImage.rgb.blue.chromaticEqualization();
+//            publishProgress(countProgress((++done) + 1, numTransformations + 2));
+
+
+            try {
+//                transformedImage.updateBitmap(ShapeIdentificationActivity.this, newRedValue, newGreenValue, newBlueValue);
+//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            try {
+//                transformedImage = new Image(ShapeIdentificationActivity.this, originalImage, false);
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
+            }
+
+            progressBar.setProgress(0);
+            UI.show(progressBar);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void results) {
+//            transformedImage.rgb.enableValueDependentColor();
+////
+//            UI.updateImageView(ShapeIdentificationActivity.this, transformedImage.bitmap, afterView);
+//            UI.clearImageViewMemory(ShapeIdentificationActivity.this);
+
+            UI.setInvisible(progressBar);
+        }
+    }
+
     // Cached image data URI
     private Uri cachedImageDataURI;
 
@@ -102,11 +162,16 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
         ShapeIdentificationActivity.ImageLoadTask imageLoadTask = new ShapeIdentificationActivity.ImageLoadTask();
         imageLoadTask.execute(cachedImageDataURI);
+
+        ShapeIdentificationActivity.ChromaticTask chromaticTask = new ShapeIdentificationActivity.ChromaticTask();
+        chromaticTask.execute();
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        UI.clearImageViewMemory(this);
     }
 
     // Count progress

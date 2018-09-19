@@ -138,6 +138,29 @@ class Image implements JSONSerializable {
         else bitmap = newBitmap;
     }
 
+    //return binary matrix representing blck & white
+    public int[][] getChromaticMatrix(){
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int[][] chromaticPixels = new int[width][height];
+        int[] pixels = new int[width*height];
+
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                int pixel = pixels[row * width + col];
+                if(((Color.red(pixel)+Color.green(pixel)+Color.blue(pixel))/3)>128){
+                    chromaticPixels[col][row] =  1;
+                } else {
+                    chromaticPixels[col][row] =  0;
+                }
+            }
+        }
+
+        return  chromaticPixels;
+    }
+
     // Generate histogram
     void generateHistogramByColorType(Image.ColorType colorType) {
         int[] valueCount = new int[256];
