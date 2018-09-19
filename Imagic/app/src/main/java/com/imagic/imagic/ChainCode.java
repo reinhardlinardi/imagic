@@ -199,4 +199,40 @@ public class ChainCode {
                 blackWhiteBitmap[currentPoint[1] - 1][currentPoint[0]] == 0 ||
                 blackWhiteBitmap[currentPoint[1]][currentPoint[0] - 1] == 0));
     }
+
+    public int predict() {
+        double[][] normalizedReference = new double[10][8];
+        for(int i = 0; i < 10; i++) {
+            normalizedReference[i] = normalizeCodeChain(referenceCodeCount[i]);
+        }
+        double[] normalizedTestChainCode = normalizeCodeChain(directionCodeCount);
+
+        double[] sum = new double[10];
+        double min = 999999.0;
+        int result = -1;
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 8; j++) {
+                sum[i] += Math.abs(normalizedReference[i][j] - normalizedTestChainCode[j]);
+            }
+            if(sum[i] < min) {
+                min = sum[i];
+                result = i;
+            }
+        }
+
+        return result;
+    }
+
+    public double[] normalizeCodeChain(int[] chainCode) {
+        int sum = 0;
+        for(int i = 0; i < 8; i++) {
+            sum += chainCode[i];
+        }
+
+        double[] result = new double[8];
+        for(int i = 0; i < 8; i++) {
+            result[i] = (double) chainCode[i] / (double) sum;
+        }
+        return result;
+    }
 }
