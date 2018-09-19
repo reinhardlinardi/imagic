@@ -151,10 +151,11 @@ class Image implements JSONSerializable {
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
                 int pixel = pixels[row * width + col];
-                if(((Color.red(pixel)+Color.green(pixel)+Color.blue(pixel))/3)>128){
-                    chromaticPixels[col][row] =  1;
+//                Log.v("color", Double.toString((double)(Color.red(pixel)+Color.green(pixel)+Color.blue(pixel)) / 3.0));
+                if(((double)(Color.red(pixel)+Color.green(pixel)+Color.blue(pixel)) / 3.0) > 128.0){
+                    chromaticPixels[row][col] =  0;
                 } else {
-                    chromaticPixels[col][row] =  0;
+                    chromaticPixels[row][col] =  1;
                 }
             }
         }
