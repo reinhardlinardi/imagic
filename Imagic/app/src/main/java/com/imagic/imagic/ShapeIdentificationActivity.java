@@ -78,7 +78,6 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 //                    {0, 0, 0, 0, 0, 0, 0, 0},
 //            };
             int[][] matrix = originalImage.getChromaticMatrix();
-            Log.v("res", Arrays.deepToString(matrix));
             chainCode.countDirectionCode(matrix);
             prediction = chainCode.predict();
 
