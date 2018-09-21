@@ -31,9 +31,6 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
                     originalImage = new Image(ShapeIdentificationActivity.this, noBitmapImage, true);
                     publishProgress(countProgress((++done) + 1, numImages + 1));
 
-                    transformedImage = new Image(ShapeIdentificationActivity.this, originalImage, false);
-                    publishProgress(countProgress((++done) + 1, numImages + 1));
-
                     if(isCancelled()) break;
                 }
                 catch(Exception e) {
@@ -56,26 +53,11 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(Void results) {
             UI.updateImageView(ShapeIdentificationActivity.this, originalImage.uri, beforeView);
-            UI.updateImageView(ShapeIdentificationActivity.this, transformedImage.uri, afterView);
             UI.clearImageViewMemory(ShapeIdentificationActivity.this);
             UI.setInvisible(progressBar);
 
             if(dataAvailableInCache()) {
                 originalImage.rgb.enableValueDependentColor();
-
-//                UI.show(redGraphView);
-//                UI.show(greenGraphView);
-//                UI.show(blueGraphView);
-//
-//                UI.renderGraphView(redGraphView, originalImage.rgb.red.series);
-//                UI.renderGraphView(greenGraphView, originalImage.rgb.green.series);
-//                UI.renderGraphView(blueGraphView, originalImage.rgb.blue.series);
-//
-//                UI.enable(enhanceButton);
-            }
-            else {
-//                ContrastEnhancementActivity.HistogramGenerationTask histogramGenerationTask = new ContrastEnhancementActivity.HistogramGenerationTask();
-//                histogramGenerationTask.execute(Image.ColorType.RED, Image.ColorType.GREEN, Image.ColorType.BLUE);
             }
         }
     }
@@ -100,42 +82,11 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
             chainCode.countDirectionCode(matrix);
             prediction = chainCode.predict();
 
-//            int numTransformations = 3;
-//            int done = 0;
-//            publishProgress(countProgress(done + 1, numTransformations + 2));
-//
-//            int[] newRedValue = new int[256];
-//            int[] newGreenValue = new int[256];
-//            int[] newBlueValue = new int[256];
-//
-//            newRedValue = transformedImage.rgb.red.chromaticEqualization();
-//            publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//            newGreenValue = transformedImage.rgb.green.chromaticEqualization();
-//            publishProgress(countProgress((++done) + 1, numTransformations + 2));
-//            newBlueValue = transformedImage.rgb.blue.chromaticEqualization();
-//            publishProgress(countProgress((++done) + 1, numTransformations + 2));
-
-
-            try {
-//                transformedImage.updateBitmap(ShapeIdentificationActivity.this, newRedValue, newGreenValue, newBlueValue);
-//                publishProgress(countProgress((++done) + 1, numTransformations + 2));
-            }
-            catch(Exception e) {
-                Log.e("Imagic", "Exception", e);
-            }
-
             return null;
         }
 
         @Override
         protected void onPreExecute() {
-            try {
-//                transformedImage = new Image(ShapeIdentificationActivity.this, originalImage, false);
-            }
-            catch(Exception e) {
-                Log.e("Imagic", "Exception", e);
-            }
-
             progressBar.setProgress(0);
             UI.show(progressBar);
         }
@@ -145,10 +96,6 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
         @Override
         protected void onPostExecute(Void results) {
-//            transformedImage.rgb.enableValueDependentColor();
-////
-//            UI.updateImageView(ShapeIdentificationActivity.this, transformedImage.bitmap, afterView);
-//            UI.clearImageViewMemory(ShapeIdentificationActivity.this);
             predictionResultView.setText(Integer.toString(prediction));
             UI.setInvisible(progressBar);
         }
@@ -159,7 +106,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
     // Image
     private Image originalImage;
-    private Image transformedImage;
+
     // UI components
     private ProgressBar progressBar;
     private ImageView beforeView;
@@ -178,7 +125,6 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
         progressBar = findViewById(R.id.shapeIdentificationProgressBar);
         beforeView = findViewById(R.id.shapeIdentificationImageBefore);
-        afterView = findViewById(R.id.shapeIdentificationImageAfter);
         predictionResultView = findViewById(R.id.shapeIdentificationVerdict);
 
         ShapeIdentificationActivity.ImageLoadTask imageLoadTask = new ShapeIdentificationActivity.ImageLoadTask();
