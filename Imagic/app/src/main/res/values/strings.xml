@@ -37,4 +37,6 @@
     <string name="equalizer_first_point_x_value">0</string>
     <string name="equalizer_fourth_point_x_value">255</string>
     <string name="text_view_same_percentage_error">Cannot use the same percentage value for all colors.</string>
+    <string name="shape_identification_verdict_label">Our Verdict is :</string>
+    <string name="shape_identification_activity_title">Shape Identification</string>
 </resources>

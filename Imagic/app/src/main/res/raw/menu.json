@@ -13,5 +13,10 @@
     "title" : "Equalizer",
     "description" : "Transform your image by creating your own histogram",
     "activityOnClick" : "Equalizer"
+  },
+  {
+    "title" : "Detect Letter",
+    "description" : "Upload an image of a letter and let the magic guesses it's value",
+    "activityOnClick" : "ShapeIdentification"
   }
 ]
