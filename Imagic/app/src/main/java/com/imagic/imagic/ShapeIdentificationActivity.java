@@ -8,10 +8,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ShapeIdentificationActivity extends AppCompatActivity{
@@ -67,16 +75,6 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         @Override
         protected Void doInBackground(Void... voids) {
             ChainCode chainCode = new ChainCode();
-//            int[][] test = new int[][]{
-//                    {0, 0, 0, 0, 0, 0, 0, 0},
-//                    {0, 0, 1, 0, 0, 0, 0, 0},
-//                    {0, 0, 1, 1, 1, 1, 0, 0},
-//                    {0, 0, 1, 1, 1, 0, 0, 0},
-//                    {0, 1, 1, 1, 1, 0, 0, 0},
-//                    {0, 0, 0, 0, 1, 0, 0, 0},
-//                    {0, 0, 0, 0, 0, 0, 0, 0},
-//                    {0, 0, 0, 0, 0, 0, 0, 0},
-//            };
             int[][] matrix = originalImage.getChromaticMatrix();
             chainCode.countDirectionCode(matrix);
             prediction = chainCode.predict();
@@ -100,6 +98,32 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         }
     }
 
+    // Option adapter
+    private class ShapeIdentificationAdapter extends ArrayAdapter<ShapeIdentificationOption> {
+
+        ShapeIdentificationAdapter(ArrayList<ShapeIdentificationOption> options) {
+            super(ShapeIdentificationActivity.this, R.layout.shape_identification_spinner_option, options);
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            LayoutInflater inflater = ShapeIdentificationActivity.this.getLayoutInflater();
+            View optionView = inflater.inflate(R.layout.shape_identification_spinner_option, parent, false);
+
+            TextView optionTextView = optionView.findViewById(R.id.shapeIdentificationSpinnerOptionTextView);
+            ShapeIdentificationOption option = getItem(position);
+
+            if(option != null) optionTextView.setText(option.algorithm);
+
+            return optionView;
+        }
+
+        @Override
+        public View getDropDownView(int position, View view, ViewGroup parent) {
+            return getView(position, view, parent);
+        }
+    }
+
     // Cached image data URI
     private Uri cachedImageDataURI;
 
@@ -109,8 +133,11 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
     // UI components
     private ProgressBar progressBar;
     private ImageView beforeView;
-    private ImageView afterView;
     private TextView predictionResultView;
+    private Button predictButton;
+
+    // Selected option
+    private ShapeIdentificationOption selectedOption;
 
     int prediction;
 
@@ -125,13 +152,24 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         progressBar = findViewById(R.id.shapeIdentificationProgressBar);
         beforeView = findViewById(R.id.shapeIdentificationImageBefore);
         predictionResultView = findViewById(R.id.shapeIdentificationVerdict);
+        predictButton = findViewById(R.id.shapeIdentificationButton);
+
+        predictButton.setOnClickListener(getButtonOnClickListener());
+
+        try {
+            ArrayList<ShapeIdentificationOption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.shape_identification_options), ShapeIdentificationOption.class);
+            ShapeIdentificationActivity.ShapeIdentificationAdapter adapter = new ShapeIdentificationActivity.ShapeIdentificationAdapter(options);
+
+            Spinner spinner = findViewById(R.id.shapeIdentificationAlgorithmSpinner);
+            spinner.setAdapter(adapter);
+            spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
+        }
+        catch(Exception e) {
+            Log.e("Imagic", "Exception", e);
+        }
 
         ShapeIdentificationActivity.ImageLoadTask imageLoadTask = new ShapeIdentificationActivity.ImageLoadTask();
         imageLoadTask.execute(cachedImageDataURI);
-
-        ShapeIdentificationActivity.ChromaticTask chromaticTask = new ShapeIdentificationActivity.ChromaticTask();
-        chromaticTask.execute();
-
     }
 
     @Override
@@ -144,6 +182,35 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
     private int countProgress(int numTaskDone, int totalNumTask) {
         float taskDoneFraction = (float) numTaskDone / totalNumTask;
         return (int)(taskDoneFraction * 100);
+    }
+
+    // Spinner on item selected listener
+    private AdapterView.OnItemSelectedListener getSpinnerOnItemSelectedListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                selectedOption = (ShapeIdentificationOption) adapterView.getItemAtPosition(position);
+                String selectedAlgorithm = selectedOption.algorithm;
+
+                TextView textView = (TextView) view;
+                textView.setText(selectedAlgorithm + "   ▾");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        };
+    }
+
+    // Button on click listener
+    private View.OnClickListener getButtonOnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Panggil predicition berdasarkan algo
+                ShapeIdentificationActivity.ChromaticTask chromaticTask = new ShapeIdentificationActivity.ChromaticTask();
+                chromaticTask.execute();
+            }
+        };
     }
 
     // Check if data is available in cache

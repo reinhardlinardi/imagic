@@ -1,0 +1,8 @@
+[
+  {
+    "algorithm" : "Outer Tracing"
+  },
+  {
+    "algorithm" : "Thinning"
+  }
+]
