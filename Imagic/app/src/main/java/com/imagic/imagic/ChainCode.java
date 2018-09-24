@@ -5,9 +5,9 @@ import android.util.Log;
 import java.util.Arrays;
 
 public class ChainCode {
-    // 0 1 2
-    // 7 x 3
-    // 6 5 4
+    // 7 0 1
+    // 6 p 2
+    // 5 4 3
     private final int NORTH = 0;
     private final int NORTH_EAST = 1;
     private final int EAST = 2;
