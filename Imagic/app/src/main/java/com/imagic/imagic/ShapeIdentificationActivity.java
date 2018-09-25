@@ -39,6 +39,9 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
                     originalImage = new Image(ShapeIdentificationActivity.this, noBitmapImage, true);
                     publishProgress(countProgress((++done) + 1, numImages + 1));
 
+                    skeletonImage = new Image(ShapeIdentificationActivity.this, originalImage, false);
+                    publishProgress(countProgress((++done) + 1, numImages + 1));
+
                     if(isCancelled()) break;
                 }
                 catch(Exception e) {
@@ -61,6 +64,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(Void results) {
             UI.updateImageView(ShapeIdentificationActivity.this, originalImage.uri, beforeView);
+            UI.updateImageView(ShapeIdentificationActivity.this, skeletonImage.uri, skeletonResult);
             UI.clearImageViewMemory(ShapeIdentificationActivity.this);
             UI.setInvisible(progressBar);
 
@@ -70,20 +74,41 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         }
     }
 
-    // Contrast enhancement async task
+    // Chromatic async task
     private class ChromaticTask extends AsyncTask<Void, Integer, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            ChainCode chainCode = new ChainCode();
+            publishProgress(countProgress(1,3));
             int[][] matrix = originalImage.getChromaticMatrix();
-            chainCode.countDirectionCode(matrix);
-            prediction = chainCode.predict();
 
+            switch(selectedOption.algorithm){
+                case "Thinning":
+                    ImageSkeleton skeleton = new ImageSkeleton(matrix);
+                    int[][] result = skeleton.getBlackWhiteMatrix();
+                    publishProgress(countProgress(2,3));
+                    try{
+                        skeletonImage.updateSkeletonBitmap(ShapeIdentificationActivity.this,result);
+                    } catch(Exception e){
+                        Log.e("Imagic", "Exception", e);
+                    }
+                    publishProgress(countProgress(3,3));
+                    break;
+                case "Outer Tracing":
+                    ChainCode chainCode = new ChainCode();
+                    chainCode.countDirectionCode(matrix);
+                    publishProgress(countProgress(2,3));
+                    prediction = chainCode.predict();
+                    publishProgress(countProgress(3,3));
+                    break;
+            }
             return null;
         }
 
         @Override
         protected void onPreExecute() {
+            UI.disable(predictButton);
+            UI.disable(spinner);
+
             progressBar.setProgress(0);
             UI.show(progressBar);
         }
@@ -93,8 +118,18 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
         @Override
         protected void onPostExecute(Void results) {
-            predictionResultView.setText(Integer.toString(prediction));
+            switch(selectedOption.algorithm){
+                case "Thinning":
+                    UI.updateImageView(ShapeIdentificationActivity.this, skeletonImage.bitmap, skeletonResult);
+                    UI.clearImageViewMemory(ShapeIdentificationActivity.this);
+                    break;
+                case "Outer Tracing":
+                    predictionResultView.setText(Integer.toString(prediction));
+                    break;
+            }
             UI.setInvisible(progressBar);
+            UI.enable(predictButton);
+            UI.enable(spinner);
         }
     }
 
@@ -129,11 +164,14 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
     // Image
     private Image originalImage;
+    private Image skeletonImage;
 
     // UI components
     private ProgressBar progressBar;
     private ImageView beforeView;
+    private ImageView skeletonResult;
     private TextView predictionResultView;
+    private Spinner spinner;
     private Button predictButton;
 
     // Selected option
@@ -151,6 +189,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
         progressBar = findViewById(R.id.shapeIdentificationProgressBar);
         beforeView = findViewById(R.id.shapeIdentificationImageBefore);
+        skeletonResult= findViewById(R.id.shapeIdentificationSkeleton);
         predictionResultView = findViewById(R.id.shapeIdentificationVerdict);
         predictButton = findViewById(R.id.shapeIdentificationButton);
 
@@ -160,7 +199,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
             ArrayList<ShapeIdentificationOption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.shape_identification_options), ShapeIdentificationOption.class);
             ShapeIdentificationActivity.ShapeIdentificationAdapter adapter = new ShapeIdentificationActivity.ShapeIdentificationAdapter(options);
 
-            Spinner spinner = findViewById(R.id.shapeIdentificationAlgorithmSpinner);
+            spinner = findViewById(R.id.shapeIdentificationAlgorithmSpinner);
             spinner.setAdapter(adapter);
             spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
         }
@@ -191,7 +230,14 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 selectedOption = (ShapeIdentificationOption) adapterView.getItemAtPosition(position);
                 String selectedAlgorithm = selectedOption.algorithm;
-
+                switch(selectedAlgorithm){
+                    case "Outer Tracing":
+                        UI.hide(skeletonResult);
+                        break;
+                    case "Thinning":
+                        UI.show(skeletonResult);
+                        break;
+                }
                 TextView textView = (TextView) view;
                 textView.setText(selectedAlgorithm + "   ▾");
             }
@@ -215,4 +261,5 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
     // Check if data is available in cache
     private boolean dataAvailableInCache() { return !(originalImage.rgb.isDataEmpty()); }
+
 }

@@ -138,6 +138,24 @@ class Image implements JSONSerializable {
         else bitmap = newBitmap;
     }
 
+    public void updateSkeletonBitmap(Context context,int[][] skeletonMatrix) throws Exception {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int[] pixels = new int[width * height];
+
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                pixels[row * width + col] = (skeletonMatrix[row][col] == 0)? Color.rgb(255,255,255) : Color.rgb(0, 0, 0);
+            }
+        }
+
+        Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        newBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+
+        if(Build.VERSION.SDK_INT >= 24) bitmap = Bitmap.createBitmap(newBitmap, 0, 0, width, height, getRotationMatrix(context), true);
+        else bitmap = newBitmap;
+    }
+
     //return binary matrix representing blck & white
     public int[][] getChromaticMatrix(){
         int width = bitmap.getWidth();
