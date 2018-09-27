@@ -79,10 +79,10 @@ public class NumberOCRActivity extends AppCompatActivity {
             switch(selectedOption.algorithm) {
                 case "Edge Detection":
                     ChainCode chainCode = new ChainCode();
-                    chainCode.countDirectionCode(matrix);
+                    chainCode.getEdgeDetectionChainCode(matrix);
                     publishProgress(countProgress(2,3));
 
-                    prediction = chainCode.predict();
+                    prediction = chainCode.edgeDetectionOCR();
                     publishProgress(countProgress(3,3));
                     break;
                 case "Thinning":
