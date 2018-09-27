@@ -67,42 +67,47 @@ public class NumberOCRActivity extends AppCompatActivity {
         }
     }
 
-    // Chromatic async task
-    private class ChromaticTask extends AsyncTask<Void, Integer, Integer> {
+    // OCR async task
+    private class OCRTask extends AsyncTask<Void, Integer, Integer> {
         @Override
         protected Integer doInBackground(Void... voids) {
             publishProgress(countProgress(1,3));
-            Integer prediction = 0;
+            Integer verdict = 0;
 
-            int[][] matrix = originalImage.getChromaticMatrix();
-            NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
+            try {
+                skeletonImage = new Image(NumberOCRActivity.this, originalImage, false);
+                skeletonImage.getBlackWhiteMatrix(128);
+                NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
 
-            switch(selectedOption.algorithm) {
-                case "Edge Detection":
-                    ChainCode chainCode = new ChainCode();
-                    chainCode.getEdgeDetectionChainCode(matrix);
-                    publishProgress(countProgress(2,3));
+                switch(selectedOption.algorithm) {
+                    case "Edge Detection":
+                        ChainCode chainCode = new ChainCode();
+                        chainCode.getEdgeDetectionChainCode(skeletonImage.blackWhiteMatrix);
+                        publishProgress(countProgress(2,3));
 
-                    prediction = chainCode.edgeDetectionOCR();
-                    publishProgress(countProgress(3,3));
-                    break;
-                case "Thinning":
-                    ImageSkeleton skeleton = new ImageSkeleton(matrix);
-                    int[][] result = skeleton.getBlackWhiteMatrix();
-                    publishProgress(countProgress(2,3));
+                        verdict = chainCode.edgeDetectionOCR();
+                        publishProgress(countProgress(3,3));
+                        break;
+                    case "Thinning":
+                        skeletonImage.getSkeleton();
+                        publishProgress(countProgress(2,3));
 
-                    try {
-                        skeletonImage.updateSkeletonBitmap(NumberOCRActivity.this,result);
-                    }
-                    catch(Exception e) {
-                        Log.e("Imagic", "Exception", e);
-                    }
+                        try {
+                            skeletonImage.setBitmapToSkeleton(NumberOCRActivity.this);
+                        }
+                        catch(Exception e) {
+                            Log.e("Imagic", "Exception", e);
+                        }
 
-                    publishProgress(countProgress(3,3));
-                    break;
+                        publishProgress(countProgress(3,3));
+                        break;
+                }
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
             }
 
-            return prediction;
+            return verdict;
         }
 
         @Override
@@ -260,8 +265,8 @@ public class NumberOCRActivity extends AppCompatActivity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ChromaticTask chromaticTask = new ChromaticTask();
-                chromaticTask.execute();
+                OCRTask OCRTask = new OCRTask();
+                OCRTask.execute();
             }
         };
     }

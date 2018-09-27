@@ -20,6 +20,9 @@ class ChainCode {
     private final int NORTH_WEST = 7;
     private final int CENTER = 8;
 
+    private final int WHITE = 0;
+    private final int BLACK = 1;
+
     private int[] directionCodeCount;
     private boolean[][] visited;
 
@@ -51,7 +54,7 @@ class ChainCode {
 
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                if(blackWhiteBitmap[y][x] == 1) { // if black
+                if(blackWhiteBitmap[y][x] == BLACK) {
                     start[0] = x;
                     start[1] = y;
 
@@ -96,7 +99,7 @@ class ChainCode {
         // Array[y][x]
         int direction;
 
-        if (previousPoint[0] == 0 && previousPoint[1] == 0) direction = CENTER;
+        if(previousPoint[0] == 0 && previousPoint[1] == 0) direction = CENTER;
         else direction = getCurrentDirection(previousPoint, currentPoint);
 
         int[] temp = new int[2];
@@ -159,7 +162,7 @@ class ChainCode {
         temp[0] = currentPoint[0] - 1;
         temp[1] = currentPoint[1] - 1;
 
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH_WEST) {
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH_WEST) {
             directionCodeCount[NORTH_WEST]++;
             return temp;
         }
@@ -173,14 +176,14 @@ class ChainCode {
         int dX = currentPoint[0] - previousPoint[0];
         int dY = currentPoint[1] - previousPoint[1];
 
-        if (dY > 0 && dX == 0) direction = SOUTH;
-        else if (dY > 0 && dX > 0) direction = SOUTH_EAST;
-        else if (dY == 0 && dX > 0) direction = EAST;
-        else if (dY < 0 && dX > 0) direction = NORTH_EAST;
-        else if (dY < 0 && dX == 0) direction = NORTH;
-        else if (dY < 0 && dX < 0) direction = NORTH_WEST;
-        else if (dY == 0 && dX < 0) direction = WEST;
-        else if (dY > 0 && dX < 0) direction = SOUTH_WEST;
+        if(dY > 0 && dX == 0) direction = SOUTH;
+        else if(dY > 0 && dX > 0) direction = SOUTH_EAST;
+        else if(dY == 0 && dX > 0) direction = EAST;
+        else if(dY < 0 && dX > 0) direction = NORTH_EAST;
+        else if(dY < 0 && dX == 0) direction = NORTH;
+        else if(dY < 0 && dX < 0) direction = NORTH_WEST;
+        else if(dY == 0 && dX < 0) direction = WEST;
+        else if(dY > 0 && dX < 0) direction = SOUTH_WEST;
 
         return direction;
     }
@@ -188,11 +191,11 @@ class ChainCode {
     // Check if current point is legal
     private boolean isLegalPoint(int[][] blackWhiteBitmap, int[] currentPoint) {
         return (!visited[currentPoint[1]][currentPoint[0]] &&
-                blackWhiteBitmap[currentPoint[1]][currentPoint[0]] == 1 &&
-                (blackWhiteBitmap[currentPoint[1] + 1][currentPoint[0]] == 0 ||
-                blackWhiteBitmap[currentPoint[1]][currentPoint[0] + 1] == 0 ||
-                blackWhiteBitmap[currentPoint[1] - 1][currentPoint[0]] == 0 ||
-                blackWhiteBitmap[currentPoint[1]][currentPoint[0] - 1] == 0));
+                blackWhiteBitmap[currentPoint[1]][currentPoint[0]] == BLACK &&
+                (blackWhiteBitmap[currentPoint[1] + 1][currentPoint[0]] == WHITE ||
+                blackWhiteBitmap[currentPoint[1]][currentPoint[0] + 1] == WHITE ||
+                blackWhiteBitmap[currentPoint[1] - 1][currentPoint[0]] == WHITE ||
+                blackWhiteBitmap[currentPoint[1]][currentPoint[0] - 1] == WHITE));
     }
 
     // Edge detection chain code OCR result

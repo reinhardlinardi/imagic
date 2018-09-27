@@ -2,7 +2,6 @@ package com.imagic.imagic;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
@@ -13,9 +12,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
 class Image implements JSONSerializable {
@@ -31,9 +27,16 @@ class Image implements JSONSerializable {
     // Constants
     static final String MIME_TYPE = "image/*";
 
+    private final int MATRIX_WHITE = 0;
+    private final int MATRIX_BLACK = 1;
+
     // Properties
     Uri uri;
+
     Bitmap bitmap;
+    int[][] blackWhiteMatrix;
+    ImageSkeleton skeleton;
+
     RGBHistogram rgb;
     GrayscaleHistogram grayscale;
     
@@ -117,7 +120,7 @@ class Image implements JSONSerializable {
     }
 
     // Update bitmap
-    public void updateBitmap(Context context, int[] newRedValue, int[] newGreenValue, int[] newBlueValue) throws Exception {
+    void updateBitmap(Context context, int[] newRedValue, int[] newGreenValue, int[] newBlueValue) throws Exception {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
@@ -138,14 +141,15 @@ class Image implements JSONSerializable {
         else bitmap = newBitmap;
     }
 
-    public void updateSkeletonBitmap(Context context,int[][] skeletonMatrix) throws Exception {
+    // Set bitmap to skeleton
+    void setBitmapToSkeleton(Context context) throws Exception {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         int[] pixels = new int[width * height];
 
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
-                pixels[row * width + col] = (skeletonMatrix[row][col] == 0)? Color.rgb(255,255,255) : Color.rgb(0, 0, 0);
+                pixels[row * width + col] = (skeleton.skeletonMatrix[row][col] == MATRIX_WHITE)? Color.rgb(255,255,255) : Color.rgb(0, 0, 0);
             }
         }
 
@@ -156,31 +160,28 @@ class Image implements JSONSerializable {
         else bitmap = newBitmap;
     }
 
-    //return binary matrix representing blck & white
-    public int[][] getChromaticMatrix(){
+    // Get black and white matrix from image
+    void getBlackWhiteMatrix(int blackThreshold) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        Log.v("image size", Integer.toString(width) + " " + Integer.toString(height));
-        int[][] chromaticPixels = new int[height][width];
-        int[] pixels = new int[width*height];
 
+        blackWhiteMatrix = new int[height][width];
+
+        int[] pixels = new int[width * height];
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
                 int pixel = pixels[row * width + col];
-//                Log.v("color", Double.toString((double)(Color.red(pixel)+Color.green(pixel)+Color.blue(pixel)) / 3.0));
-                Log.v("Coordinate", Integer.toString(row) + " " + Integer.toString(col));
-                if(((double)(Color.red(pixel)+Color.green(pixel)+Color.blue(pixel)) / 3.0) > 128.0){
-                    chromaticPixels[row][col] =  0;
-                } else {
-                    chromaticPixels[row][col] =  1;
-                }
+
+                if(((Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3) < blackThreshold) blackWhiteMatrix[row][col] = MATRIX_BLACK;
+                else blackWhiteMatrix[row][col] = MATRIX_WHITE;
             }
         }
-
-        return  chromaticPixels;
     }
+
+    // Get image skeleton
+    void getSkeleton() { skeleton = new ImageSkeleton(blackWhiteMatrix); }
 
     // Generate histogram
     void generateHistogramByColorType(Image.ColorType colorType) {
