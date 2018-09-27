@@ -44,4 +44,6 @@
     <dimen name="seek_bar_color_description_layout_width">0dp</dimen>
     <dimen name="spinner_and_button_linear_layout_top_margin">15dp</dimen>
     <dimen name="seek_bar_field_description_width">0dp</dimen>
+    <dimen name="number_ocr_verdict_space_height">30dp</dimen>
+    <dimen name="number_ocr_verdict_margin_all">10dp</dimen>
 </resources>

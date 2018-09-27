@@ -68,12 +68,13 @@ public class NumberOCRActivity extends AppCompatActivity {
     }
 
     // Chromatic async task
-    private class ChromaticTask extends AsyncTask<Void, Integer, Void> {
+    private class ChromaticTask extends AsyncTask<Void, Integer, Integer> {
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Integer doInBackground(Void... voids) {
             publishProgress(countProgress(1,3));
-            int[][] matrix = originalImage.getChromaticMatrix();
+            Integer prediction = 0;
 
+            int[][] matrix = originalImage.getChromaticMatrix();
             NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
 
             switch(selectedOption.algorithm) {
@@ -100,7 +101,8 @@ public class NumberOCRActivity extends AppCompatActivity {
                     publishProgress(countProgress(3,3));
                     break;
             }
-            return null;
+
+            return prediction;
         }
 
         @Override
@@ -116,12 +118,14 @@ public class NumberOCRActivity extends AppCompatActivity {
         protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
 
         @Override
-        protected void onPostExecute(Void results) {
+        protected void onPostExecute(Integer results) {
             NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
 
             switch(selectedOption.algorithm) {
                 case "Edge Detection":
-                    verdictTextView.setText(Integer.toString(prediction));
+                    verdictTextView.setText(Integer.toString(results));
+                    UI.show(verdictLabelTextView);
+                    UI.show(verdictTextView);
                     break;
                 case "Thinning":
                     UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
@@ -174,10 +178,8 @@ public class NumberOCRActivity extends AppCompatActivity {
     private ImageView skeletonImageView;
     private Spinner algorithmSpinner;
     private Button predictButton;
+    private TextView verdictLabelTextView;
     private TextView verdictTextView;
-
-    // Remove later
-    int prediction;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -190,10 +192,12 @@ public class NumberOCRActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.numberOCRProgressBar);
         originalImageView = findViewById(R.id.numberOCRImage);
         skeletonImageView = findViewById(R.id.numberOCRSkeleton);
-        verdictTextView = findViewById(R.id.numberOCRVerdict);
-        predictButton = findViewById(R.id.numberOCRButton);
 
+        predictButton = findViewById(R.id.numberOCRButton);
         predictButton.setOnClickListener(getButtonOnClickListener());
+
+        verdictLabelTextView = findViewById(R.id.numberOCRVerdictLabel);
+        verdictTextView = findViewById(R.id.numberOCRVerdict);
 
         try {
             ArrayList<NumberOCROption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.number_ocr_options), NumberOCROption.class);
@@ -235,9 +239,13 @@ public class NumberOCRActivity extends AppCompatActivity {
                 switch(selectedOption.algorithm) {
                     case "Edge Detection":
                         UI.hide(skeletonImageView);
+                        UI.show(verdictLabelTextView);
+                        UI.show(verdictTextView);
                         break;
                     case "Thinning":
                         UI.show(skeletonImageView);
+                        UI.setInvisible(verdictLabelTextView);
+                        UI.setInvisible(verdictTextView);
                         break;
                 }
             }

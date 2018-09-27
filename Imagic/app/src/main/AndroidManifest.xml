@@ -55,12 +55,10 @@
             android:label="@string/equalizer_activity_title"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ShapeIdentificationActivity"
+            android:name=".NumberOCRActivity"
             android:configChanges="orientation"
-            android:label="@string/shape_identification_activity_title"
+            android:label="@string/number_ocr_activity_title"
             android:screenOrientation="portrait" />
-        <activity android:name=".NumberOCR" />
-        <activity android:name=".NumberOCRActivity"></activity>
     </application>
 
 </manifest>
