@@ -16,7 +16,7 @@ Imagic was created as a team project for Image Processing course @ [Institut Tek
 - OCR
 
 ## Powered By
-Java 8
+![](assets/android.png)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![](assets/java.png)
 
 ## Developers
 - [Reinhard Linardi](https://github.com/reinhardlinardi)
