@@ -1,13 +1,15 @@
 package com.imagic.imagic;
 
-import android.util.Log;
+class ChainCode {
+    /*
+    Chain code for all directions, p = current position
 
-import java.util.Arrays;
+    7 0 1
+    6 p 2
+    5 4 3
+    */
 
-public class ChainCode {
-    // 7 0 1
-    // 6 p 2
-    // 5 4 3
+    // Chain codes
     private final int NORTH = 0;
     private final int NORTH_EAST = 1;
     private final int EAST = 2;
@@ -18,61 +20,70 @@ public class ChainCode {
     private final int NORTH_WEST = 7;
     private final int CENTER = 8;
 
+    private final int WHITE = 0;
+    private final int BLACK = 1;
+
     private int[] directionCodeCount;
-    private int[][] referenceCodeCount = new int[][]{
-            {94, 28, 39, 29, 92, 29, 39, 28},
-            {135, 33, 20, 0, 148, 21, 31, 1},
-            {60, 100, 122, 24, 70, 84, 144, 18},
-            {88, 61, 106, 60, 86, 61, 108, 58},
-            {80, 67, 34, 1, 146, 1, 100, 1},
-            {111, 43, 153, 44, 105, 50, 145, 45},
-            {97, 50, 76, 48, 93, 51, 78, 45},
-            {94, 51, 95, 0, 90, 56, 89, 1},
-            {66, 42, 54, 42, 68, 40, 56, 42},
-            {93, 50, 77, 45, 98, 48, 76, 48},
-    };
     private boolean[][] visited;
 
-    public ChainCode() {
-        directionCodeCount = new int[8];
-    }
+    // Edge detection chain code references for 0-9
+    private int[][] referenceCodeCount = new int[][]{
+        {94, 28, 39, 29, 92, 29, 39, 28},
+        {135, 33, 20, 0, 148, 21, 31, 1},
+        {60, 100, 122, 24, 70, 84, 144, 18},
+        {88, 61, 106, 60, 86, 61, 108, 58},
+        {80, 67, 34, 1, 146, 1, 100, 1},
+        {111, 43, 153, 44, 105, 50, 145, 45},
+        {97, 50, 76, 48, 93, 51, 78, 45},
+        {94, 51, 95, 0, 90, 56, 89, 1},
+        {66, 42, 54, 42, 68, 40, 56, 42},
+        {93, 50, 77, 45, 98, 48, 76, 48},
+    };
 
+    // Constructor
+    ChainCode() { directionCodeCount = new int[8]; }
+
+    // Scan line until encounter a black point as start point
     private int[] searchStartPoint(int[][] blackWhiteBitmap) {
         int[] start = new int[2]; // x, y
         int width = blackWhiteBitmap[0].length;
         int height = blackWhiteBitmap.length;
+
         visited = new boolean[height][width];
         boolean found = false;
+
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                if(blackWhiteBitmap[y][x] == 1) { // if black
+                if(blackWhiteBitmap[y][x] == BLACK) {
                     start[0] = x;
                     start[1] = y;
+
                     found = true;
                     break;
                 }
             }
-            if(found) {
-                break;
-            }
+
+            if(found) break;
         }
+
         return start;
     }
 
-    public void countDirectionCode(int[][] blackWhiteBitmap) {
-        // seekPoint initialization
+    // Get edge detection chain code
+    void getEdgeDetectionChainCode(int[][] blackWhiteBitmap) {
+        // Seek point initialization
         int[] startPoint = searchStartPoint(blackWhiteBitmap);
-        int[] currentPoint = new int[2];
+        int[] currentPoint;
         int[] previousPoint = new int[2];
 
         currentPoint = nextPoint(startPoint, previousPoint, blackWhiteBitmap);
         previousPoint[0] = startPoint[0];
         previousPoint[1] = startPoint[1];
         visited[currentPoint[1]][currentPoint[0]] = true;
-//        Log.v("curr point", Integer.toString(currentPoint[0]) + " " + Integer.toString(currentPoint[1]));
-//        Log.v("startPoint", Integer.toString(startPoint[0]) + " " + Integer.toString(startPoint[1]));
-        // seek the bitmap
+
+        // Seek the bitmap
         int[] temp = new int[2];
+
         while(currentPoint[0] != startPoint[0] || currentPoint[1] != startPoint[1]) {
             temp[0] = currentPoint[0];
             temp[1] = currentPoint[1];
@@ -80,140 +91,126 @@ public class ChainCode {
             visited[currentPoint[1]][currentPoint[0]] = true;
             previousPoint[0] = temp[0];
             previousPoint[1] = temp[1];
-//            Log.v("curr point", Integer.toString(currentPoint[0]) + " " + Integer.toString(currentPoint[1]));
-//            Log.v("startPoint", Integer.toString(startPoint[0]) + " " + Integer.toString(startPoint[1]));
         }
-
-        Log.v("chain code", Arrays.toString(directionCodeCount));
     }
 
-    public int[] nextPoint(int[] currentPoint, int[] previousPoint, int[][] blackWhiteBitmap) {
-        // array[y][x]
+    // Find next point
+    private int[] nextPoint(int[] currentPoint, int[] previousPoint, int[][] blackWhiteBitmap) {
+        // Array[y][x]
         int direction;
-        if (previousPoint[0] == 0 && previousPoint[1] == 0) {
-            direction = CENTER;
-        } else {
-            direction = getCurrentDirection(previousPoint, currentPoint);
-        }
-//        Log.v("direction", Integer.toString(direction));
+
+        if(previousPoint[0] == 0 && previousPoint[1] == 0) direction = CENTER;
+        else direction = getCurrentDirection(previousPoint, currentPoint);
+
         int[] temp = new int[2];
         temp[0] = currentPoint[0];
         temp[1] = currentPoint[1] - 1;
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH) {
 
-//            Log.v("go to", "NORTH");
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH) {
             directionCodeCount[NORTH]++;
             return temp;
         }
 
         temp[0] = currentPoint[0] + 1;
         temp[1] = currentPoint[1] - 1;
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH_WEST) {
-//            Log.v("go to", "NORTH EAST");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH_WEST) {
             directionCodeCount[NORTH_EAST]++;
             return temp;
         }
 
         temp[0] = currentPoint[0] + 1;
         temp[1] = currentPoint[1];
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != WEST) {
-//            Log.v("go to", "EAST");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != WEST) {
             directionCodeCount[EAST]++;
             return temp;
         }
 
         temp[0] = currentPoint[0] + 1;
         temp[1] = currentPoint[1] + 1;
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != NORTH_WEST) {
-//            Log.v("go to", "SOUTH EAST");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != NORTH_WEST) {
             directionCodeCount[SOUTH_EAST]++;
             return temp;
         }
 
         temp[0] = currentPoint[0];
         temp[1] = currentPoint[1] + 1;
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != NORTH) {
-//            Log.v("go to", "SOUTH");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != NORTH) {
             directionCodeCount[SOUTH]++;
             return temp;
         }
 
         temp[0] = currentPoint[0] - 1;
         temp[1] = currentPoint[1] + 1;
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != NORTH_EAST) {
-//            Log.v("go to", "SOUTH WEST");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != NORTH_EAST) {
             directionCodeCount[SOUTH_WEST]++;
             return temp;
         }
 
         temp[0] = currentPoint[0] - 1;
         temp[1] = currentPoint[1];
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != EAST) {
-//            Log.v("go to", "WEST");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != EAST) {
             directionCodeCount[WEST]++;
             return temp;
         }
 
         temp[0] = currentPoint[0] - 1;
         temp[1] = currentPoint[1] - 1;
-        if (isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH_WEST) {
-//            Log.v("go to", "NORTH EAST");
+
+        if(isLegalPoint(blackWhiteBitmap, temp) && direction != SOUTH_WEST) {
             directionCodeCount[NORTH_WEST]++;
             return temp;
         }
+
         return temp;
     }
 
+    // Get current direction
     public int getCurrentDirection(int[] previousPoint, int[] currentPoint) {
         int direction = CENTER;
         int dX = currentPoint[0] - previousPoint[0];
         int dY = currentPoint[1] - previousPoint[1];
-//        Log.v("curr prev", Arrays.toString(currentPoint) + " " + Arrays.toString(previousPoint));
-//        Log.v("dX dY", Integer.toString(dX) + " " + Integer.toString(dY));
-        if (dY > 0 && dX == 0) {
-            direction = SOUTH;
-        } else if (dY > 0 && dX > 0) {
-            direction = SOUTH_EAST;
-        } else if (dY == 0 && dX > 0) {
-            direction = EAST;
-        } else if (dY < 0 && dX > 0) {
-            direction = NORTH_EAST;
-        } else if (dY < 0 && dX == 0) {
-            direction = NORTH;
-        } else if (dY < 0 && dX < 0) {
-            direction = NORTH_WEST;
-        } else if (dY == 0 && dX < 0) {
-            direction = WEST;
-        } else if (dY > 0 && dX < 0) {
-            direction = SOUTH_WEST;
-        }
+
+        if(dY > 0 && dX == 0) direction = SOUTH;
+        else if(dY > 0 && dX > 0) direction = SOUTH_EAST;
+        else if(dY == 0 && dX > 0) direction = EAST;
+        else if(dY < 0 && dX > 0) direction = NORTH_EAST;
+        else if(dY < 0 && dX == 0) direction = NORTH;
+        else if(dY < 0 && dX < 0) direction = NORTH_WEST;
+        else if(dY == 0 && dX < 0) direction = WEST;
+        else if(dY > 0 && dX < 0) direction = SOUTH_WEST;
 
         return direction;
     }
 
-    public boolean isLegalPoint(int[][] blackWhiteBitmap, int[] currentPoint) {
+    // Check if current point is legal
+    private boolean isLegalPoint(int[][] blackWhiteBitmap, int[] currentPoint) {
         return (!visited[currentPoint[1]][currentPoint[0]] &&
-                blackWhiteBitmap[currentPoint[1]][currentPoint[0]] == 1 &&
-                (blackWhiteBitmap[currentPoint[1] + 1][currentPoint[0]] == 0 ||
-                blackWhiteBitmap[currentPoint[1]][currentPoint[0] + 1] == 0 ||
-                blackWhiteBitmap[currentPoint[1] - 1][currentPoint[0]] == 0 ||
-                blackWhiteBitmap[currentPoint[1]][currentPoint[0] - 1] == 0));
+                blackWhiteBitmap[currentPoint[1]][currentPoint[0]] == BLACK &&
+                (blackWhiteBitmap[currentPoint[1] + 1][currentPoint[0]] == WHITE ||
+                blackWhiteBitmap[currentPoint[1]][currentPoint[0] + 1] == WHITE ||
+                blackWhiteBitmap[currentPoint[1] - 1][currentPoint[0]] == WHITE ||
+                blackWhiteBitmap[currentPoint[1]][currentPoint[0] - 1] == WHITE));
     }
 
-    public int predict() {
+    // Edge detection chain code OCR result
+    int edgeDetectionOCR() {
         double[][] normalizedReference = new double[10][8];
-        for(int i = 0; i < 10; i++) {
-            normalizedReference[i] = normalizeCodeChain(referenceCodeCount[i]);
-        }
-        double[] normalizedTestChainCode = normalizeCodeChain(directionCodeCount);
+        for(int i = 0; i < 10; i++) normalizedReference[i] = normalizeCodeChain(referenceCodeCount[i]);
 
+        double[] normalizedTestChainCode = normalizeCodeChain(directionCodeCount);
         double[] sum = new double[10];
         double min = 999999.0;
         int result = -1;
+
         for(int i = 0; i < 10; i++) {
-            for(int j = 0; j < 8; j++) {
-                sum[i] += Math.abs(normalizedReference[i][j] - normalizedTestChainCode[j]);
-            }
+            for(int j = 0; j < 8; j++) sum[i] += Math.abs(normalizedReference[i][j] - normalizedTestChainCode[j]);
+
             if(sum[i] < min) {
                 min = sum[i];
                 result = i;
@@ -223,16 +220,14 @@ public class ChainCode {
         return result;
     }
 
-    public double[] normalizeCodeChain(int[] chainCode) {
+    // Normalize code chain
+    private double[] normalizeCodeChain(int[] chainCode) {
         int sum = 0;
-        for(int i = 0; i < 8; i++) {
-            sum += chainCode[i];
-        }
-
         double[] result = new double[8];
-        for(int i = 0; i < 8; i++) {
-            result[i] = (double) chainCode[i] / (double) sum;
-        }
+
+        for(int i = 0; i < 8; i++) sum += chainCode[i];
+        for(int i = 0; i < 8; i++) result[i] = (double) chainCode[i] / (double) sum;
+
         return result;
     }
 }

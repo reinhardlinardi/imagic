@@ -4,8 +4,7 @@ import android.content.Context;
 
 import org.json.JSONObject;
 
-class ShapeIdentificationOption implements JSONSerializable {
-
+public class NumberOCROption implements JSONSerializable {
     // Properties
     public String algorithm;
 

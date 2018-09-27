@@ -189,7 +189,7 @@
                     android:layout_marginEnd="@dimen/contrast_enhance_spinner_side_margin"
                     android:layout_marginStart="@dimen/contrast_enhance_spinner_side_margin"
                     android:layout_weight="1"
-                    android:background="@android:color/holo_blue_dark"
+                    android:background="@drawable/spinner_color"
                     android:popupBackground="@android:color/holo_blue_dark" />
 
                 <Button

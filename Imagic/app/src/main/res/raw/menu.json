@@ -15,8 +15,8 @@
     "activityOnClick" : "Equalizer"
   },
   {
-    "title" : "Detect Letter",
-    "description" : "Upload an image of a letter and let the magic guesses it's value",
-    "activityOnClick" : "ShapeIdentification"
+    "title" : "OCR",
+    "description" : "Optical character recognition for single digit number",
+    "activityOnClick" : "NumberOCR"
   }
 ]

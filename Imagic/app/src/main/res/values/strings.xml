@@ -16,6 +16,7 @@
     <string name="contrast_enhancement_activity_title">Contrast Enhancement</string>
     <string name="original_image_content_description">Original Image</string>
     <string name="transformed_image_content_description">Transformed Image</string>
+    <string name="skeleton_image_content_description">Skeleton Image</string>
     <string name="contrast_enhance_button_text">Enhance</string>
     <string name="seek_bar_text_view_initial_value">100%</string>
     <string name="seek_bar_text_view_initial_value_no_percent">100</string>
@@ -37,7 +38,8 @@
     <string name="equalizer_first_point_x_value">0</string>
     <string name="equalizer_fourth_point_x_value">255</string>
     <string name="text_view_same_percentage_error">Cannot use the same percentage value for all colors.</string>
-    <string name="shape_identification_verdict_label">Our Verdict is :</string>
-    <string name="shape_identification_activity_title">Shape Identification</string>
-    <string name="shape_identification_button_text">PREDICT!</string>
+    <string name="number_ocr_verdict_label">Verdict :</string>
+    <string name="number_ocr_activity_title">OCR</string>
+    <string name="number_ocr_button_text">Analyze</string>
+    <string name="number_ocr_verdict_text">\?</string>
 </resources>
