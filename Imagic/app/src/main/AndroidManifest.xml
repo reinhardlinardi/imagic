@@ -49,15 +49,18 @@
             android:configChanges="orientation"
             android:label="@string/contrast_enhancement_activity_title"
             android:screenOrientation="portrait" />
-        <activity android:name=".EqualizerActivity"
+        <activity
+            android:name=".EqualizerActivity"
             android:configChanges="orientation"
             android:label="@string/equalizer_activity_title"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ShapeIdentificationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ShapeIdentificationActivity"
             android:configChanges="orientation"
             android:label="@string/shape_identification_activity_title"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
+        <activity android:name=".NumberOCR" />
+        <activity android:name=".NumberOCRActivity"></activity>
     </application>
 
 </manifest>

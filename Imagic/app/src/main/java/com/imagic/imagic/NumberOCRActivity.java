@@ -1,12 +1,10 @@
 package com.imagic.imagic;
 
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +18,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class ShapeIdentificationActivity extends AppCompatActivity{
+public class NumberOCRActivity extends AppCompatActivity {
 
     // Image load async task
     private class ImageLoadTask extends AsyncTask<Uri, Integer, Void> {
@@ -34,12 +31,12 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
             for(Uri URI : URIs) {
                 try {
-                    Image noBitmapImage = JSONSerializer.deserialize(ShapeIdentificationActivity.this, Cache.read(URI), Image.class);
+                    Image noBitmapImage = JSONSerializer.deserialize(NumberOCRActivity.this, Cache.read(URI), Image.class);
 
-                    originalImage = new Image(ShapeIdentificationActivity.this, noBitmapImage, true);
+                    originalImage = new Image(NumberOCRActivity.this, noBitmapImage, true);
                     publishProgress(countProgress((++done) + 1, numImages + 1));
 
-                    skeletonImage = new Image(ShapeIdentificationActivity.this, originalImage, false);
+                    skeletonImage = new Image(NumberOCRActivity.this, originalImage, false);
                     publishProgress(countProgress((++done) + 1, numImages + 1));
 
                     if(isCancelled()) break;
@@ -63,14 +60,10 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
         @Override
         protected void onPostExecute(Void results) {
-            UI.updateImageView(ShapeIdentificationActivity.this, originalImage.uri, beforeView);
-            UI.updateImageView(ShapeIdentificationActivity.this, skeletonImage.uri, skeletonResult);
-            UI.clearImageViewMemory(ShapeIdentificationActivity.this);
+            UI.updateImageView(NumberOCRActivity.this, originalImage.uri, originalImageView);
+            UI.updateImageView(NumberOCRActivity.this, skeletonImage.uri, skeletonImageView);
+            UI.clearImageViewMemory(NumberOCRActivity.this);
             UI.setInvisible(progressBar);
-
-            if(dataAvailableInCache()) {
-                originalImage.rgb.enableValueDependentColor();
-            }
         }
     }
 
@@ -87,13 +80,13 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
                     int[][] result = skeleton.getBlackWhiteMatrix();
                     publishProgress(countProgress(2,3));
                     try{
-                        skeletonImage.updateSkeletonBitmap(ShapeIdentificationActivity.this,result);
+                        skeletonImage.updateSkeletonBitmap(NumberOCRActivity.this,result);
                     } catch(Exception e){
                         Log.e("Imagic", "Exception", e);
                     }
                     publishProgress(countProgress(3,3));
                     break;
-                case "Outer Tracing":
+                case "Edge Detection":
                     ChainCode chainCode = new ChainCode();
                     chainCode.countDirectionCode(matrix);
                     publishProgress(countProgress(2,3));
@@ -107,7 +100,7 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         @Override
         protected void onPreExecute() {
             UI.disable(predictButton);
-            UI.disable(spinner);
+            UI.disable(algorithmSpinner);
 
             progressBar.setProgress(0);
             UI.show(progressBar);
@@ -120,33 +113,33 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         protected void onPostExecute(Void results) {
             switch(selectedOption.algorithm){
                 case "Thinning":
-                    UI.updateImageView(ShapeIdentificationActivity.this, skeletonImage.bitmap, skeletonResult);
-                    UI.clearImageViewMemory(ShapeIdentificationActivity.this);
+                    UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
+                    UI.clearImageViewMemory(NumberOCRActivity.this);
                     break;
-                case "Outer Tracing":
-                    predictionResultView.setText(Integer.toString(prediction));
+                case "Edge Detection":
+                    verdictTextView.setText(Integer.toString(prediction));
                     break;
             }
             UI.setInvisible(progressBar);
             UI.enable(predictButton);
-            UI.enable(spinner);
+            UI.enable(algorithmSpinner);
         }
     }
 
     // Option adapter
-    private class ShapeIdentificationAdapter extends ArrayAdapter<ShapeIdentificationOption> {
+    private class NumberOCRAdapter extends ArrayAdapter<NumberOCROption> {
 
-        ShapeIdentificationAdapter(ArrayList<ShapeIdentificationOption> options) {
-            super(ShapeIdentificationActivity.this, R.layout.shape_identification_spinner_option, options);
+        NumberOCRAdapter(ArrayList<NumberOCROption> options) {
+            super(NumberOCRActivity.this, R.layout.number_ocr_spinner_option, options);
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            LayoutInflater inflater = ShapeIdentificationActivity.this.getLayoutInflater();
-            View optionView = inflater.inflate(R.layout.shape_identification_spinner_option, parent, false);
+            LayoutInflater inflater = NumberOCRActivity.this.getLayoutInflater();
+            View optionView = inflater.inflate(R.layout.number_ocr_spinner_option, parent, false);
 
-            TextView optionTextView = optionView.findViewById(R.id.shapeIdentificationSpinnerOptionTextView);
-            ShapeIdentificationOption option = getItem(position);
+            TextView optionTextView = optionView.findViewById(R.id.numberOCRSpinnerOptionTextView);
+            NumberOCROption option = getItem(position);
 
             if(option != null) optionTextView.setText(option.algorithm);
 
@@ -168,46 +161,47 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
 
     // UI components
     private ProgressBar progressBar;
-    private ImageView beforeView;
-    private ImageView skeletonResult;
-    private TextView predictionResultView;
-    private Spinner spinner;
+    private ImageView originalImageView;
+    private ImageView skeletonImageView;
+    private Spinner algorithmSpinner;
     private Button predictButton;
+    private TextView verdictTextView;
 
     // Selected option
-    private ShapeIdentificationOption selectedOption;
+    private NumberOCROption selectedOption;
 
+    // Remove later
     int prediction;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_shape_identification);
+        setContentView(R.layout.activity_number_ocr);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) cachedImageDataURI = Uri.parse(bundle.getString(Cache.INTENT_BUNDLE_NAME));
 
-        progressBar = findViewById(R.id.shapeIdentificationProgressBar);
-        beforeView = findViewById(R.id.shapeIdentificationImageBefore);
-        skeletonResult= findViewById(R.id.shapeIdentificationSkeleton);
-        predictionResultView = findViewById(R.id.shapeIdentificationVerdict);
-        predictButton = findViewById(R.id.shapeIdentificationButton);
+        progressBar = findViewById(R.id.numberOCRProgressBar);
+        originalImageView = findViewById(R.id.numberOCRImage);
+        skeletonImageView = findViewById(R.id.numberOCRSkeleton);
+        verdictTextView = findViewById(R.id.numberOCRVerdict);
+        predictButton = findViewById(R.id.numberOCRButton);
 
         predictButton.setOnClickListener(getButtonOnClickListener());
 
         try {
-            ArrayList<ShapeIdentificationOption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.shape_identification_options), ShapeIdentificationOption.class);
-            ShapeIdentificationActivity.ShapeIdentificationAdapter adapter = new ShapeIdentificationActivity.ShapeIdentificationAdapter(options);
+            ArrayList<NumberOCROption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.number_ocr_options), NumberOCROption.class);
+            NumberOCRAdapter adapter = new NumberOCRActivity.NumberOCRAdapter(options);
 
-            spinner = findViewById(R.id.shapeIdentificationAlgorithmSpinner);
-            spinner.setAdapter(adapter);
-            spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
+            algorithmSpinner = findViewById(R.id.numberOCRAlgorithmSpinner);
+            algorithmSpinner.setAdapter(adapter);
+            algorithmSpinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
         }
         catch(Exception e) {
             Log.e("Imagic", "Exception", e);
         }
 
-        ShapeIdentificationActivity.ImageLoadTask imageLoadTask = new ShapeIdentificationActivity.ImageLoadTask();
+        ImageLoadTask imageLoadTask = new ImageLoadTask();
         imageLoadTask.execute(cachedImageDataURI);
     }
 
@@ -228,16 +222,18 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                selectedOption = (ShapeIdentificationOption) adapterView.getItemAtPosition(position);
+                selectedOption = (NumberOCROption) adapterView.getItemAtPosition(position);
                 String selectedAlgorithm = selectedOption.algorithm;
-                switch(selectedAlgorithm){
-                    case "Outer Tracing":
-                        UI.hide(skeletonResult);
+
+                switch(selectedAlgorithm) {
+                    case "Edge Detection":
+                        UI.hide(skeletonImageView);
                         break;
                     case "Thinning":
-                        UI.show(skeletonResult);
+                        UI.show(skeletonImageView);
                         break;
                 }
+
                 TextView textView = (TextView) view;
                 textView.setText(selectedAlgorithm + "   ▾");
             }
@@ -252,14 +248,9 @@ public class ShapeIdentificationActivity extends AppCompatActivity{
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Panggil predicition berdasarkan algo
-                ShapeIdentificationActivity.ChromaticTask chromaticTask = new ShapeIdentificationActivity.ChromaticTask();
+                ChromaticTask chromaticTask = new ChromaticTask();
                 chromaticTask.execute();
             }
         };
     }
-
-    // Check if data is available in cache
-    private boolean dataAvailableInCache() { return !(originalImage.rgb.isDataEmpty()); }
-
 }
