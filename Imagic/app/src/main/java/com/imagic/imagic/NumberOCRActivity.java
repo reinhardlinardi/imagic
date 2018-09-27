@@ -74,23 +74,29 @@ public class NumberOCRActivity extends AppCompatActivity {
             publishProgress(countProgress(1,3));
             int[][] matrix = originalImage.getChromaticMatrix();
 
-            switch(selectedOption.algorithm){
-                case "Thinning":
-                    ImageSkeleton skeleton = new ImageSkeleton(matrix);
-                    int[][] result = skeleton.getBlackWhiteMatrix();
-                    publishProgress(countProgress(2,3));
-                    try{
-                        skeletonImage.updateSkeletonBitmap(NumberOCRActivity.this,result);
-                    } catch(Exception e){
-                        Log.e("Imagic", "Exception", e);
-                    }
-                    publishProgress(countProgress(3,3));
-                    break;
+            NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
+
+            switch(selectedOption.algorithm) {
                 case "Edge Detection":
                     ChainCode chainCode = new ChainCode();
                     chainCode.countDirectionCode(matrix);
                     publishProgress(countProgress(2,3));
+
                     prediction = chainCode.predict();
+                    publishProgress(countProgress(3,3));
+                    break;
+                case "Thinning":
+                    ImageSkeleton skeleton = new ImageSkeleton(matrix);
+                    int[][] result = skeleton.getBlackWhiteMatrix();
+                    publishProgress(countProgress(2,3));
+
+                    try {
+                        skeletonImage.updateSkeletonBitmap(NumberOCRActivity.this,result);
+                    }
+                    catch(Exception e) {
+                        Log.e("Imagic", "Exception", e);
+                    }
+
                     publishProgress(countProgress(3,3));
                     break;
             }
@@ -111,15 +117,18 @@ public class NumberOCRActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void results) {
-            switch(selectedOption.algorithm){
+            NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
+
+            switch(selectedOption.algorithm) {
+                case "Edge Detection":
+                    verdictTextView.setText(Integer.toString(prediction));
+                    break;
                 case "Thinning":
                     UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
                     UI.clearImageViewMemory(NumberOCRActivity.this);
                     break;
-                case "Edge Detection":
-                    verdictTextView.setText(Integer.toString(prediction));
-                    break;
             }
+
             UI.setInvisible(progressBar);
             UI.enable(predictButton);
             UI.enable(algorithmSpinner);
@@ -166,9 +175,6 @@ public class NumberOCRActivity extends AppCompatActivity {
     private Spinner algorithmSpinner;
     private Button predictButton;
     private TextView verdictTextView;
-
-    // Selected option
-    private NumberOCROption selectedOption;
 
     // Remove later
     int prediction;
@@ -222,10 +228,11 @@ public class NumberOCRActivity extends AppCompatActivity {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                selectedOption = (NumberOCROption) adapterView.getItemAtPosition(position);
-                String selectedAlgorithm = selectedOption.algorithm;
+                NumberOCROption selectedOption = (NumberOCROption) adapterView.getItemAtPosition(position);
+                TextView textView = (TextView) view;
+                textView.setText(selectedOption.algorithm + "   ▾");
 
-                switch(selectedAlgorithm) {
+                switch(selectedOption.algorithm) {
                     case "Edge Detection":
                         UI.hide(skeletonImageView);
                         break;
@@ -233,9 +240,6 @@ public class NumberOCRActivity extends AppCompatActivity {
                         UI.show(skeletonImageView);
                         break;
                 }
-
-                TextView textView = (TextView) view;
-                textView.setText(selectedAlgorithm + "   ▾");
             }
 
             @Override

@@ -157,6 +157,8 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             int[] newGreenValue = new int[256];
             int[] newBlueValue = new int[256];
 
+            ContrastEnhancementOption selectedOption = (ContrastEnhancementOption) algorithmSpinner.getSelectedItem();
+
             switch(selectedOption.algorithm) {
                 case "Linear":
                     newRedValue = transformedImage.rgb.red.stretch((double) redPercentage / 100);
@@ -206,7 +208,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
                 Log.e("Imagic", "Exception", e);
             }
 
+            UI.disable(algorithmSpinner);
             UI.disable(enhanceButton);
+
             progressBar.setProgress(0);
             UI.show(progressBar);
         }
@@ -226,6 +230,7 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             UI.clearImageViewMemory(ContrastEnhancementActivity.this);
 
             UI.setInvisible(progressBar);
+            UI.enable(algorithmSpinner);
             UI.enable(enhanceButton);
         }
     }
@@ -273,15 +278,13 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
     private SeekBar redSeekBar;
     private SeekBar greenSeekBar;
     private SeekBar blueSeekBar;
+    private Spinner algorithmSpinner;
     private Button enhanceButton;
 
     // SeekBar percentage value
     private int redPercentage;
     private int greenPercentage;
     private int bluePercentage;
-
-    // Selected option
-    private ContrastEnhancementOption selectedOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -315,9 +318,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
             ArrayList<ContrastEnhancementOption> options = JSONSerializer.arrayDeserialize(this, Text.readRawResource(this, R.raw.contrast_enhancement_options), ContrastEnhancementOption.class);
             ContrastEnhancementAdapter adapter = new ContrastEnhancementAdapter(options);
 
-            Spinner spinner = findViewById(R.id.equalizationAlgorithmSpinner);
-            spinner.setAdapter(adapter);
-            spinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
+            algorithmSpinner = findViewById(R.id.equalizationAlgorithmSpinner);
+            algorithmSpinner.setAdapter(adapter);
+            algorithmSpinner.setOnItemSelectedListener(getSpinnerOnItemSelectedListener());
         }
         catch(Exception e) {
             Log.e("Imagic", "Exception", e);
@@ -382,11 +385,9 @@ public class ContrastEnhancementActivity extends AppCompatActivity {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(position);
-                String selectedAlgorithm = selectedOption.algorithm;
-
+                ContrastEnhancementOption selectedOption = (ContrastEnhancementOption) adapterView.getItemAtPosition(position);
                 TextView textView = (TextView) view;
-                textView.setText(selectedAlgorithm + "   ▾");
+                textView.setText(selectedOption.algorithm + "   ▾");
             }
 
             @Override
