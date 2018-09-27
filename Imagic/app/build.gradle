@@ -19,6 +19,12 @@ android {
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
     }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            def appName = "imagic"
+            outputFileName = appName + ".apk"
+        }
+    }
 }
 
 dependencies {
