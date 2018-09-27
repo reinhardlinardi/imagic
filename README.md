@@ -15,6 +15,9 @@ Imagic was created as a team project for Image Processing course @ [Institut Tek
 - Equalizer
 - OCR
 
+## Download
+You can download the latest release of Imagic [here](https://reinhardlinardi.github.io/imagic).
+
 ## Powered By
 ![](assets/android.png)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![](assets/java.png)
 
