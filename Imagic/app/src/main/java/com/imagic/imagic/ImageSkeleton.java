@@ -1,27 +1,30 @@
 package com.imagic.imagic;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 class ImageSkeleton {
 
     // Point
     private class Point{
-        int x;
-        int y;
+
+        // Properties
+        int row;
+        int col;
 
         // Constructors
         Point(int row, int col) {
-            x = col;
-            y = row;
-        }
-
-        Point(Point p) {
-            x = p.x;
-            y = p.y;
+            this.col = col;
+            this.row = row;
         }
     }
+
+    // Constants
+    private final int WHITE = 0;
+    private final int BLACK = 1;
+
+    private final int START_GREEN = 2;
+    private final int EDGE_BLUE = 3;
+    private final int CYCLE_RED = 4;
 
     /*
     Zhang-Suen thinning algorithm neighbor numbering, p = current position
@@ -29,13 +32,8 @@ class ImageSkeleton {
     // 6 p 2
     // 5 4 3
      */
-
-    // Constants
     private final int[][] neighbors = {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}};
     private final int[][][] neighborGroups = {{{0, 2, 4}, {2, 4, 6}}, {{0, 2, 6}, {0, 4, 6}}};
-
-    private final int WHITE = 0;
-    private final int BLACK = 1;
 
     // Properties
     int[][] skeletonMatrix;
@@ -113,7 +111,7 @@ class ImageSkeleton {
                 }
             }
 
-            for(Point p : pixelsToBeWhitened) skeletonMatrix[p.y][p.x] = WHITE;
+            for(Point p : pixelsToBeWhitened) skeletonMatrix[p.row][p.col] = WHITE;
             pixelsToBeWhitened.clear();
         }
         while(firstTest || isChanged);
@@ -130,8 +128,8 @@ class ImageSkeleton {
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < cols; col++) {
                 if(skeletonMatrix[row][col] == BLACK) {
-                    p.x = col;
-                    p.y = row;
+                    p.col = col;
+                    p.row = row;
 
                     found = true;
                     break;
@@ -147,7 +145,7 @@ class ImageSkeleton {
     // Skeleton post-processing
     void postProcess() {
         Point start = getSkeletonFirstPoint();
-        Log.d("Skeleton", Integer.toString(start.y) + " " + Integer.toString(start.x));
+        skeletonMatrix[start.row][start.col] = START_GREEN;
     }
 
     void extractSkeletonFeature() {

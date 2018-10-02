@@ -30,6 +30,10 @@ class Image implements JSONSerializable {
     private final int MATRIX_WHITE = 0;
     private final int MATRIX_BLACK = 1;
 
+    private final int MATRIX_START_GREEN = 2;
+    private final int MATRIX_EDGE_BLUE = 3;
+    private final int MATRIX_CYCLE_RED = 4;
+
     // Properties
     Uri uri;
 
@@ -149,7 +153,23 @@ class Image implements JSONSerializable {
 
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
-                pixels[row * width + col] = (skeleton.skeletonMatrix[row][col] == MATRIX_WHITE)? Color.rgb(255,255,255) : Color.rgb(0, 0, 0);
+                switch(skeleton.skeletonMatrix[row][col]) {
+                    case MATRIX_BLACK:
+                        pixels[row * width + col] = Color.rgb(0,0,0);
+                        break;
+                    case MATRIX_WHITE:
+                        pixels[row * width + col] = Color.rgb(255,255,255);
+                        break;
+                    case MATRIX_START_GREEN:
+                        pixels[row * width + col] = Color.rgb(0,255,0);
+                        break;
+                    case MATRIX_EDGE_BLUE:
+                        pixels[row * width + col] = Color.rgb(0,0,255);
+                        break;
+                    case MATRIX_CYCLE_RED:
+                        pixels[row * width + col] = Color.rgb(255,0,0);
+                        break;
+                }
             }
         }
 
