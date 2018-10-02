@@ -111,4 +111,16 @@ class ImageSkeleton {
         }
         while(firstTest || isChanged);
     }
+
+    void preprocessSkeleton() {
+        //clean up skeleton noise
+    }
+
+    void extractSkeletonFeature() {
+        //1. jumlah cycle
+        //2. punya berapa cabang
+        //3. jml titik ujung
+        //4. letak titik ujung
+        //5. perbandingan chain code berdasarkan arah
+    }
 }
