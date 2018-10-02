@@ -1,5 +1,7 @@
 package com.imagic.imagic;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 class ImageSkeleton {
@@ -177,9 +179,20 @@ class ImageSkeleton {
     // Extract all features (vertexes, intersections, and cycles) using DFS
     private void extractFeatures(int row, int col) {
         visited[row][col] = true;
-
-        if(isVertex(row, col)) vertex.add(new Point(row, col));
-        else if(isIntersection(row, col)) intersection.add(new Point(row, col));
+//        Log.d("coord", Integer.toString(row) + " " + Integer.toString(col));
+        if(isVertex(row, col)) {
+            if(vertex.size() > 0) {
+                int prevVertexIndex = vertex.size() - 1;
+                if (row != vertex.get(prevVertexIndex).row && col != vertex.get(prevVertexIndex).col) {
+                    vertex.add(new Point(row, col));
+                }
+            } else {
+                vertex.add(new Point(row, col));
+            }
+        }
+        else if(isIntersection(row, col)) {
+            intersection.add(new Point(row, col));
+        }
 
         // DFS
         for(int idx = 0; idx < neighbors.length; idx++) {
@@ -188,6 +201,53 @@ class ImageSkeleton {
 
             if(isInsideBorder(nextRow, nextCol)) {
                 if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]) extractFeatures(nextRow, nextCol);
+            }
+        }
+    }
+
+    void eliminateSkeletonNoise(Point intersectionPoint, ArrayList<Point> Points) {
+        // Asumsi cuma ada 1 cabang noise setiap eliminasi
+        int minimumDistance = 9999999;
+        int maximumDistance = -1;
+        int indexChosenPoint = -1;
+        for(int i = 0; i < Points.size(); i++) {
+            // URGENT MODE - Manhattan distance NEED IMPROVEMENT (pengennya jarak absolut ngikutin pixelnya)
+            int d = Math.abs(Points.get(i).row - intersectionPoint.row) + Math.abs(Points.get(i).col - intersectionPoint.col);
+            Log.d("distances", Integer.toString(d));
+            if (d < minimumDistance) {
+                minimumDistance = d;
+                indexChosenPoint = i;
+            }
+            if (d > maximumDistance) {
+                maximumDistance = d;
+            }
+        }
+
+        if ((double)minimumDistance / (double)maximumDistance < 0.2) { // threshold kuli (indikator ujung palsu yg masih ccd)
+            deleteSkeletonEdge(intersectionPoint, Points.get(indexChosenPoint));
+            vertex.remove(Points.get(indexChosenPoint));
+            intersection.remove(intersectionPoint);
+        }
+    }
+
+    void deleteSkeletonEdge(Point start, Point end) {
+        visited[start.row][start.col] = true;
+        if (start.row != end.row || start.col != end.col) {
+            for(int idx = 0; idx < neighbors.length; idx++) {
+                int nextRow = start.row + neighbors[idx][1];
+                int nextCol = start.col + neighbors[idx][0];
+
+                if(isInsideBorder(nextRow, nextCol)) {
+                    if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]) {
+                        int d1 = Math.abs(end.row - start.row) + Math.abs(end.col - start.col);
+                        int d2 = Math.abs(end.row - nextRow) + Math.abs(end.col - nextCol);
+                        if(d2 < d1) {
+                            Point next = new Point(nextRow, nextCol);
+                            skeletonMatrix[nextRow][nextCol] = WHITE;
+                            deleteSkeletonEdge(next, end);
+                        }
+                    }
+                }
             }
         }
     }
@@ -204,9 +264,51 @@ class ImageSkeleton {
         if(isVertex(start.row, start.col)) vertex.add(start);
 
         extractFeatures(start.row, start.col);
-        for(Point p : vertex) skeletonMatrix[p.row][p.col] = VERTEX_GREEN;
-        for(Point p : intersection) skeletonMatrix[p.row][p.col] = INTERSECTION_BLUE;
+        for(Point p : vertex) {
+            Log.d("vertex:", Integer.toString(p.row) + " " + Integer.toString(p.col));
+        }
+        for(Point p : intersection) {
+            Log.d("intersection:", Integer.toString(p.row) + " " + Integer.toString(p.col));
+        }
+        Log.d("vertex size: ", Integer.toString(vertex.size()));
+        Log.d("intersecton size: ", Integer.toString(intersection.size()));
 
-        // continue
+        // continue process skeleton
+        int numOfIntersectNeighbor = 0;
+        if (vertex.size() == 2 && intersection.size() == 1) {
+            intersection.clear();
+        } else if (vertex.size() == 3 && intersection.size() == 1) {
+            numOfIntersectNeighbor = countWhiteToBlackTransition(intersection.get(0).row, intersection.get(0).col);
+            if (numOfIntersectNeighbor == 3) {
+                resetVisited();
+                eliminateSkeletonNoise(intersection.get(0), vertex);
+            }
+        } else if (intersection.size() > 1) {
+            for(int i = 0; i < intersection.size(); i++) {
+                numOfIntersectNeighbor = countWhiteToBlackTransition(intersection.get(i).row, intersection.get(i).col);
+                if(numOfIntersectNeighbor == 3) {
+                    resetVisited();
+                    eliminateSkeletonNoise(intersection.get(i), vertex); // vertex harus diganti jd koordinat kaki"
+//                    KAKI
+//                           /
+//                    -----*/
+//                kaki 2    \
+//                           \kaki 1
+
+                }
+            }
+        }
+        Log.d("======================", "=================================");
+        Log.d("vertex size: ", Integer.toString(vertex.size()));
+        Log.d("intersecton size: ", Integer.toString(intersection.size()));
+        for(Point p : vertex) {
+            skeletonMatrix[p.row][p.col] = VERTEX_GREEN;
+        }
+        for(Point p : intersection) {
+            skeletonMatrix[p.row][p.col] = INTERSECTION_BLUE;
+        }
+
+        //count cycle
+        //predict
     }
 }
