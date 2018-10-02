@@ -181,7 +181,10 @@ class Image implements JSONSerializable {
     }
 
     // Get image skeleton
-    void getSkeleton() { skeleton = new ImageSkeleton(blackWhiteMatrix); }
+    void getSkeleton() {
+        skeleton = new ImageSkeleton(blackWhiteMatrix);
+        skeleton.postProcess();
+    }
 
     // Generate histogram
     void generateHistogramByColorType(Image.ColorType colorType) {

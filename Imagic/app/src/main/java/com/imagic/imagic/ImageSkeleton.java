@@ -1,18 +1,25 @@
 package com.imagic.imagic;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 class ImageSkeleton {
 
     // Point
     private class Point{
-        public int x;
-        public int y;
+        int x;
+        int y;
 
-        // Constructor
-        public Point(int row, int col) {
-            x = row;
-            y = col;
+        // Constructors
+        Point(int row, int col) {
+            x = col;
+            y = row;
+        }
+
+        Point(Point p) {
+            x = p.x;
+            y = p.y;
         }
     }
 
@@ -101,7 +108,7 @@ class ImageSkeleton {
                     if(countWhiteToBlackTransition(row, col) != 1) continue;
                     if(!isAtLeastOneIsWhite(row, col, firstTest ? 0 : 1)) continue;
 
-                    pixelsToBeWhitened.add(new Point(col, row));
+                    pixelsToBeWhitened.add(new Point(row, col));
                     isChanged = true;
                 }
             }
@@ -112,8 +119,35 @@ class ImageSkeleton {
         while(firstTest || isChanged);
     }
 
-    void preprocessSkeleton() {
-        //clean up skeleton noise
+    // Get skeleton first point
+    private Point getSkeletonFirstPoint() {
+        Point p = new Point(0,0);
+        boolean found = false;
+
+        int rows = skeletonMatrix.length;
+        int cols = skeletonMatrix[0].length;
+
+        for(int row = 0; row < rows; row++) {
+            for(int col = 0; col < cols; col++) {
+                if(skeletonMatrix[row][col] == BLACK) {
+                    p.x = col;
+                    p.y = row;
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if(found) break;
+        }
+
+        return p;
+    }
+
+    // Skeleton post-processing
+    void postProcess() {
+        Point start = getSkeletonFirstPoint();
+        Log.d("Skeleton", Integer.toString(start.y) + " " + Integer.toString(start.x));
     }
 
     void extractSkeletonFeature() {
