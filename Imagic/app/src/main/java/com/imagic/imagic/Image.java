@@ -30,8 +30,8 @@ class Image implements JSONSerializable {
     private final int MATRIX_WHITE = 0;
     private final int MATRIX_BLACK = 1;
 
-    private final int MATRIX_START_GREEN = 2;
-    private final int MATRIX_EDGE_BLUE = 3;
+    private final int MATRIX_VERTEX_GREEN = 2;
+    private final int MATRIX_INTERSECTION_BLUE = 3;
     private final int MATRIX_CYCLE_RED = 4;
 
     // Properties
@@ -160,10 +160,10 @@ class Image implements JSONSerializable {
                     case MATRIX_WHITE:
                         pixels[row * width + col] = Color.rgb(255,255,255);
                         break;
-                    case MATRIX_START_GREEN:
+                    case MATRIX_VERTEX_GREEN:
                         pixels[row * width + col] = Color.rgb(0,255,0);
                         break;
-                    case MATRIX_EDGE_BLUE:
+                    case MATRIX_INTERSECTION_BLUE:
                         pixels[row * width + col] = Color.rgb(0,0,255);
                         break;
                     case MATRIX_CYCLE_RED:

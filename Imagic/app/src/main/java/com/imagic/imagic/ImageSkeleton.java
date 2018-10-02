@@ -22,8 +22,8 @@ class ImageSkeleton {
     private final int WHITE = 0;
     private final int BLACK = 1;
 
-    private final int START_GREEN = 2;
-    private final int EDGE_BLUE = 3;
+    private final int VERTEX_GREEN = 2;
+    private final int INTERSECTION_BLUE = 3;
     private final int CYCLE_RED = 4;
 
     /*
@@ -37,6 +37,12 @@ class ImageSkeleton {
 
     // Properties
     int[][] skeletonMatrix;
+
+    ArrayList<Point> vertex;
+    ArrayList<Point> intersection;
+    ArrayList<Point> cycle;
+
+    boolean[][] visited;
 
     // Constructor
     ImageSkeleton(int[][] blackWhiteImage) {
@@ -118,7 +124,7 @@ class ImageSkeleton {
     }
 
     // Get skeleton first point
-    private Point getSkeletonFirstPoint() {
+    private Point getFirstPoint() {
         Point p = new Point(0,0);
         boolean found = false;
 
@@ -142,17 +148,68 @@ class ImageSkeleton {
         return p;
     }
 
-    // Skeleton post-processing
-    void postProcess() {
-        Point start = getSkeletonFirstPoint();
-        skeletonMatrix[start.row][start.col] = START_GREEN;
+    // Reset visited
+    private void resetVisited() {
+        int rows = skeletonMatrix.length;
+        int cols = skeletonMatrix[0].length;
+
+        visited = new boolean[rows][cols];
+        for(int row = 0; row < rows; row++) visited[row] = new boolean[cols];
     }
 
-    void extractSkeletonFeature() {
-        //1. jumlah cycle
-        //2. punya berapa cabang
-        //3. jml titik ujung
-        //4. letak titik ujung
-        //5. perbandingan chain code berdasarkan arah
+    // Inside border
+    private boolean isInsideBorder(int row, int col) {
+        int rows = skeletonMatrix.length;
+        int cols = skeletonMatrix[0].length;
+
+        return row >= 0 && row < rows && col >= 0 && col < cols;
+    }
+
+    // Check if point is vertex
+    private boolean isVertex(int row, int col, int nextNeighborCount, boolean isStartPoint) {
+        boolean result = countBlackNeighbors(row, col) <= 2 && countWhiteToBlackTransition(row, col) == 1;
+        if(!isStartPoint) result = result && (nextNeighborCount == 0);
+
+        return result;
+    }
+
+
+    // Extract all features (vertexes, intersections, and cycles) using DFS
+    private void extractFeatures(int row, int col) {
+        int nextNeighborCount = 0;
+        visited[row][col] = true;
+
+        // DFS
+        for(int idx = 0; idx < neighbors.length; idx++) {
+            int nextRow = row + neighbors[idx][1];
+            int nextCol = col + neighbors[idx][0];
+
+            if(isInsideBorder(nextRow, nextCol)) {
+                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]) {
+                    nextNeighborCount++;
+                    extractFeatures(nextRow, nextCol);
+                }
+            }
+        }
+
+
+        if(isVertex(row, col, nextNeighborCount, false)) vertex.add(new Point(row, col));
+        else if(countBlackNeighbors(row, col) == 3 && countWhiteToBlackTransition(row, col) == 3) intersection.add(new Point(row, col));
+    }
+
+    // Skeleton post-processing
+    void postProcess() {
+        resetVisited();
+
+        vertex = new ArrayList<>();
+        intersection = new ArrayList<>();
+        cycle = new ArrayList<>();
+
+        Point start = getFirstPoint();
+        if(isVertex(start.row, start.col, 0, true)) vertex.add(start);
+
+        extractFeatures(start.row, start.col);
+        for(Point p : vertex) skeletonMatrix[p.row][p.col] = VERTEX_GREEN;
+        for(Point p : intersection) skeletonMatrix[p.row][p.col] = INTERSECTION_BLUE;
     }
 }
