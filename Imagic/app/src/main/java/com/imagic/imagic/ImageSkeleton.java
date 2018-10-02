@@ -168,16 +168,13 @@ class ImageSkeleton {
     }
 
     // Check if point is vertex
-    private boolean isVertex(int row, int col, int nextNeighborCount, boolean isStartPoint) {
-        boolean result = countBlackNeighbors(row, col) <= 2 && countWhiteToBlackTransition(row, col) == 1;
-        if(!isStartPoint) result = result && (nextNeighborCount == 0);
-
-        return result;
+    private boolean isVertex(int row, int col) {
+        return countBlackNeighbors(row, col) <= 2 && countWhiteToBlackTransition(row, col) == 1;
     }
 
     // Check if point is intersection
-    private boolean isIntersection(int row, int col, int nextNeighborCount) {
-        return /*nextNeighborCount >= 2 &&*/ countBlackNeighbors(row, col) >= 3 && countWhiteToBlackTransition(row, col) >= 3;
+    private boolean isIntersection(int row, int col) {
+        return countBlackNeighbors(row, col) >= 3 && countWhiteToBlackTransition(row, col) >= 3;
     }
 
     // Extract all features (vertexes, intersections, and cycles) using DFS
@@ -198,11 +195,8 @@ class ImageSkeleton {
             }
         }
 
-        if(isVertex(row, col, nextNeighborCount, false)) vertex.add(new Point(row, col));
-        else if(isIntersection(row, col, nextNeighborCount)) {
-            Log.d("Intersection", Integer.toString(nextNeighborCount));
-            intersection.add(new Point(row, col));
-        }
+        if(isVertex(row, col)) vertex.add(new Point(row, col));
+        else if(isIntersection(row, col)) intersection.add(new Point(row, col));
     }
 
     // Skeleton post-processing
@@ -214,7 +208,7 @@ class ImageSkeleton {
         cycle = new ArrayList<>();
 
         Point start = getFirstPoint();
-        if(isVertex(start.row, start.col, 0, true)) vertex.add(start);
+        if(isVertex(start.row, start.col)) vertex.add(start);
 
         extractFeatures(start.row, start.col);
         for(Point p : vertex) skeletonMatrix[p.row][p.col] = VERTEX_GREEN;
