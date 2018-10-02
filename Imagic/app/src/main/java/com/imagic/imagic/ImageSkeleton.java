@@ -44,7 +44,7 @@ class ImageSkeleton {
         int count = 0;
 
         for (int i = 0; i < neighbors.length - 1; i++) {
-            if(skeletonMatrix[row + neighbors[i][1]][col + neighbors[i][0]] == 1) count++;
+            if(skeletonMatrix[row + neighbors[i][1]][col + neighbors[i][0]] == BLACK) count++;
         }
 
         return count;
@@ -94,7 +94,7 @@ class ImageSkeleton {
 
             for(int row = 1; row < skeletonMatrix.length - 1; row++) {
                 for(int col = 1; col < skeletonMatrix[0].length - 1; col++) {
-                    if(skeletonMatrix[row][col] != 1) continue;
+                    if(skeletonMatrix[row][col] != BLACK) continue;
                     int numberOfNeighbor = countBlackNeighbors(row, col);
 
                     if(numberOfNeighbor < 2 || numberOfNeighbor > 6) continue;

@@ -41,5 +41,5 @@
     <string name="number_ocr_verdict_label">Verdict :</string>
     <string name="number_ocr_activity_title">OCR</string>
     <string name="number_ocr_button_text">Analyze</string>
-    <string name="number_ocr_verdict_text">\?</string>
+    <string name="number_ocr_verdict_text">-</string>
 </resources>

@@ -171,7 +171,7 @@ class ChainCode {
     }
 
     // Get current direction
-    public int getCurrentDirection(int[] previousPoint, int[] currentPoint) {
+    private int getCurrentDirection(int[] previousPoint, int[] currentPoint) {
         int direction = CENTER;
         int dX = currentPoint[0] - previousPoint[0];
         int dY = currentPoint[1] - previousPoint[1];
