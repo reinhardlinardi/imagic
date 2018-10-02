@@ -222,7 +222,17 @@ class ImageSkeleton {
                 maximumDistance = d;
             }
         }
+//        hapus semua yang kurang dari threshold -> nanti ini mungkin bakal dipakai
+//        for(int i = 0; i < Points.size(); i++) {
+//            // URGENT MODE - Manhattan distance NEED IMPROVEMENT (pengennya jarak absolut ngikutin pixelnya)
+//            int d = Math.abs(Points.get(i).row - intersectionPoint.row) + Math.abs(Points.get(i).col - intersectionPoint.col);
+//            if ((double)d / (double)maximumDistance < 0.2) { // threshold kuli (indikator ujung palsu yg masih ccd)
+//                deleteSkeletonEdge(intersectionPoint, Points.get(i));
+//                vertex.remove(Points.get(i));
+//            }
+//        }
 
+        Log.d("Distance ratio", Double.toString((double)minimumDistance / (double)maximumDistance));
         if ((double)minimumDistance / (double)maximumDistance < 0.2) { // threshold kuli (indikator ujung palsu yg masih ccd)
             deleteSkeletonEdge(intersectionPoint, Points.get(indexChosenPoint));
             vertex.remove(Points.get(indexChosenPoint));
@@ -283,7 +293,7 @@ class ImageSkeleton {
                 resetVisited();
                 eliminateSkeletonNoise(intersection.get(0), vertex);
             }
-        } else if (intersection.size() > 1) {
+        } else if (intersection.size() > 1 && vertex.size() > 2) {
             for(int i = 0; i < intersection.size(); i++) {
                 numOfIntersectNeighbor = countWhiteToBlackTransition(intersection.get(i).row, intersection.get(i).col);
                 if(numOfIntersectNeighbor == 3) {
@@ -309,6 +319,17 @@ class ImageSkeleton {
         }
 
         //count cycle
-        //predict
+        int cycleCount = countCycle();
+        Log.d("Cycle count", Integer.toString(cycleCount));
+    }
+
+    int countCycle() {
+        if(vertex.size() == 0) {
+            if(intersection.size() == 0) return 1;
+            else if(intersection.size() == 1 || intersection.size() == 2) return 2;
+        } else if(intersection.size() == 1 && (vertex.size() == 1 || vertex.size() == 2)) {
+            return 1;
+        }
+        return 0;
     }
 }
