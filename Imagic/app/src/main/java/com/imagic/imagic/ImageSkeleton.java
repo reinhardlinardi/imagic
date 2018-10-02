@@ -1,7 +1,5 @@
 package com.imagic.imagic;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 class ImageSkeleton {
@@ -26,7 +24,6 @@ class ImageSkeleton {
 
     private final int VERTEX_GREEN = 2;
     private final int INTERSECTION_BLUE = 3;
-    private final int CYCLE_RED = 4;
 
     /*
     Zhang-Suen thinning algorithm neighbor numbering, p = current position
@@ -179,8 +176,10 @@ class ImageSkeleton {
 
     // Extract all features (vertexes, intersections, and cycles) using DFS
     private void extractFeatures(int row, int col) {
-        int nextNeighborCount = 0;
         visited[row][col] = true;
+
+        if(isVertex(row, col)) vertex.add(new Point(row, col));
+        else if(isIntersection(row, col)) intersection.add(new Point(row, col));
 
         // DFS
         for(int idx = 0; idx < neighbors.length; idx++) {
@@ -188,15 +187,9 @@ class ImageSkeleton {
             int nextCol = col + neighbors[idx][0];
 
             if(isInsideBorder(nextRow, nextCol)) {
-                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]) {
-                    nextNeighborCount++;
-                    extractFeatures(nextRow, nextCol);
-                }
+                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]) extractFeatures(nextRow, nextCol);
             }
         }
-
-        if(isVertex(row, col)) vertex.add(new Point(row, col));
-        else if(isIntersection(row, col)) intersection.add(new Point(row, col));
     }
 
     // Skeleton post-processing
@@ -213,5 +206,7 @@ class ImageSkeleton {
         extractFeatures(start.row, start.col);
         for(Point p : vertex) skeletonMatrix[p.row][p.col] = VERTEX_GREEN;
         for(Point p : intersection) skeletonMatrix[p.row][p.col] = INTERSECTION_BLUE;
+
+        // continue
     }
 }

@@ -32,7 +32,6 @@ class Image implements JSONSerializable {
 
     private final int MATRIX_VERTEX_GREEN = 2;
     private final int MATRIX_INTERSECTION_BLUE = 3;
-    private final int MATRIX_CYCLE_RED = 4;
 
     // Properties
     Uri uri;
@@ -165,9 +164,6 @@ class Image implements JSONSerializable {
                         break;
                     case MATRIX_INTERSECTION_BLUE:
                         pixels[row * width + col] = Color.rgb(0x00,0xFF,0xFF);
-                        break;
-                    case MATRIX_CYCLE_RED:
-                        pixels[row * width + col] = Color.rgb(0xFF,0,0);
                         break;
                 }
             }
