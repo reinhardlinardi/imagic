@@ -158,16 +158,16 @@ class Image implements JSONSerializable {
                         pixels[row * width + col] = Color.rgb(0,0,0);
                         break;
                     case MATRIX_WHITE:
-                        pixels[row * width + col] = Color.rgb(255,255,255);
+                        pixels[row * width + col] = Color.rgb(0xFF,0xFF,0xFF);
                         break;
                     case MATRIX_VERTEX_GREEN:
-                        pixels[row * width + col] = Color.rgb(0,255,0);
+                        pixels[row * width + col] = Color.rgb(0x32,0xCD,0x32);
                         break;
                     case MATRIX_INTERSECTION_BLUE:
-                        pixels[row * width + col] = Color.rgb(0,0,255);
+                        pixels[row * width + col] = Color.rgb(0x1E,0x90,0xFF);
                         break;
                     case MATRIX_CYCLE_RED:
-                        pixels[row * width + col] = Color.rgb(255,0,0);
+                        pixels[row * width + col] = Color.rgb(0xFF,0,0);
                         break;
                 }
             }

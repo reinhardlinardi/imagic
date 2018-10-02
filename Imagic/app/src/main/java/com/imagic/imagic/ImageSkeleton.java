@@ -1,5 +1,7 @@
 package com.imagic.imagic;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 class ImageSkeleton {
@@ -173,6 +175,10 @@ class ImageSkeleton {
         return result;
     }
 
+    // Check if point is intersection
+    private boolean isIntersection(int row, int col, int nextNeighborCount) {
+        return /*nextNeighborCount >= 2 &&*/ countBlackNeighbors(row, col) >= 3 && countWhiteToBlackTransition(row, col) >= 3;
+    }
 
     // Extract all features (vertexes, intersections, and cycles) using DFS
     private void extractFeatures(int row, int col) {
@@ -192,9 +198,11 @@ class ImageSkeleton {
             }
         }
 
-
         if(isVertex(row, col, nextNeighborCount, false)) vertex.add(new Point(row, col));
-        else if(countBlackNeighbors(row, col) == 3 && countWhiteToBlackTransition(row, col) == 3) intersection.add(new Point(row, col));
+        else if(isIntersection(row, col, nextNeighborCount)) {
+            Log.d("Intersection", Integer.toString(nextNeighborCount));
+            intersection.add(new Point(row, col));
+        }
     }
 
     // Skeleton post-processing
