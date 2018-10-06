@@ -45,7 +45,7 @@ class ChainCode {
 
     // Scan line until encounter a black point as start point
     private int[] searchStartPoint(int[][] blackWhiteBitmap) {
-        int[] start = new int[2]; // x, y
+        int[] start = new int[2]; // col, row
         int width = blackWhiteBitmap[0].length;
         int height = blackWhiteBitmap.length;
 
@@ -96,7 +96,7 @@ class ChainCode {
 
     // Find next point
     private int[] nextPoint(int[] currentPoint, int[] previousPoint, int[][] blackWhiteBitmap) {
-        // Array[y][x]
+        // Array[row][col]
         int direction;
 
         if(previousPoint[0] == 0 && previousPoint[1] == 0) direction = CENTER;
@@ -171,7 +171,7 @@ class ChainCode {
     }
 
     // Get current direction
-    public int getCurrentDirection(int[] previousPoint, int[] currentPoint) {
+    private int getCurrentDirection(int[] previousPoint, int[] currentPoint) {
         int direction = CENTER;
         int dX = currentPoint[0] - previousPoint[0];
         int dY = currentPoint[1] - previousPoint[1];

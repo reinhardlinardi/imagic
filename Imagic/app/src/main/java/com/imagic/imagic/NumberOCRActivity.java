@@ -99,6 +99,7 @@ public class NumberOCRActivity extends AppCompatActivity {
                             Log.e("Imagic", "Exception", e);
                         }
 
+                        verdict = skeletonImage.skeleton.getPrediction();
                         publishProgress(countProgress(3,3));
                         break;
                 }
@@ -129,12 +130,11 @@ public class NumberOCRActivity extends AppCompatActivity {
             switch(selectedOption.algorithm) {
                 case "Edge Detection":
                     verdictTextView.setText(Integer.toString(results));
-                    UI.show(verdictLabelTextView);
-                    UI.show(verdictTextView);
                     break;
                 case "Thinning":
                     UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
                     UI.clearImageViewMemory(NumberOCRActivity.this);
+                    verdictTextView.setText(Integer.toString(results));
                     break;
             }
 
@@ -244,13 +244,9 @@ public class NumberOCRActivity extends AppCompatActivity {
                 switch(selectedOption.algorithm) {
                     case "Edge Detection":
                         UI.hide(skeletonImageView);
-                        UI.show(verdictLabelTextView);
-                        UI.show(verdictTextView);
                         break;
                     case "Thinning":
                         UI.show(skeletonImageView);
-                        UI.setInvisible(verdictLabelTextView);
-                        UI.setInvisible(verdictTextView);
                         break;
                 }
             }

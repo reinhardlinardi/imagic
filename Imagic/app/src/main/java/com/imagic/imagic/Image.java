@@ -30,6 +30,9 @@ class Image implements JSONSerializable {
     private final int MATRIX_WHITE = 0;
     private final int MATRIX_BLACK = 1;
 
+    private final int MATRIX_VERTEX_GREEN = 2;
+    private final int MATRIX_INTERSECTION_BLUE = 3;
+
     // Properties
     Uri uri;
 
@@ -149,7 +152,20 @@ class Image implements JSONSerializable {
 
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
-                pixels[row * width + col] = (skeleton.skeletonMatrix[row][col] == MATRIX_WHITE)? Color.rgb(255,255,255) : Color.rgb(0, 0, 0);
+                switch(skeleton.skeletonMatrix[row][col]) {
+                    case MATRIX_BLACK:
+                        pixels[row * width + col] = Color.rgb(0,0,0);
+                        break;
+                    case MATRIX_WHITE:
+                        pixels[row * width + col] = Color.rgb(0xFF,0xFF,0xFF);
+                        break;
+                    case MATRIX_VERTEX_GREEN:
+                        pixels[row * width + col] = Color.rgb(0x32,0xCD,0x32);
+                        break;
+                    case MATRIX_INTERSECTION_BLUE:
+                        pixels[row * width + col] = Color.rgb(0x00,0xFF,0xFF);
+                        break;
+                }
             }
         }
 
@@ -181,7 +197,10 @@ class Image implements JSONSerializable {
     }
 
     // Get image skeleton
-    void getSkeleton() { skeleton = new ImageSkeleton(blackWhiteMatrix); }
+    void getSkeleton() {
+        skeleton = new ImageSkeleton(blackWhiteMatrix);
+        skeleton.postProcess();
+    }
 
     // Generate histogram
     void generateHistogramByColorType(Image.ColorType colorType) {
