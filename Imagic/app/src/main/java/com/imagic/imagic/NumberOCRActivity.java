@@ -68,11 +68,11 @@ public class NumberOCRActivity extends AppCompatActivity {
     }
 
     // OCR async task
-    private class OCRTask extends AsyncTask<Void, Integer, Integer> {
+    private class OCRTask extends AsyncTask<Void, Integer, Character> {
         @Override
-        protected Integer doInBackground(Void... voids) {
+        protected Character doInBackground(Void... voids) {
             publishProgress(countProgress(1,3));
-            Integer verdict = 0;
+            Character verdict = ' ';
 
             try {
                 skeletonImage = new Image(NumberOCRActivity.this, originalImage, false);
@@ -84,8 +84,9 @@ public class NumberOCRActivity extends AppCompatActivity {
                         ChainCode chainCode = new ChainCode();
                         chainCode.getEdgeDetectionChainCode(skeletonImage.blackWhiteMatrix);
                         publishProgress(countProgress(2,3));
-
-                        verdict = chainCode.edgeDetectionOCR();
+                        //TODO fix edgeDetectionOCR return value
+//                        verdict = chainCode.edgeDetectionOCR();
+                        verdict = 'x';
                         publishProgress(countProgress(3,3));
                         break;
                     case "Thinning":
@@ -124,17 +125,17 @@ public class NumberOCRActivity extends AppCompatActivity {
         protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
 
         @Override
-        protected void onPostExecute(Integer results) {
+        protected void onPostExecute(Character results) {
             NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
 
             switch(selectedOption.algorithm) {
                 case "Edge Detection":
-                    verdictTextView.setText(Integer.toString(results));
+                    verdictTextView.setText(Character.toString(results));
                     break;
                 case "Thinning":
                     UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
                     UI.clearImageViewMemory(NumberOCRActivity.this);
-                    verdictTextView.setText(Integer.toString(results));
+                    verdictTextView.setText(Character.toString(results));
                     break;
             }
 
