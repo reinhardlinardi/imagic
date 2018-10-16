@@ -199,6 +199,8 @@ class Image implements JSONSerializable {
     // Get image skeleton
     void getSkeleton() {
         skeleton = new ImageSkeleton(blackWhiteMatrix);
+        //TODO: itung jumlah objek kepisah
+//        int numOfObject = skeleton.countSeparatedObject();
         skeleton.postProcess();
     }
 

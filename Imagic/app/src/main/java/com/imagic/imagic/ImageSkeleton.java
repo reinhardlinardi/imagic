@@ -3,6 +3,7 @@ package com.imagic.imagic;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class ImageSkeleton {
 
@@ -36,6 +37,7 @@ class ImageSkeleton {
     private final int[][] neighbors = {{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}};
     private final int[][][] neighborGroups = {{{0, 2, 4}, {2, 4, 6}}, {{0, 2, 6}, {0, 4, 6}}};
     private int[] directionCodeCount;
+    private int objectCount;
 
     // Properties
     int[][] skeletonMatrix;
@@ -54,6 +56,7 @@ class ImageSkeleton {
     // Constructor
     ImageSkeleton(int[][] blackWhiteImage) {
         skeletonMatrix = blackWhiteImage;
+        directionCodeCount = new int[8];
         getImageSkeleton();
     }
 
@@ -212,7 +215,10 @@ class ImageSkeleton {
             int nextCol = col + neighbors[idx][0];
 
             if(isInsideBorder(nextRow, nextCol)) {
-                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]) extractFeatures(nextRow, nextCol);
+                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]){
+                    directionCodeCount[idx%8]++;
+                    extractFeatures(nextRow, nextCol);
+                }
             }
         }
     }
@@ -274,6 +280,40 @@ class ImageSkeleton {
         }
     }
 
+//    void dfs(int row, int col) {
+//        visited[row][col] = true;
+//
+//        // DFS
+//        for(int idx = 0; idx < neighbors.length; idx++) {
+//            int nextRow = row + neighbors[idx][1];
+//            int nextCol = col + neighbors[idx][0];
+//
+//            if(isInsideBorder(nextRow, nextCol)) {
+//                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]){
+//                    dfs(nextRow, nextCol);
+//                }
+//            }
+//        }
+//    }
+
+//    int countSeparatedObject() {
+//        resetVisited();
+//        int count = 0;
+//        int rows = skeletonMatrix.length;
+//        int cols = skeletonMatrix[0].length;
+//
+//        for(int row = 0; row < rows; row++) {
+//            for(int col = 0; col < cols; col++) {
+//                if(skeletonMatrix[row][col] == BLACK && !visited[row][col]){
+//                    count++;
+//                    dfs(row, col);
+//                }
+//            }
+//        }
+//        Log.d("Num of Objects", Integer.toString(count));
+//        return count;
+//    }
+
     // Skeleton post-processing
     void postProcess() {
         resetVisited();
@@ -282,10 +322,26 @@ class ImageSkeleton {
         intersection = new ArrayList<>();
         cycle = new ArrayList<>();
 
-        Point start = getFirstPoint();
-        if(isVertex(start.row, start.col)) vertex.add(start);
+//        Point start = getFirstPoint();
+//        if(isVertex(start.row, start.col)) vertex.add(start);
 
-        extractFeatures(start.row, start.col);
+        objectCount = 0;
+        int rows = skeletonMatrix.length;
+        int cols = skeletonMatrix[0].length;
+
+        for(int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (skeletonMatrix[row][col] == BLACK && !visited[row][col]) {
+                    Point point = new Point(row, col);
+                    if(isVertex(point.row, point.col)) vertex.add(point);
+                    objectCount++;
+                    extractFeatures(row, col);
+                }
+            }
+        }
+//        extractFeatures(start.row, start.col);
+        Log.d("Num of Objects", Integer.toString(objectCount));
+
         for(Point p : vertex) {
             Log.d("vertex:", Integer.toString(p.row) + " " + Integer.toString(p.col));
         }
@@ -345,62 +401,66 @@ class ImageSkeleton {
         return 0;
     }
 
-    int getPrediction(){
-        int verdict = 999;
-
-        if (countCycle() > 0){
-            //Case 0,4,6,8,9
-            if(countCycle() == 2){
-                verdict = 8;
-            } else {
-                //Case 0,4,6,9
-                if(vertex.size() == 0){
-                    verdict = 0;
-                } else {
-                    //Case 4,6,9
-                    if(vertex.size() == 2){
-                        verdict = 4;
-                    } else {
-                        //Case 6,9
-                        if(vertex.get(0).row < intersection.get(0).row){
-                            verdict = 6;
-                        } else {
-                            verdict = 9;
-                        }
-                    }
-                }
-            }
-        } else if (countCycle() == 0){
-            //Case 1,2,3,5,7
-            if (vertex.size() == 3 && intersection.size() == 1) {
-                double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
-                if (dIntersectionTopRatio > 0.75) {
-                    verdict = 1;
-                } else {
-                    verdict = 3;
-                }
-            } else {
-                //Case 1,2,5,7
-                double ratio = (double)(maxCol-minCol) / (double)(maxRow-minRow);
-                if (ratio < 0.4) {
-                    verdict = 1;
-                } else { // 2, 5, 7
-                    ratio = (double)Math.abs(vertex.get(0).col - vertex.get(1).col) / (double)(maxCol-minCol);
-                    if (ratio < 0.6) {
-                        verdict = 7;
-                    } else {
-                        if (isUpperVertexFront()) {
-                            verdict = 2;
-                        } else {
-                            verdict = 5;
-                        }
-                    }
-                }
-            }
-        }
-
-        return verdict;
+    int getPrediction() {
+        Log.d("Chain code", Arrays.toString(directionCodeCount));
+        return 0;
     }
+//    int getPrediction(){
+//        int verdict = 999;
+//
+//        if (countCycle() > 0){
+//            //Case 0,4,6,8,9
+//            if(countCycle() == 2){
+//                verdict = 8;
+//            } else {
+//                //Case 0,4,6,9
+//                if(vertex.size() == 0){
+//                    verdict = 0;
+//                } else {
+//                    //Case 4,6,9
+//                    if(vertex.size() == 2){
+//                        verdict = 4;
+//                    } else {
+//                        //Case 6,9
+//                        if(vertex.get(0).row < intersection.get(0).row){
+//                            verdict = 6;
+//                        } else {
+//                            verdict = 9;
+//                        }
+//                    }
+//                }
+//            }
+//        } else if (countCycle() == 0){
+//            //Case 1,2,3,5,7
+//            if (vertex.size() == 3 && intersection.size() == 1) {
+//                double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
+//                if (dIntersectionTopRatio > 0.75) {
+//                    verdict = 1;
+//                } else {
+//                    verdict = 3;
+//                }
+//            } else {
+//                //Case 1,2,5,7
+//                double ratio = (double)(maxCol-minCol) / (double)(maxRow-minRow);
+//                if (ratio < 0.4) {
+//                    verdict = 1;
+//                } else { // 2, 5, 7
+//                    ratio = (double)Math.abs(vertex.get(0).col - vertex.get(1).col) / (double)(maxCol-minCol);
+//                    if (ratio < 0.6) {
+//                        verdict = 7;
+//                    } else {
+//                        if (isUpperVertexFront()) {
+//                            verdict = 2;
+//                        } else {
+//                            verdict = 5;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return verdict;
+//    }
 
     boolean isUpperVertexFront(){
         return ((vertex.get(0).col < vertex.get(1).col && vertex.get(0).row < vertex.get(1).row) ||
