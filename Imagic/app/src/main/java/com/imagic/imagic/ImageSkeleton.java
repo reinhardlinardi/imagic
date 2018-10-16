@@ -136,12 +136,12 @@ class ImageSkeleton {
     private char[] charWithTwoObjects = {'!', '"', ':', ';', '=', '?', 'i', 'j'};
     private int[][] referenceCodeCountTwoObject = new int[][]{
             {0, 0, 0, 1, 48, 0, 0, 0}, // !
-            {0, 0, 0, 4, 20, 8, 0, 0}, // "
+            {0, 0, 0, 4, 21, 8, 0, 0}, // "
             {0, 0, 0, 0, 0, 0, 0, 0}, // :
-            {0, 0, 0, 3, 10, 2, 0, 0}, // ;
+            {0, 0, 0, 1, 7, 2, 0, 0}, // ;
             {0, 0, 84, 0, 0, 0, 0, 0}, // =
             {4, 0, 10, 11, 27, 30, 8, 1}, // ?
-
+//            0, 0, 0, 1, 7, 3, 0, 0
             {0, 0, 0, 0, 46, 0, 0, 0}, // i
             {2, 0, 0, 1, 65, 7, 5, 0}, // j
     };
@@ -554,62 +554,62 @@ class ImageSkeleton {
     }
 
     //TODO restore number prediction only feature
-//    int getPrediction(){
-//        int verdict = 999;
-//
-//        if (countCycle() > 0){
-//            //Case 0,4,6,8,9
-//            if(countCycle() == 2){
-//                verdict = 8;
-//            } else {
-//                //Case 0,4,6,9
-//                if(vertex.size() == 0){
-//                    verdict = 0;
-//                } else {
-//                    //Case 4,6,9
-//                    if(vertex.size() == 2){
-//                        verdict = 4;
-//                    } else {
-//                        //Case 6,9
-//                        if(vertex.get(0).row < intersection.get(0).row){
-//                            verdict = 6;
-//                        } else {
-//                            verdict = 9;
-//                        }
-//                    }
-//                }
-//            }
-//        } else if (countCycle() == 0){
-//            //Case 1,2,3,5,7
-//            if (vertex.size() == 3 && intersection.size() == 1) {
-//                double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
-//                if (dIntersectionTopRatio > 0.75) {
-//                    verdict = 1;
-//                } else {
-//                    verdict = 3;
-//                }
-//            } else {
-//                //Case 1,2,5,7
-//                double ratio = (double)(maxCol-minCol) / (double)(maxRow-minRow);
-//                if (ratio < 0.4) {
-//                    verdict = 1;
-//                } else { // 2, 5, 7
-//                    ratio = (double)Math.abs(vertex.get(0).col - vertex.get(1).col) / (double)(maxCol-minCol);
-//                    if (ratio < 0.6) {
-//                        verdict = 7;
-//                    } else {
-//                        if (isUpperVertexFront()) {
-//                            verdict = 2;
-//                        } else {
-//                            verdict = 5;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        return verdict;
-//    }
+    int getNumberPrediction(){
+        int verdict = 999;
+
+        if (countCycle() > 0){
+            //Case 0,4,6,8,9
+            if(countCycle() == 2){
+                verdict = 8;
+            } else {
+                //Case 0,4,6,9
+                if(vertex.size() == 0){
+                    verdict = 0;
+                } else {
+                    //Case 4,6,9
+                    if(vertex.size() == 2){
+                        verdict = 4;
+                    } else {
+                        //Case 6,9
+                        if(vertex.get(0).row < intersection.get(0).row){
+                            verdict = 6;
+                        } else {
+                            verdict = 9;
+                        }
+                    }
+                }
+            }
+        } else if (countCycle() == 0){
+            //Case 1,2,3,5,7
+            if (vertex.size() == 3 && intersection.size() == 1) {
+                double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
+                if (dIntersectionTopRatio > 0.75) {
+                    verdict = 1;
+                } else {
+                    verdict = 3;
+                }
+            } else {
+                //Case 1,2,5,7
+                double ratio = (double)(maxCol-minCol) / (double)(maxRow-minRow);
+                if (ratio < 0.4) {
+                    verdict = 1;
+                } else { // 2, 5, 7
+                    ratio = (double)Math.abs(vertex.get(0).col - vertex.get(1).col) / (double)(maxCol-minCol);
+                    if (ratio < 0.6) {
+                        verdict = 7;
+                    } else {
+                        if (isUpperVertexFront()) {
+                            verdict = 2;
+                        } else {
+                            verdict = 5;
+                        }
+                    }
+                }
+            }
+        }
+
+        return verdict;
+    }
 
     boolean isUpperVertexFront(){
         return ((vertex.get(0).col < vertex.get(1).col && vertex.get(0).row < vertex.get(1).row) ||

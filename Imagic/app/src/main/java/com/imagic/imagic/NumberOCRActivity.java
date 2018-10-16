@@ -73,7 +73,7 @@ public class NumberOCRActivity extends AppCompatActivity {
         protected Character doInBackground(Void... voids) {
             publishProgress(countProgress(1,3));
             Character verdict = ' ';
-
+            int verdictInt;
             try {
                 skeletonImage = new Image(NumberOCRActivity.this, originalImage, false);
                 skeletonImage.getBlackWhiteMatrix(128);
@@ -85,7 +85,7 @@ public class NumberOCRActivity extends AppCompatActivity {
                         chainCode.getEdgeDetectionChainCode(skeletonImage.blackWhiteMatrix);
                         publishProgress(countProgress(2,3));
 
-                        int verdictInt = chainCode.edgeDetectionOCR();
+                        verdictInt = chainCode.edgeDetectionOCR();
                         verdict = (char)('0' + verdictInt);
                         publishProgress(countProgress(3,3));
                         break;
@@ -101,6 +101,21 @@ public class NumberOCRActivity extends AppCompatActivity {
                         }
 
                         verdict = skeletonImage.skeleton.getPrediction();
+                        publishProgress(countProgress(3,3));
+                        break;
+                    case "Thinning (Number)":
+                        skeletonImage.getSkeleton();
+                        publishProgress(countProgress(2,3));
+
+                        try {
+                            skeletonImage.setBitmapToSkeleton(NumberOCRActivity.this);
+                        }
+                        catch(Exception e) {
+                            Log.e("Imagic", "Exception", e);
+                        }
+
+                        verdictInt = skeletonImage.skeleton.getNumberPrediction();
+                        verdict = (char) ('0' + verdictInt);
                         publishProgress(countProgress(3,3));
                         break;
                 }
@@ -132,6 +147,7 @@ public class NumberOCRActivity extends AppCompatActivity {
                 case "Edge Detection":
                     verdictTextView.setText(Character.toString(results));
                     break;
+                case "Thinning (Number)":
                 case "Thinning":
                     UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
                     UI.clearImageViewMemory(NumberOCRActivity.this);
@@ -246,6 +262,7 @@ public class NumberOCRActivity extends AppCompatActivity {
                     case "Edge Detection":
                         UI.hide(skeletonImageView);
                         break;
+                    case "Thinning (Number)":
                     case "Thinning":
                         UI.show(skeletonImageView);
                         break;
