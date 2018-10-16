@@ -136,9 +136,9 @@ class ImageSkeleton {
     private char[] charWithTwoObjects = {'!', '"', ':', ';', '=', '?', 'i', 'j'};
     private int[][] referenceCodeCountTwoObject = new int[][]{
             {0, 0, 0, 1, 48, 0, 0, 0}, // !
-            {0, 0, 0, 4, 21, 8, 0, 0}, // "
+            {0, 0, 0, 4, 20, 8, 0, 0}, // "
             {0, 0, 0, 0, 0, 0, 0, 0}, // :
-            {0, 0, 0, 1, 7, 2, 0, 0}, // ;
+            {1, 0, 0, 4, 17, 7, 1, 0}, // ;
             {0, 0, 84, 0, 0, 0, 0, 0}, // =
             {4, 0, 10, 11, 27, 30, 8, 1}, // ?
 //            0, 0, 0, 1, 7, 3, 0, 0
@@ -438,7 +438,9 @@ class ImageSkeleton {
         // continue process skeleton
         int numOfIntersectNeighbor = 0;
         if (vertex.size() == 2 && intersection.size() == 1) {
-            intersection.clear();
+            if (countWhiteToBlackTransition(intersection.get(0).row, intersection.get(0). col) <= 3) {
+                intersection.clear();
+            }
         } else if (vertex.size() == 3 && intersection.size() == 1) {
             numOfIntersectNeighbor = countWhiteToBlackTransition(intersection.get(0).row, intersection.get(0).col);
             if (numOfIntersectNeighbor == 3) {
