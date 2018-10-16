@@ -100,7 +100,37 @@ class ImageSkeleton {
             {40, 12, 19, 14, 52, 32, 44, 17}, // 9
 
             // Non alphabetic char
-            
+            {45, 9, 47, 3, 76, 21, 48, 0}, // # bad skeleton
+            {78, 3, 26, 31, 50, 24, 35, 13}, // $
+            {47, 24, 32, 23, 32, 42, 16, 25}, // &
+            {1, 0, 0, 2, 11, 3, 0, 0}, // '
+            {4, 0, 0, 16, 66, 16, 0, 6}, // (
+            {5, 0, 0, 15, 68, 15, 1, 5}, // )
+            {3, 5, 7, 7, 23, 8, 8, 6}, // *
+            {1, 0, 20, 1, 40, 1, 21, 0}, // +
+            {1, 0, 1, 2, 11, 4, 1, 0}, // ,
+            {0, 0, 20, 0, 0, 0, 0, 0}, // -
+            {0, 0, 0, 0, 0, 0, 0, 0}, // .
+            {7, 0, 0, 0, 53, 21, 0, 0}, // /
+            {5, 0, 23, 19, 6, 24, 21, 0}, // <
+            {4, 0, 23, 18, 6, 24, 21, 0}, // >
+            {0, 0, 23, 1, 90, 2, 0, 0}, // [
+            {0, 0, 11, 1, 92, 0, 12, 0}, // ]
+            {0, 0, 0, 20, 54, 0, 0, 3}, // \
+            {2, 0, 3, 19, 33, 15, 2, 2}, // ^
+            {0, 0, 56, 0, 0, 0, 0, 0}, // _
+            {0, 0, 4, 8, 3, 0, 0, 2}, // `
+            {5, 0, 7, 15, 65, 17, 5, 2}, // {
+            {0, 0, 0, 0, 93, 0, 0, 0}, // |
+            {3, 0, 5, 16, 64, 16, 7, 3}, // }
+            {7, 0, 0, 0, 6, 16, 34, 4}, // ~
+            {64, 34, 97, 56, 103, 76, 50, 24}, // @
+    };
+
+    private char[] charWithOneObjectTwoCycle = {'B', '8'};
+    private int[][] referenceCodeCountOneObjectTwoCycle = new int[][] {
+            {70, 0, 71, 19, 35, 17, 39, 4}, // B
+            {52, 21, 38, 22, 40, 30, 33, 19}, // 8
     };
 
     private char[] charWithTwoObjects = {'!', '"', ':', ';', '=', '?', 'i', 'j'};
@@ -125,6 +155,7 @@ class ImageSkeleton {
     private final int[][][] neighborGroups = {{{0, 2, 4}, {2, 4, 6}}, {{0, 2, 6}, {0, 4, 6}}};
     private int[] directionCodeCount;
     private int objectCount;
+    private int cycleCount;
 
     // Properties
     int[][] skeletonMatrix;
@@ -440,7 +471,7 @@ class ImageSkeleton {
         }
 
         //count cycle
-        int cycleCount = countCycle();
+        cycleCount = countCycle();
         Log.d("Cycle count", Integer.toString(cycleCount));
     }
 
@@ -487,8 +518,15 @@ class ImageSkeleton {
         int resultIndex = 0;
         int[][] reference = new int[0][0];
 
+        Log.d("cycle count predict", Integer.toString(cycleCount));
         if (objectCount == 1) {
-            reference = referenceCodeCountOneObject;
+            if (cycleCount == 2) {
+                Log.d("tes 1", "tes");
+                reference = referenceCodeCountOneObjectTwoCycle;
+            } else {
+                Log.d("tes 2", "tes");
+                reference = referenceCodeCountOneObject;
+            }
         } else if (objectCount == 2) {
             reference = referenceCodeCountTwoObject;
         }
@@ -506,7 +544,11 @@ class ImageSkeleton {
 
         //Log.d("result", Integer.toString(resultIndex));
         if (objectCount == 1) {
-            result = charWithOneObject[resultIndex];
+            if (cycleCount == 2) {
+                result = charWithOneObjectTwoCycle[resultIndex];
+            } else {
+                result = charWithOneObject[resultIndex];
+            }
         } else if (objectCount == 2) {
             result = charWithTwoObjects[resultIndex];
         }
