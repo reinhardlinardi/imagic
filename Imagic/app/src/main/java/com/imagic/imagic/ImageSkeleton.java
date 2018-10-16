@@ -28,11 +28,16 @@ class ImageSkeleton {
     private final int VERTEX_GREEN = 2;
     private final int INTERSECTION_BLUE = 3;
 
+    private char[] charWithOneObject = {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '#', '$', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '<', '>', '[', ']', '\\', '^', '_', '`', '{', '|', '}', '~', '@'};
     private int[][] referenceCodeCountOneObject = new int[][]{
             {94, 28, 39, 29, 92, 29, 39, 28},
     };
 
-    private char[] charWithTwoObject = {'!', '"', ':', ';', '=', '?', 'i', 'j'};
+    private char[] charWithTwoObjects = {'!', '"', ':', ';', '=', '?', 'i', 'j'};
     private int[][] referenceCodeCountTwoObject = new int[][]{
             {0, 0, 0, 1, 48, 0, 0, 0}, // !
             {0, 0, 0, 4, 20, 8, 0, 0}, // "
@@ -385,17 +390,61 @@ class ImageSkeleton {
 
     char getPrediction() {
         char verdict = '\0';
+        double[] normalizedTestCodeChain = normalizeCodeChain(directionCodeCount);
+
         Log.d("Chain code", Arrays.toString(directionCodeCount));
         if (objectCount == 3) {
             verdict = '%';
-        } else if (objectCount == 2) {
-
-        } else if (objectCount == 1) {
-
         } else if (objectCount == 0) {
             verdict = ' ';
+        } else if (objectCount == 1 || objectCount == 2){
+            verdict = searchTheMostSimilarChainCode(normalizedTestCodeChain);
         }
         return verdict;
+    }
+
+    private double[] normalizeCodeChain(int[] chainCode) {
+        int sum = 0;
+        double[] result = new double[8];
+
+        for(int i = 0; i < 8; i++) sum += chainCode[i];
+        for(int i = 0; i < 8; i++) {
+            result[i] = (sum == 0) ? 0.0 : (double) chainCode[i] / (double) sum;
+        }
+
+        return result;
+    }
+
+    private char searchTheMostSimilarChainCode(double[] normalizedTestCodeChain) {
+        char result = '\0';
+        double minimumError = 99999999.0;
+        int resultIndex = 0;
+        int[][] reference = new int[0][0];
+
+        if (objectCount == 1) {
+            reference = referenceCodeCountOneObject;
+        } else if (objectCount == 2) {
+            reference = referenceCodeCountTwoObject;
+        }
+
+        for(int i = 0; i < reference.length; i++) {
+            double[] normalizedReference = normalizeCodeChain(reference[i]);
+            double sum = 0;
+            for(int j = 0; j < 8; j++) sum += Math.abs(normalizedReference[j] - normalizedTestCodeChain[j]);
+            if (minimumError > sum) {
+                minimumError = sum;
+                resultIndex = i;
+            }
+            //Log.d("min sum", Double.toString(minimumError) + " " + Double.toString(sum));
+        }
+
+        //Log.d("result", Integer.toString(resultIndex));
+        if (objectCount == 1) {
+            result = charWithOneObject[resultIndex];
+        } else if (objectCount == 2) {
+            result = charWithTwoObjects[resultIndex];
+        }
+        return result;
     }
 //    int getPrediction(){
 //        int verdict = 999;
