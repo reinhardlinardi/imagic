@@ -521,10 +521,8 @@ class ImageSkeleton {
         Log.d("cycle count predict", Integer.toString(cycleCount));
         if (objectCount == 1) {
             if (cycleCount == 2) {
-                Log.d("tes 1", "tes");
                 reference = referenceCodeCountOneObjectTwoCycle;
             } else {
-                Log.d("tes 2", "tes");
                 reference = referenceCodeCountOneObject;
             }
         } else if (objectCount == 2) {

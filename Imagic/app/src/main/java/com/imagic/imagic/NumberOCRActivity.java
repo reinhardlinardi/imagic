@@ -84,9 +84,9 @@ public class NumberOCRActivity extends AppCompatActivity {
                         ChainCode chainCode = new ChainCode();
                         chainCode.getEdgeDetectionChainCode(skeletonImage.blackWhiteMatrix);
                         publishProgress(countProgress(2,3));
-                        //TODO fix edgeDetectionOCR return value
-//                        verdict = chainCode.edgeDetectionOCR();
-                        verdict = 'x';
+
+                        int verdictInt = chainCode.edgeDetectionOCR();
+                        verdict = (char)('0' + verdictInt);
                         publishProgress(countProgress(3,3));
                         break;
                     case "Thinning":
