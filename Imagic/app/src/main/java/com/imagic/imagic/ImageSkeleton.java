@@ -28,6 +28,22 @@ class ImageSkeleton {
     private final int VERTEX_GREEN = 2;
     private final int INTERSECTION_BLUE = 3;
 
+    private int[][] referenceCodeCountOneObject = new int[][]{
+            {94, 28, 39, 29, 92, 29, 39, 28},
+    };
+
+    private char[] charWithTwoObject = {'!', '"', ':', ';', '=', '?', 'i', 'j'};
+    private int[][] referenceCodeCountTwoObject = new int[][]{
+            {0, 0, 0, 1, 48, 0, 0, 0}, // !
+            {0, 0, 0, 4, 20, 8, 0, 0}, // "
+            {0, 0, 0, 0, 0, 0, 0, 0}, // :
+            {0, 0, 0, 3, 10, 2, 0, 0}, // ;
+            {0, 0, 84, 0, 0, 0, 0, 0}, // =
+            {4, 0, 10, 11, 27, 30, 8, 1}, // ?
+
+            {0, 0, 0, 0, 46, 0, 0, 0}, // i
+            {2, 0, 0, 1, 65, 7, 5, 0}, // j
+    };
     /*
     Zhang-Suen thinning algorithm neighbor numbering, p = current position
     // 7 0 1
@@ -280,40 +296,6 @@ class ImageSkeleton {
         }
     }
 
-//    void dfs(int row, int col) {
-//        visited[row][col] = true;
-//
-//        // DFS
-//        for(int idx = 0; idx < neighbors.length; idx++) {
-//            int nextRow = row + neighbors[idx][1];
-//            int nextCol = col + neighbors[idx][0];
-//
-//            if(isInsideBorder(nextRow, nextCol)) {
-//                if(skeletonMatrix[nextRow][nextCol] == BLACK && !visited[nextRow][nextCol]){
-//                    dfs(nextRow, nextCol);
-//                }
-//            }
-//        }
-//    }
-
-//    int countSeparatedObject() {
-//        resetVisited();
-//        int count = 0;
-//        int rows = skeletonMatrix.length;
-//        int cols = skeletonMatrix[0].length;
-//
-//        for(int row = 0; row < rows; row++) {
-//            for(int col = 0; col < cols; col++) {
-//                if(skeletonMatrix[row][col] == BLACK && !visited[row][col]){
-//                    count++;
-//                    dfs(row, col);
-//                }
-//            }
-//        }
-//        Log.d("Num of Objects", Integer.toString(count));
-//        return count;
-//    }
-
     // Skeleton post-processing
     void postProcess() {
         resetVisited();
@@ -401,9 +383,19 @@ class ImageSkeleton {
         return 0;
     }
 
-    int getPrediction() {
+    char getPrediction() {
+        char verdict = '\0';
         Log.d("Chain code", Arrays.toString(directionCodeCount));
-        return 0;
+        if (objectCount == 3) {
+            verdict = '%';
+        } else if (objectCount == 2) {
+
+        } else if (objectCount == 1) {
+
+        } else if (objectCount == 0) {
+            verdict = ' ';
+        }
+        return verdict;
     }
 //    int getPrediction(){
 //        int verdict = 999;
