@@ -9,4 +9,13 @@
     </style>
 
     <style name="ImagicTheme" parent="AppTheme"></style>
+
+    <style name="ImagicTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="ImagicTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="ImagicTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

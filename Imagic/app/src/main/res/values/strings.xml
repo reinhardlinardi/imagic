@@ -1,45 +1,10 @@
 <resources>
+    <!-- Android studio generated resources -->
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <!-- Custom resources -->
     <string name="app_name">Imagic</string>
-    <string name="main_above_picture_message">Welcome to Imagic,</string>
-    <string name="main_below_picture_message">A magical powered\nimage processing application.</string>
-    <string name="welcome_message">Transform your image with our\nmagic spells right now!</string>
-    <string name="welcome_image_description">Imagic Icon</string>
-    <string name="select_image_button_text">Select Image</string>
-    <string name="capture_image_button_text">Capture Image</string>
-    <string name="menu_activity_title">Magic Spell</string>
-    <string name="menu_message">What magic spell do you want to use?</string>
-    <string name="menu_option_title">Magic</string>
-    <string name="menu_option_description">Describes about magic</string>
-    <string name="menu_image_description">Magic spell book</string>
-    <string name="histogram_activity_title">Histogram</string>
-    <string name="graph_series_no_data">0=0</string>
-    <string name="contrast_enhancement_activity_title">Contrast Enhancement</string>
-    <string name="original_image_content_description">Original Image</string>
-    <string name="transformed_image_content_description">Transformed Image</string>
-    <string name="skeleton_image_content_description">Skeleton Image</string>
-    <string name="contrast_enhance_button_text">Enhance</string>
-    <string name="seek_bar_text_view_initial_value">100%</string>
-    <string name="seek_bar_text_view_initial_value_no_percent">100</string>
-    <string name="seek_bar_red_color_description">R</string>
-    <string name="seek_bar_green_color_description">G</string>
-    <string name="seek_bar_blue_color_description">B</string>
-    <string name="equalizer_activity_title">Equalizer</string>
-    <string name="seek_bar_first_point_description">1</string>
-    <string name="seek_bar_second_point_description">2</string>
-    <string name="seek_bar_second_point_x_initial_value">127</string>
-    <string name="seek_bar_third_point_description">3</string>
-    <string name="seek_bar_third_point_x_initial_value">254</string>
-    <string name="seek_bar_fourth_point_description">4</string>
-    <string name="textView_before">Before</string>
-    <string name="textView_after">After</string>
-    <string name="textView_userDefined">User Defined Histogram</string>
-    <string name="textView_x">Color</string>
-    <string name="textView_y">Percentage (%)</string>
-    <string name="equalizer_first_point_x_value">0</string>
-    <string name="equalizer_fourth_point_x_value">255</string>
-    <string name="text_view_same_percentage_error">Cannot use the same percentage value for all colors.</string>
-    <string name="number_ocr_verdict_label">Verdict :</string>
-    <string name="number_ocr_activity_title">OCR</string>
-    <string name="number_ocr_button_text">Analyze</string>
-    <string name="number_ocr_verdict_text">-</string>
+    <string name="tab_text_1">Histogram</string>
+    <string name="tab_text_2">Contrast</string>
+    <string name="tab_text_3">Equalizer</string>
 </resources>
