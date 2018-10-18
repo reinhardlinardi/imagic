@@ -7,4 +7,10 @@
     <string name="contrast_enhancement_tab_name">Contrast</string>
     <string name="equalizer_tab_name">Equalizer</string>
     <string name="ocr_tab_name">OCR</string>
+
+    <!-- Test text -->
+    <string name="hello_histogram">Hello Histogram!</string>
+    <string name="hello_contrast_enhancement">Hello Contrast Enhancement!</string>
+    <string name="hello_equalizer">Hello Equalizer!</string>
+    <string name="hello_ocr">Hello OCR!</string>
 </resources>
