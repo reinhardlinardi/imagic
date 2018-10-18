@@ -68,12 +68,12 @@ public class NumberOCRActivity extends AppCompatActivity {
     }
 
     // OCR async task
-    private class OCRTask extends AsyncTask<Void, Integer, Integer> {
+    private class OCRTask extends AsyncTask<Void, Integer, Character> {
         @Override
-        protected Integer doInBackground(Void... voids) {
+        protected Character doInBackground(Void... voids) {
             publishProgress(countProgress(1,3));
-            Integer verdict = 0;
-
+            Character verdict = ' ';
+            int verdictInt;
             try {
                 skeletonImage = new Image(NumberOCRActivity.this, originalImage, false);
                 skeletonImage.getBlackWhiteMatrix(128);
@@ -85,7 +85,8 @@ public class NumberOCRActivity extends AppCompatActivity {
                         chainCode.getEdgeDetectionChainCode(skeletonImage.blackWhiteMatrix);
                         publishProgress(countProgress(2,3));
 
-                        verdict = chainCode.edgeDetectionOCR();
+                        verdictInt = chainCode.edgeDetectionOCR();
+                        verdict = (char)('0' + verdictInt);
                         publishProgress(countProgress(3,3));
                         break;
                     case "Thinning":
@@ -100,6 +101,21 @@ public class NumberOCRActivity extends AppCompatActivity {
                         }
 
                         verdict = skeletonImage.skeleton.getPrediction();
+                        publishProgress(countProgress(3,3));
+                        break;
+                    case "Thinning (Number)":
+                        skeletonImage.getSkeleton();
+                        publishProgress(countProgress(2,3));
+
+                        try {
+                            skeletonImage.setBitmapToSkeleton(NumberOCRActivity.this);
+                        }
+                        catch(Exception e) {
+                            Log.e("Imagic", "Exception", e);
+                        }
+
+                        verdictInt = skeletonImage.skeleton.getNumberPrediction();
+                        verdict = (char) ('0' + verdictInt);
                         publishProgress(countProgress(3,3));
                         break;
                 }
@@ -124,17 +140,18 @@ public class NumberOCRActivity extends AppCompatActivity {
         protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
 
         @Override
-        protected void onPostExecute(Integer results) {
+        protected void onPostExecute(Character results) {
             NumberOCROption selectedOption = (NumberOCROption) algorithmSpinner.getSelectedItem();
 
             switch(selectedOption.algorithm) {
                 case "Edge Detection":
-                    verdictTextView.setText(Integer.toString(results));
+                    verdictTextView.setText(Character.toString(results));
                     break;
+                case "Thinning (Number)":
                 case "Thinning":
                     UI.updateImageView(NumberOCRActivity.this, skeletonImage.bitmap, skeletonImageView);
                     UI.clearImageViewMemory(NumberOCRActivity.this);
-                    verdictTextView.setText(Integer.toString(results));
+                    verdictTextView.setText(Character.toString(results));
                     break;
             }
 
@@ -245,6 +262,7 @@ public class NumberOCRActivity extends AppCompatActivity {
                     case "Edge Detection":
                         UI.hide(skeletonImageView);
                         break;
+                    case "Thinning (Number)":
                     case "Thinning":
                         UI.show(skeletonImageView);
                         break;
