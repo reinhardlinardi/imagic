@@ -1,10 +1,10 @@
 <resources>
     <!-- Android studio generated resources -->
-    <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <!-- Custom resources -->
     <string name="app_name">Imagic</string>
-    <string name="tab_text_1">Histogram</string>
-    <string name="tab_text_2">Contrast</string>
-    <string name="tab_text_3">Equalizer</string>
+    <string name="histogram_tab_name">Histogram</string>
+    <string name="contrast_enhancement_tab_name">Contrast</string>
+    <string name="equalizer_tab_name">Equalizer</string>
+    <string name="ocr_tab_name">OCR</string>
 </resources>
