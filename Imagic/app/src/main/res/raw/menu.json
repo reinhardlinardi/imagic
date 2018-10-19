@@ -1,0 +1,18 @@
+[
+  {
+    "menuName" : "Histogram",
+    "fragmentClassName" : "Histogram"
+  },
+  {
+    "menuName" : "Contrast Enhancement",
+    "fragmentClassName" : "ContrastEnhancement"
+  },
+  {
+    "menuName" : "Equalizer",
+    "fragmentClassName" : "Equalizer"
+  },
+  {
+    "menuName" : "OCR",
+    "fragmentClassName" : "OCR"
+  }
+]

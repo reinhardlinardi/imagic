@@ -9,55 +9,83 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    /* Constants */
-    private static final int NUM_OF_MENU = 4;
+    /* Properties */
+
+    // ArrayList of menu
+    private static ArrayList<Menu> menu;
+
+    /* Lifecycles */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set title bar
+        // Toolbar = complementary bar for action bar
+        // We set this toolbar as support action bar to display app title
         Toolbar titleBar = findViewById(R.id.titleBar);
         setSupportActionBar(titleBar);
 
+        // View Pager = a component to enable swipe to change to another tab instead of clicking the desired tab
+        // TabLayout = parent component of a group of tabs, handle everything related to tabs
         ViewPager viewPager = findViewById(R.id.viewContainer);
         TabLayout tabLayout = findViewById(R.id.tabLayout);
 
-        MenuAdapter menuAdapter = new MenuAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(menuAdapter);
+        try {
+            // Read all menu from JSON file and put into ArrayList
+            String menuJSON = TextFile.readRawResourceFile(this, R.raw.menu);
+            menu = JSONSerializer.arrayListDeserialize(this, menuJSON, Menu.class);
 
-        // When tab changes, change view as well and vice versa
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+            // We have to create an adapter that extends FragmentStatePagerAdapter and set it as View Pager's adapter
+            // FragmentStatePagerAdapter is an adapter to manage fragments in an efficient way, good for heavy fragments and prevent fragments stay in the memory all at once
+            MenuAdapter menuAdapter = new MenuAdapter(getSupportFragmentManager());
+            viewPager.setAdapter(menuAdapter);
+
+            // Associate view pager swipe with the correct tab selection and vice versa
+            viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+            tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        }
+        catch(Exception e) {
+            Log.e("Imagic", "Exception", e);
+        }
     }
 
-    // Adapter for menu
+    /* Adapters */
+
+    // Adapter for tabs (menu)
     public class MenuAdapter extends FragmentStatePagerAdapter {
 
         // Constructor
-        MenuAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
+        MenuAdapter(FragmentManager fragmentManager) { super(fragmentManager); }
 
-        // Get n-th fragment
+        // Return the desired fragment for corresponding tabs given its position from the left
         @Override
         public Fragment getItem(int position) {
-            switch(position) {
-                case 0 : return HistogramFragment.newInstance("a", "b");
-                case 1 : return ContrastEnhancementFragment.newInstance("a", "b");
-                case 2 : return EqualizerFragment.newInstance("a", "b");
-                case 3 : return OCRFragment.newInstance("a", "b");
+            final String packageName = MainActivity.this.getApplicationContext().getPackageName();
+            final String packageDelimiter = ".";
+            final String fragmentClassSuffix = "Fragment";
+
+            final String fragmentClassName = menu.get(position).fragmentClassName;
+            final String fragmentClassPath = packageName + packageDelimiter + fragmentClassName + fragmentClassSuffix;
+
+            try {
+                return (Fragment)(Class.forName(fragmentClassPath)).newInstance();
+            }
+            catch(Exception e) {
+                Log.e("Imagic", "Exception", e);
             }
 
             return null;
         }
 
-        // Return number of menu
+        // Return the number of tabs
         @Override
-        public int getCount() { return NUM_OF_MENU; }
+        public int getCount() { return menu.size(); }
     }
 }
