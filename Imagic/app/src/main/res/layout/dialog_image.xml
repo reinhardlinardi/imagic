@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical"
+    android:paddingEnd="@dimen/dialog_container_side_padding"
+    android:paddingStart="@dimen/dialog_container_side_padding">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialog_button_top_space" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/selectImageButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawablePadding="@dimen/dialog_button_drawable_padding"
+            android:drawableTop="@drawable/ic_folder"
+            android:text="@string/select_image_button_text"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/captureImageButton"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawablePadding="@dimen/dialog_button_drawable_padding"
+            android:drawableTop="@drawable/ic_camera"
+            android:text="@string/capture_image_button_text"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialog_button_bottom_space" />
+
+</LinearLayout>

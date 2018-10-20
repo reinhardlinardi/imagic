@@ -45,7 +45,7 @@ public class HistogramFragment extends Fragment {
 
 
     @Override
-    public void onViewCreated(View view, Bundle savedStateInstance) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         progressBar = view.findViewById(R.id.histogramProgressBar);
         imageView = view.findViewById(R.id.histogramImageView);
 
@@ -53,6 +53,10 @@ public class HistogramFragment extends Fragment {
         greenGraphView = view.findViewById(R.id.histogramGreenGraphView);
         blueGraphView = view.findViewById(R.id.histogramBlueGraphView);
         grayscaleGraphView = view.findViewById(R.id.histogramGrayscaleGraphView);
+
+        // Show image dialog
+        ImageDialogFragment imageDialog = new ImageDialogFragment();
+        imageDialog.show(getFragmentManager(), "imageDialog");
     }
 
     @Override

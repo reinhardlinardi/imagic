@@ -12,7 +12,7 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements FragmentListener {
+public class MainActivity extends AppCompatActivity implements FragmentListener, ImageDialogListener {
 
     /* Properties */
 
@@ -89,4 +89,9 @@ public class MainActivity extends AppCompatActivity implements FragmentListener 
         @Override
         public int getCount() { return menu.size(); }
     }
+
+    /* Implemented interfaces methods */
+
+    @Override
+    public void resetImage() {}
 }
