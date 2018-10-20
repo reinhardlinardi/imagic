@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * A helper class to serialize and deserialize object or ArrayList of object to / from JSON string.
- * Class of that object and all of its subclass(es) must implement JSONSerializable interface.
+ * Class of that object must implement JSONSerializable interface.
  */
 class JSONSerializer {
 

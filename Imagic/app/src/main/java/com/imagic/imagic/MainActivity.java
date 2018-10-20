@@ -9,11 +9,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentListener {
 
     /* Properties */
 
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
         }
         catch(Exception e) {
-            Log.e("Imagic", "Exception", e);
+            Debug.ex(e);
         }
     }
 
@@ -67,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         // Return the desired fragment for corresponding tabs given its position from the left
         @Override
         public Fragment getItem(int position) {
+            // Get full class path by concatenating package name with class name
             final String packageName = MainActivity.this.getApplicationContext().getPackageName();
             final String packageDelimiter = ".";
             final String fragmentClassSuffix = "Fragment";
@@ -75,10 +75,11 @@ public class MainActivity extends AppCompatActivity {
             final String fragmentClassPath = packageName + packageDelimiter + fragmentClassName + fragmentClassSuffix;
 
             try {
+                // Return new fragment instance based on class path
                 return (Fragment)(Class.forName(fragmentClassPath)).newInstance();
             }
             catch(Exception e) {
-                Log.e("Imagic", "Exception", e);
+                Debug.ex(e);
             }
 
             return null;

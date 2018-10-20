@@ -13,4 +13,6 @@
     <string name="hello_contrast_enhancement">Hello Contrast Enhancement!</string>
     <string name="hello_equalizer">Hello Equalizer!</string>
     <string name="hello_ocr">Hello OCR!</string>
+    <string name="histogram_image_view_content_description">Histogram Image View</string>
+    <string name="graph_view_empty_series_data">0=0</string>
 </resources>
