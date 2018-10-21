@@ -1,7 +1,13 @@
 package com.imagic.imagic;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -9,8 +15,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.widget.ImageView;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements FragmentListener, ImageDialogListener {
 
@@ -18,6 +28,11 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
 
     // ArrayList of menu
     private static ArrayList<Menu> menu;
+
+    // Original image URI, image view, and fragment context
+    Uri uri;
+    ImageView view;
+    Context context;
 
     /* Lifecycles */
 
@@ -49,10 +64,20 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             // Associate view pager swipe with the correct tab selection and vice versa
             viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
             tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
+            // Set image URI and view to null, no image loaded at first
+            uri = null;
+            view = null;
         }
         catch(Exception e) {
             Debug.ex(e);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        view = null;
     }
 
     /* Adapters */
@@ -90,8 +115,78 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
         public int getCount() { return menu.size(); }
     }
 
+
+
     /* Implemented interfaces methods */
 
+    // Register original image view to MainActivity
     @Override
-    public void resetImage() {}
+    public void registerOriginalImageView(Context context, ImageView view) {
+        this.context = context;
+        this.view = view;
+    }
+
+    // Reset given image view to original image
+    @Override
+    public void resetImage(Context context) {
+        // If user had loaded image before, reset image
+        if(uri != null) {
+            UI.setImageView(context, view, uri);
+            UI.clearMemory(context);
+        }
+    }
+
+    // Send intent to select image
+    @Override
+    public void sendSelectImageIntent() {
+        // Create intent to get content
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType(Image.MIME_TYPE);
+        startActivityForResult(intent, IntentRequestCode.SELECT_IMAGE.code);
+    }
+
+    // Send intent to capture image
+    @Override
+    public void sendCaptureImageIntent() {
+        // Create intent to capture image
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            // Create temporary file to save captured image data
+            final String filename = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            final String extensionSuffix = ".jpg";
+
+            final String packageName = getApplicationContext().getPackageName();
+            final String packageDelimiter = ".";
+            final String providerName = "provider";
+
+            final String providerPath = packageName + packageDelimiter + providerName;
+
+            try {
+                File file = File.createTempFile(filename, extensionSuffix, getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+                uri = FileProvider.getUriForFile(this, providerPath, file);
+
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                startActivityForResult(intent, IntentRequestCode.CAPTURE_IMAGE.code);
+            }
+            catch(Exception e) {
+                Debug.ex(e);
+            }
+        }
+    }
+
+    // Get image URI
+    public Uri getImageURI() { return uri; }
+
+    /* Intent result */
+
+    // Change image based on select or capture image activity result
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK) {
+            if(requestCode == IntentRequestCode.SELECT_IMAGE.code) uri = data.getData();
+            UI.setImageView(context, view, uri);
+            UI.clearMemory(context);
+        }
+    }
 }

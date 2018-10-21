@@ -20,6 +20,8 @@ class TextFile {
     // Default charset (UTF-8) for text files
     private static final String DEFAULT_CHARSET = "UTF8";
 
+    /* Methods */
+
     // Read each line using BufferedReader's readLine and return all lines as a string
     private static String readAllLines(BufferedReader reader) throws Exception {
         StringBuilder allLines = new StringBuilder();

@@ -9,9 +9,9 @@ import java.util.Arrays;
 class ColorHistogram extends Histogram {
 
     /* Constants */
-    final int NUM_OF_VALUE =  256;
-    final int MIN_VALUE = 0;
-    final int MAX_VALUE = 255;
+    static final int NUM_OF_VALUE =  256;
+    static final int MIN_VALUE = 0;
+    static final int MAX_VALUE = 255;
 
     /* Methods */
 

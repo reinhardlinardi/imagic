@@ -1,5 +1,7 @@
 package com.imagic.imagic;
 
+import android.content.Context;
+
 /**
  * An interface to help communication between ImageDialogFragment and MainActivity.
  *
@@ -10,6 +12,12 @@ package com.imagic.imagic;
  */
 interface ImageDialogListener {
 
-    // Reset image
-    void resetImage();
+    // Reset given image view to original image
+    void resetImage(Context context);
+
+    // Send intent to select image
+    void sendSelectImageIntent();
+
+    // Send intent to capture image
+    void sendCaptureImageIntent();
 }

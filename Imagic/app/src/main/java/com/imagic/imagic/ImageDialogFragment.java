@@ -4,16 +4,30 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * A class representing custom alert dialog for showing options to change or reset image.
  */
 public class ImageDialogFragment extends DialogFragment {
+
+    /* Constants */
+
+    // Dialog tag
+    static final String TAG = "imageDialog";
 
     /* Properties */
 
@@ -46,8 +60,7 @@ public class ImageDialogFragment extends DialogFragment {
                    @Override
                    public void onClick(DialogInterface dialogInterface, int id) {
                        // Reset image (right button)
-                       activity.resetImage();
-                       Debug.d("Clicked", "", "Reset");
+                       activity.resetImage(getContext());
                    }
                })
                .setNegativeButton(R.string.image_dialog_negative_button, new DialogInterface.OnClickListener() {
@@ -55,7 +68,6 @@ public class ImageDialogFragment extends DialogFragment {
                    public void onClick(DialogInterface dialogInterface, int id) {
                        // Cancel (left button)
                        ImageDialogFragment.this.getDialog().cancel();
-                       Debug.d("Clicked", "", "Cancel");
                    }
                });
 
@@ -75,7 +87,11 @@ public class ImageDialogFragment extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Debug.d("Clicked", "", "Select Image");
+                // Dismiss dialog
+                ImageDialogFragment.this.getDialog().dismiss();
+
+                // Send intent to select image
+                activity.sendSelectImageIntent();
             }
         };
     }
@@ -85,7 +101,11 @@ public class ImageDialogFragment extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Debug.d("Clicked", "", "Capture Image");
+                // Dismiss dialog
+                ImageDialogFragment.this.getDialog().dismiss();
+
+                // Send intent to capture image
+                activity.sendCaptureImageIntent();
             }
         };
     }

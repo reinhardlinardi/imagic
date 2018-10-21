@@ -47,21 +47,32 @@ public class HistogramFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         progressBar = view.findViewById(R.id.histogramProgressBar);
-        imageView = view.findViewById(R.id.histogramImageView);
+        UI.setInvisible(progressBar);
 
         redGraphView = view.findViewById(R.id.histogramRedGraphView);
         greenGraphView = view.findViewById(R.id.histogramGreenGraphView);
         blueGraphView = view.findViewById(R.id.histogramBlueGraphView);
         grayscaleGraphView = view.findViewById(R.id.histogramGrayscaleGraphView);
 
-        // Show image dialog
-        ImageDialogFragment imageDialog = new ImageDialogFragment();
-        imageDialog.show(getFragmentManager(), "imageDialog");
+        UI.hide(redGraphView);
+        UI.hide(greenGraphView);
+        UI.hide(blueGraphView);
+        UI.hide(grayscaleGraphView);
+
+        UI.setGraphViewXAxisBoundary(redGraphView, ColorHistogram.MIN_VALUE, ColorHistogram.MAX_VALUE);
+        UI.setGraphViewXAxisBoundary(greenGraphView, ColorHistogram.MIN_VALUE, ColorHistogram.MAX_VALUE);
+        UI.setGraphViewXAxisBoundary(blueGraphView, ColorHistogram.MIN_VALUE, ColorHistogram.MAX_VALUE);
+        UI.setGraphViewXAxisBoundary(grayscaleGraphView, ColorHistogram.MIN_VALUE, ColorHistogram.MAX_VALUE);
+
+        imageView = view.findViewById(R.id.histogramImageView);
+        imageView.setOnClickListener(getImageViewOnClickListener());
+        activity.registerOriginalImageView(getContext(), imageView);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        UI.clearMemory(getContext());
     }
 
     @Override
@@ -78,5 +89,17 @@ public class HistogramFragment extends Fragment {
     // Factory method to create new instance of fragment
     public static HistogramFragment newInstance() {
         return new HistogramFragment();
+    }
+
+    // Get image view on click listener
+    private View.OnClickListener getImageViewOnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Show image selection dialog
+                ImageDialogFragment imageDialog = new ImageDialogFragment();
+                imageDialog.show(getFragmentManager(), ImageDialogFragment.TAG);
+            }
+        };
     }
 }

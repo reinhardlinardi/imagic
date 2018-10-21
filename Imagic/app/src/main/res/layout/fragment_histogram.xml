@@ -43,7 +43,8 @@
                     android:layout_width="0dp"
                     android:layout_height="@dimen/image_view_layout_height"
                     android:layout_weight="1"
-                    android:contentDescription="@string/histogram_image_view_content_description" />
+                    android:contentDescription="@string/histogram_image_view_content_description"
+                    android:src="@drawable/ic_mountain" />
 
             </LinearLayout>
 

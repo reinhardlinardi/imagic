@@ -16,7 +16,7 @@
     <dimen name="graph_space_gap_layout_height">20dp</dimen>
     <dimen name="graph_view_layout_height">300dp</dimen>
     <dimen name="dialog_button_top_space">20dp</dimen>
-    <dimen name="dialog_button_bottom_space">10dp</dimen>
+    <dimen name="dialog_button_bottom_space">5dp</dimen>
     <dimen name="dialog_button_drawable_padding">10dp</dimen>
     <dimen name="dialog_container_side_padding">20dp</dimen>
     <dimen name="dialog_button_padding_top">5dp</dimen>

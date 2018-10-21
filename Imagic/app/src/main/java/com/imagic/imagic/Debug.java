@@ -8,6 +8,7 @@ import android.util.Log;
 class Debug {
 
     /* Constants */
+
     private static final String APP_NAME = "Imagic";
     private static final String EXCEPTION_MSG = "Exception";
 
