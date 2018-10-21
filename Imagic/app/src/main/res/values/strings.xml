@@ -17,6 +17,6 @@
     <string name="graph_view_empty_series_data">0=0</string>
     <string name="image_dialog_positive_button">Reset</string>
     <string name="image_dialog_negative_button">Cancel</string>
-    <string name="select_image_button_text">Select</string>
-    <string name="capture_image_button_text">Capture</string>
+    <string name="select_image_button_text">Select From\nGallery\n</string>
+    <string name="capture_image_button_text">Capture Using\nCamera\n</string>
 </resources>
