@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
 
     // Original image URI, image view, and fragment context
     Uri uri;
-    ImageView view;
     Context context;
+    ImageView view;
 
     /* Lifecycles */
 
@@ -65,8 +65,9 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
             tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
-            // Set image URI and view to null, no image loaded at first
+            // Set image URI, image view, and fragment context to null, no image loaded at first
             uri = null;
+            context = null;
             view = null;
         }
         catch(Exception e) {
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        context = null;
         view = null;
     }
 

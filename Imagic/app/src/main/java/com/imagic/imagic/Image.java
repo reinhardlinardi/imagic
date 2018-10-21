@@ -21,9 +21,15 @@ class Image {
     // Constructors
     Image() { recycleBitmap(); }
 
-    Image(Context context, Uri uri) throws Exception { bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri); }
+    Image(Context context, Uri uri) throws Exception {
+        recycleBitmap();
+        bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+    }
 
-    Image(Context context, Image image) { bitmap = image.bitmap; }
+    Image(Context context, Image image) {
+        recycleBitmap();
+        bitmap = image.bitmap;
+    }
 
     // Recycle bitmap
     private void recycleBitmap() {

@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -66,7 +67,14 @@ public class HistogramFragment extends Fragment {
 
         imageView = view.findViewById(R.id.histogramImageView);
         imageView.setOnClickListener(getImageViewOnClickListener());
+
         activity.registerOriginalImageView(getContext(), imageView);
+        Uri uri = activity.getImageURI();
+
+        if(uri != null) {
+            UI.setImageView(getContext(), imageView, uri);
+            UI.clearMemory(getContext());
+        }
     }
 
     @Override
