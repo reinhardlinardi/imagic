@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,9 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class OCRFragment extends Fragment {
+public class OCRFragment extends Fragment implements MainActivityListener {
 
     //private OnFragmentInteractionListener mListener;
+    private FragmentListener activity;
 
     public OCRFragment() {
         // Required empty public constructor
@@ -48,6 +50,7 @@ public class OCRFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        activity = (FragmentListener) context;
         /*
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
@@ -61,6 +64,16 @@ public class OCRFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         //mListener = null;
+    }
+
+    @Override
+    public void sendSelectImageIntent(Intent intent) {
+
+    }
+
+    @Override
+    public void sendCaptureImageIntent(Intent intent) {
+
     }
 
     /**

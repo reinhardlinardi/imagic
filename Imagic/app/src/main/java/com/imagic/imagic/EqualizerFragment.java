@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,9 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class EqualizerFragment extends Fragment {
+public class EqualizerFragment extends Fragment implements MainActivityListener {
 
     //private OnFragmentInteractionListener mListener;
+    private FragmentListener activity;
 
     public EqualizerFragment() {
         // Required empty public constructor
@@ -47,6 +49,7 @@ public class EqualizerFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        activity = (FragmentListener) context;
         /*
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
@@ -60,6 +63,16 @@ public class EqualizerFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         //mListener = null;
+    }
+
+    @Override
+    public void sendSelectImageIntent(Intent intent) {
+
+    }
+
+    @Override
+    public void sendCaptureImageIntent(Intent intent) {
+
     }
 
     /**

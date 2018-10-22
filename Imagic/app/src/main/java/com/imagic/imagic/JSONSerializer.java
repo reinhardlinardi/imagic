@@ -1,7 +1,5 @@
 package com.imagic.imagic;
 
-import android.content.Context;
-
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -24,20 +22,20 @@ class JSONSerializer {
     }
 
     // Deserialize a JSON string and return an object of the given class
-    static <T extends JSONSerializable> T deserialize(Context context, String json, Class<T> type) throws Exception {
+    static <T extends JSONSerializable> T deserialize(String json, Class<T> type) throws Exception {
         T result = type.newInstance();
-        result.jsonDeserialize(context, json);
+        result.jsonDeserialize(json);
         return result;
     }
 
     // Deserialize a JSON string and return an ArrayList of object of the given class
-    static <T extends JSONSerializable> ArrayList<T> arrayListDeserialize(Context context, String json, Class<T> type) throws Exception {
+    static <T extends JSONSerializable> ArrayList<T> arrayListDeserialize(String json, Class<T> type) throws Exception {
         JSONArray serializableArrayList = new JSONArray(json);
         ArrayList<T> resultArrayList = new ArrayList<>();
 
         for(int idx = 0; idx < serializableArrayList.length(); idx++) {
             T result = type.newInstance();
-            result.jsonDeserialize(context, serializableArrayList.getString(idx));
+            result.jsonDeserialize(serializableArrayList.getString(idx));
             resultArrayList.add(result);
         }
 

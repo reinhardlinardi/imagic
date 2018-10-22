@@ -48,6 +48,13 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/histogramHelpTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/help_text" />
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/graph_space_gap_layout_height" />

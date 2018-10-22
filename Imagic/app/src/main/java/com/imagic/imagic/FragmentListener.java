@@ -1,11 +1,14 @@
 package com.imagic.imagic;
 
-import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
-import android.widget.ImageView;
+import android.support.v4.app.Fragment;
+
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
 
 /**
- * An interface to help communication between fragment and MainActivity.
+ * An interface to help communication between from fragment to MainActivity.
  *
  * MainActivity have to implement this interface as well as all of its methods.
  * Each fragment will hold a reference to MainActivity in a "communicator variable" on attach.
@@ -14,9 +17,27 @@ import android.widget.ImageView;
  */
 interface FragmentListener {
 
-    // Register original image view and fragment context to MainActivity
-    void registerOriginalImageView(Context context, ImageView view);
+    // Update URI on image intent result
+    void onImageIntentResult(int requestCode, int resultCode, Intent data);
+
+    // Check if image has no bitmap yet
+    boolean isImageHasBitmap();
+
+    // Check if RGB histogram data is available
+    boolean isRGBHistogramDataAvailable();
+
+    // Check if grayscale histogram data
+    boolean isGrayscaleHistogramDataAvailable();
 
     // Get image URI
     Uri getImageURI();
+
+    // Get histogram bar graph series data
+    BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType);
+
+    // Load image bitmap
+    void loadImageBitmap() throws Exception;
+
+    // Update histogram data
+    void updateHistogramData(ColorType colorType);
 }

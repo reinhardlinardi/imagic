@@ -19,10 +19,16 @@ class ColorHistogram extends Histogram {
     ColorHistogram() {}
 
     // Get color value from DataPoint
-    private int getColorValue(int idx) { return (int)(data.get(idx).getX()); }
+    protected int getColorValue(int idx) { return (int)(data.get(idx).getX()); }
 
     // Get frequency from DataPoint
-    private int getFrequency(int idx) { return (int)(data.get(idx).getY()); }
+    protected int getFrequency(int idx) { return (int)(data.get(idx).getY()); }
+
+    // Set data from data array
+    protected final void setData(int[] dataArray) {
+        resetData();
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) addData(idx, dataArray[idx]);
+    }
 
     // Get minimum color value with non-zero frequency
     private int getMinColorValue() {
@@ -75,6 +81,4 @@ class ColorHistogram extends Histogram {
 
         return CDF;
     }
-
-
 }

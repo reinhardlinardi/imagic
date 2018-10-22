@@ -45,9 +45,4 @@
             android:textColor="@android:color/holo_blue_dark" />
 
     </LinearLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dialog_button_bottom_space" />
-
 </LinearLayout>

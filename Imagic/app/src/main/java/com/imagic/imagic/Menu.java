@@ -1,7 +1,5 @@
 package com.imagic.imagic;
 
-import android.content.Context;
-
 import org.json.JSONObject;
 
 /**
@@ -42,7 +40,7 @@ class Menu implements JSONSerializable {
 
     // Deserialization
     @Override
-    public void jsonDeserialize(Context context, String json) throws Exception {
+    public void jsonDeserialize(String json) throws Exception {
         JSONObject jsonObject = new JSONObject(json);
 
         menuName = jsonObject.getString(MENU_NAME_KEY);

@@ -1,9 +1,7 @@
 package com.imagic.imagic;
 
-import android.content.Context;
-
 /**
- * An interface to help communication between ImageDialogFragment and MainActivity.
+ * An interface to help communication from ImageDialogFragment to MainActivity.
  *
  * MainActivity have to implement this interface as well as all of its methods.
  * ImageDialogFragment will hold a reference to MainActivity in a "communicator variable" on attach.
@@ -11,9 +9,6 @@ import android.content.Context;
  * We can pass events back to MainActivity from ImageDialogFragment by calling method from our "communicator variable" in ImageDialogFragment.
  */
 interface ImageDialogListener {
-
-    // Reset given image view to original image
-    void resetImage(Context context);
 
     // Send intent to select image
     void sendSelectImageIntent();

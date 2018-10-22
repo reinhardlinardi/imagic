@@ -24,7 +24,7 @@ class GrayscaleHistogram extends ColorHistogram {
         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
             @Override
             public int get(DataPoint data) {
-                final float baseValue = 0.75f;
+                final float baseValue = 0.25f;
                 final float extraValue = ((float)((int)(data.getX()) + 1) / NUM_OF_VALUE) / 2;
                 final float totalValue = baseValue + extraValue;
 

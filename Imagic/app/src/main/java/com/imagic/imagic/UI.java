@@ -34,6 +34,12 @@ class UI {
     // Disable
     static void disable(View view) { view.setEnabled(false); }
 
+    // Set clickable, usually for ImageView when no async tasks are running
+    static void setClickable(View view) { view.setClickable(true); }
+
+    // Set unclickable, usually for ImageView when async tasks are running
+    static void setUnclickable(View view) { view.setClickable(false); }
+
     // Set image view with image from given URI using Glide
     static void setImageView(Context context, ImageView view, Uri uri) { Glide.with(context).load(uri).into(view); }
 
