@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -239,6 +240,9 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
     // Get image URI
     public Uri getImageURI() { return uri; }
 
+    // Get image bitmap
+    public Bitmap getImageBitmap() { return image.bitmap; }
+
     // Load image bitmap
     public void loadImageBitmap() throws Exception { image = new Image(this, uri); }
 
@@ -251,6 +255,12 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             case GRAYSCALE : return grayscale.getBarGraphSeries();
             default : return null;
         }
+    }
+
+    // Reset all histogram data
+    public void resetAllHistogramData() {
+        rgb.resetData();
+        grayscale.resetData();
     }
 
     // Update histogram data

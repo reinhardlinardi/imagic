@@ -2,6 +2,7 @@ package com.imagic.imagic;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -162,17 +163,18 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
 
         @Override
         protected Boolean doInBackground(Boolean... bools) {
+            boolean executedFromIntentResult = bools[0];
             publishProgress(countProgress(1, 2));
 
             try {
-                activity.loadImageBitmap();
+                if(executedFromIntentResult) activity.loadImageBitmap();
                 publishProgress(countProgress(2, 2));
             }
             catch(Exception e) {
                 Debug.ex(e);
             }
 
-            return bools[0];
+            return executedFromIntentResult;
         }
 
         @Override
@@ -188,27 +190,21 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
         protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
 
         @Override
-        protected void onPostExecute(Boolean forceHistogramUpdate) {
-            UI.setImageView(getContext(), imageView, activity.getImageURI());
+        protected void onPostExecute(Boolean executedFromIntentResult) {
+            UI.setImageView(getContext(), imageView, activity.getImageBitmap());
             UI.clearMemory(getContext());
-
             UI.setInvisible(progressBar);
-            ArrayList<ColorType> missingColorTypes = new ArrayList<>();
 
-            // If async task executed by intent result, force all color type histogram data update, else update missing color type histogram data only
-            if(forceHistogramUpdate) {
-                missingColorTypes.add(ColorType.RED);
-                missingColorTypes.add(ColorType.GREEN);
-                missingColorTypes.add(ColorType.BLUE);
-                missingColorTypes.add(ColorType.GRAYSCALE);
-            }
-            else missingColorTypes = getMissingHistogramDataColorTypes();
+            // If user change image, reset all histogram data
+            if(executedFromIntentResult) activity.resetAllHistogramData();
+            ArrayList<ColorType> missingColorTypes = getMissingHistogramDataColorTypes();
 
-            // If there are missing color type histogram data, generate data, else show histogram directly
+            // If any histogram data is missing, generate data
             if(!missingColorTypes.isEmpty()) {
                 HistogramGenerationAsyncTask histogramGenerationAsyncTask = new HistogramGenerationAsyncTask();
                 histogramGenerationAsyncTask.execute(missingColorTypes.toArray(new ColorType[missingColorTypes.size()]));
-            } else {
+            }
+            else {
                 UI.setGraphView(redGraphView, activity.getHistogramBarGraphSeriesData(ColorType.RED));
                 UI.setGraphView(greenGraphView, activity.getHistogramBarGraphSeriesData(ColorType.GREEN));
                 UI.setGraphView(blueGraphView, activity.getHistogramBarGraphSeriesData(ColorType.BLUE));

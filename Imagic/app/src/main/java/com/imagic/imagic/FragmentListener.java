@@ -1,8 +1,8 @@
 package com.imagic.imagic;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -32,11 +32,17 @@ interface FragmentListener {
     // Get image URI
     Uri getImageURI();
 
+    // Get image bitmap
+    Bitmap getImageBitmap();
+
     // Get histogram bar graph series data
     BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType);
 
     // Load image bitmap
     void loadImageBitmap() throws Exception;
+
+    // Reset all histogram data
+    void resetAllHistogramData();
 
     // Update histogram data
     void updateHistogramData(ColorType colorType);

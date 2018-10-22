@@ -3,7 +3,10 @@ package com.imagic.imagic;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 
 import java.util.Arrays;
@@ -15,6 +18,7 @@ class Image {
 
     /* Constants */
     static final String MIME_TYPE = "image/*";
+    private static final int LOLLIPOP_SDK_INT = 24;
 
     /* Properties */
     Bitmap bitmap;
@@ -30,6 +34,12 @@ class Image {
     Image(Context context, Uri uri) throws Exception {
         recycleBitmap();
         bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        // Rotate bitmap, so bitmap have correct orientation
+        if(Build.VERSION.SDK_INT >= LOLLIPOP_SDK_INT) bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, getRotationMatrix(context, uri), true);
     }
 
     Image(Context context, Image image) {
@@ -45,6 +55,25 @@ class Image {
         if(bitmap != null) {
             if(!bitmap.isRecycled()) bitmap.recycle();
         }
+    }
+
+    // Get rotation matrix for bitmap based on original image's orientation
+    private Matrix getRotationMatrix(Context context, Uri uri) throws Exception {
+        Matrix matrix = new Matrix();
+        ExifInterface exif = new ExifInterface(context.getContentResolver().openInputStream(uri));
+
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        int degree;
+
+        switch(rotation) {
+            case ExifInterface.ORIENTATION_ROTATE_90: degree = 90; break;
+            case ExifInterface.ORIENTATION_ROTATE_180: degree = 180; break;
+            case ExifInterface.ORIENTATION_ROTATE_270: degree = 270 ; break;
+            default: degree = 0; break;
+        }
+
+        if(rotation != 0f) matrix.preRotate(degree);
+        return matrix;
     }
 
     // Get histogram data by color type
