@@ -35,11 +35,20 @@ interface FragmentListener {
     // Get image URI
     Uri getImageURI();
 
+    // Get image
+    Image getImage();
+
+    // Get RGB histogram
+    RGBHistogram getRGBHistogram();
+
     // Get image bitmap
     Bitmap getImageBitmap();
 
     // Get histogram bar graph series data
     BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType);
+
+    // Update image bitmap and histograms
+    void updateImage(Image image);
 
     // Load image bitmap and scale it down to match image view dimension if necessary
     void loadImageBitmap(int viewWidth, int viewHeight) throws Exception;

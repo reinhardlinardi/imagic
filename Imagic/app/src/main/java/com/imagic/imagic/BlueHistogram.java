@@ -16,6 +16,8 @@ class BlueHistogram extends ColorHistogram {
     // Constructor
     BlueHistogram() {}
 
+    BlueHistogram(BlueHistogram blueHistogram) { super(blueHistogram); }
+
     // Get BarGraphSeries from data with value dependent color
     @Override
     protected BarGraphSeries<DataPoint> getBarGraphSeries() {

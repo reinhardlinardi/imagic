@@ -64,6 +64,10 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
     private int greenPercentage;
     private int bluePercentage;
 
+    // Transformed image and histogram
+    Image image;
+    RGBHistogram rgb;
+
     /* Lifecycles */
 
     @Override
@@ -229,9 +233,10 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
                 if(isAttachedToMainActivity()) {
                     if(activity.hasImage()) {
                         resetSeekBar();
+                        activity.updateImage(image);
 
-                        UI.setImageView(getContext(), imageView, activity.getImageBitmap());
-                        UI.clearMemory(getContext());
+                        ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
+                        imageLoadAsyncTask.execute(false);
                     }
                 }
             }
@@ -282,7 +287,15 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(isAttachedToMainActivity()) {
+                    if(activity.hasImage()) {
+                        image = new Image(getContext(), activity.getImage());
+                        rgb = new RGBHistogram(activity.getRGBHistogram());
 
+                        ContrastEnhancementAsyncTask contrastEnhancementAsyncTask = new ContrastEnhancementAsyncTask();
+                        contrastEnhancementAsyncTask.execute();
+                    }
+                }
             }
         };
     }
@@ -338,9 +351,9 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
         greenSeekBar.setProgress(100);
         blueSeekBar.setProgress(100);
 
-        redTextView.setText("100%");
-        greenTextView.setText("100%");
-        blueTextView.setText("100%");
+        redTextView.setText(R.string.seek_bar_100_percent_text);
+        greenTextView.setText(R.string.seek_bar_100_percent_text);
+        blueTextView.setText(R.string.seek_bar_100_percent_text);
     }
 
     // Count progress
@@ -412,8 +425,12 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
         @Override
         protected void onPostExecute(Boolean executedFromIntentResult) {
             if(isAttachedToMainActivity()) {
-                UI.setImageView(getContext(), imageView, activity.getImageBitmap());
-                UI.setImageView(getContext(), transformedImageView, activity.getImageBitmap());
+                image = new Image(getContext(), activity.getImage());
+                rgb = new RGBHistogram(activity.getRGBHistogram());
+
+                UI.setImageView(getContext(), imageView, image.bitmap);
+                UI.setImageView(getContext(), transformedImageView, image.bitmap);
+
                 UI.clearMemory(getContext());
                 UI.setInvisible(progressBar);
 
@@ -426,13 +443,13 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
                     HistogramGenerationAsyncTask histogramGenerationAsyncTask = new HistogramGenerationAsyncTask();
                     histogramGenerationAsyncTask.execute(missingColorTypes.toArray(new ColorType[missingColorTypes.size()]));
                 } else {
-                    UI.setGraphView(redGraphView, activity.getHistogramBarGraphSeriesData(ColorType.RED));
-                    UI.setGraphView(greenGraphView, activity.getHistogramBarGraphSeriesData(ColorType.GREEN));
-                    UI.setGraphView(blueGraphView, activity.getHistogramBarGraphSeriesData(ColorType.BLUE));
+                    UI.setGraphView(redGraphView, rgb.red.getBarGraphSeries());
+                    UI.setGraphView(greenGraphView, rgb.green.getBarGraphSeries());
+                    UI.setGraphView(blueGraphView, rgb.blue.getBarGraphSeries());
 
-                    UI.setGraphView(transformedRedGraphView, activity.getHistogramBarGraphSeriesData(ColorType.RED));
-                    UI.setGraphView(transformedGreenGraphView, activity.getHistogramBarGraphSeriesData(ColorType.GREEN));
-                    UI.setGraphView(transformedBlueGraphView, activity.getHistogramBarGraphSeriesData(ColorType.BLUE));
+                    UI.setGraphView(transformedRedGraphView, rgb.red.getBarGraphSeries());
+                    UI.setGraphView(transformedGreenGraphView, rgb.green.getBarGraphSeries());
+                    UI.setGraphView(transformedBlueGraphView, rgb.blue.getBarGraphSeries());
 
                     UI.setClickable(imageView);
                     UI.enable(resetButton);
@@ -485,13 +502,15 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
         @Override
         protected void onPostExecute(Void result) {
             if(isAttachedToMainActivity()) {
-                UI.setGraphView(redGraphView, activity.getHistogramBarGraphSeriesData(ColorType.RED));
-                UI.setGraphView(greenGraphView, activity.getHistogramBarGraphSeriesData(ColorType.GREEN));
-                UI.setGraphView(blueGraphView, activity.getHistogramBarGraphSeriesData(ColorType.BLUE));
+                rgb = new RGBHistogram(activity.getRGBHistogram());
 
-                UI.setGraphView(transformedRedGraphView, activity.getHistogramBarGraphSeriesData(ColorType.RED));
-                UI.setGraphView(transformedGreenGraphView, activity.getHistogramBarGraphSeriesData(ColorType.GREEN));
-                UI.setGraphView(transformedBlueGraphView, activity.getHistogramBarGraphSeriesData(ColorType.BLUE));
+                UI.setGraphView(redGraphView, rgb.red.getBarGraphSeries());
+                UI.setGraphView(greenGraphView, rgb.green.getBarGraphSeries());
+                UI.setGraphView(blueGraphView, rgb.blue.getBarGraphSeries());
+
+                UI.setGraphView(transformedRedGraphView, rgb.red.getBarGraphSeries());
+                UI.setGraphView(transformedGreenGraphView, rgb.green.getBarGraphSeries());
+                UI.setGraphView(transformedBlueGraphView, rgb.blue.getBarGraphSeries());
 
                 UI.setInvisible(progressBar);
                 UI.setClickable(imageView);
@@ -507,6 +526,72 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
 
                 if(!UI.isVisible(transformedImageView)) UI.show(transformedImageView);
                 if(!UI.isVisible(container)) UI.show(container);
+            }
+        }
+    }
+
+    // Contrast enhancement async task
+    private class ContrastEnhancementAsyncTask extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(isAttachedToMainActivity()) {
+                String algorithm = ((ContrastEnhancementAlgorithm) spinner.getSelectedItem()).algorithmName;
+                publishProgress(countProgress(1, 3));
+
+                int[][] mapping = rgb.stretchHistogram(algorithm, (double)redPercentage/100, (double)greenPercentage/100, (double)bluePercentage/100);
+                publishProgress(countProgress(2,3));
+
+                image.updateBitmapByColorMapping(mapping[0], mapping[1], mapping[2]);
+                publishProgress(countProgress(3, 3));
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if(isAttachedToMainActivity()) {
+                UI.setUnclickable(imageView);
+                UI.disable(resetButton);
+                UI.disable(applyButton);
+
+                UI.disable(redSeekBar);
+                UI.disable(greenSeekBar);
+                UI.disable(blueSeekBar);
+
+                UI.disable(spinnerContainer);
+                UI.disable(enhanceButton);
+
+                progressBar.setProgress(0);
+                UI.show(progressBar);
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { if(isAttachedToMainActivity()) progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if(isAttachedToMainActivity()) {
+                UI.setImageView(getContext(), transformedImageView, image.bitmap);
+                UI.clearMemory(getContext());
+
+                UI.setGraphView(transformedRedGraphView, rgb.red.getBarGraphSeries());
+                UI.setGraphView(transformedGreenGraphView, rgb.green.getBarGraphSeries());
+                UI.setGraphView(transformedBlueGraphView, rgb.blue.getBarGraphSeries());
+
+                UI.setInvisible(progressBar);
+                UI.setClickable(imageView);
+                UI.enable(resetButton);
+                UI.enable(applyButton);
+
+                UI.enable(redSeekBar);
+                UI.enable(greenSeekBar);
+                UI.enable(blueSeekBar);
+
+                UI.enable(spinnerContainer);
+                UI.enable(enhanceButton);
             }
         }
     }

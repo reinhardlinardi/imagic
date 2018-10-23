@@ -253,13 +253,14 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
     // Get image URI
     public Uri getImageURI() { return uri; }
 
+    // Get image
+    public Image getImage() { return image; }
+
+    // Get RGB histogram
+    public RGBHistogram getRGBHistogram() { return rgb; }
+
     // Get image bitmap
     public Bitmap getImageBitmap() { return image.bitmap; }
-
-    // Load image bitmap and scale it down to match image view dimension if necessary
-    public void loadImageBitmap(int viewWidth, int viewHeight) throws Exception {
-        if(hasImage()) image = new Image(this, uri, viewWidth, viewHeight);
-    }
 
     // Get histogram bar graph series data
     public BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType) {
@@ -270,6 +271,17 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             case GRAYSCALE : return grayscale.getBarGraphSeries();
             default : return new BarGraphSeries<>();
         }
+    }
+
+    // Update image bitmap and histograms
+    public void updateImage(Image image) {
+        this.image = new Image(this, image);
+        for(ColorType colorType : ColorType.values()) updateHistogramData(colorType);
+    }
+
+    // Load image bitmap and scale it down to match image view dimension if necessary
+    public void loadImageBitmap(int viewWidth, int viewHeight) throws Exception {
+        if(hasImage()) image = new Image(this, uri, viewWidth, viewHeight);
     }
 
     // Reset all histogram data

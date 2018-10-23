@@ -63,7 +63,7 @@ class Image {
 
     Image(Context context, Image image) {
         recycleBitmap();
-        bitmap = image.bitmap;
+        bitmap = Bitmap.createBitmap(image.bitmap);
     }
 
     // Check if image has bitmap
@@ -124,5 +124,27 @@ class Image {
             return frequencyCount;
         }
         else return null;
+    }
+
+    // Update bitmap by color mapping
+    void updateBitmapByColorMapping(int[] redMapping, int[] greenMapping, int[] blueMapping) {
+        if(hasBitmap()) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
+                    pixels[row * width + col] = Color.rgb(redMapping[Color.red(pixel)], greenMapping[Color.green(pixel)], blueMapping[Color.blue(pixel)]);
+                }
+            }
+
+            recycleBitmap();
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
     }
 }

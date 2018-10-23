@@ -20,6 +20,11 @@ class Histogram {
     // Constructor
     Histogram() { resetData(); }
 
+    Histogram(Histogram histogram) {
+        resetData();
+        data.addAll(histogram.data);
+    }
+
     // Check if histogram contains any data
     protected final boolean isEmpty() { return data.size() == 0; }
 

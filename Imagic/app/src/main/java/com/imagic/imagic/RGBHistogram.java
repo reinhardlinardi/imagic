@@ -18,6 +18,14 @@ class RGBHistogram {
     // Constructor
     RGBHistogram() { resetData(); }
 
+    RGBHistogram(RGBHistogram rgbHistogram) {
+        resetData();
+
+        red = new RedHistogram(rgbHistogram.red);
+        green = new GreenHistogram(rgbHistogram.green);
+        blue = new BlueHistogram(rgbHistogram.blue);
+    }
+
     // Check if all histogram has data
     boolean allHasData() { return !(red.isEmpty() || green.isEmpty() || blue.isEmpty()); }
 
@@ -26,5 +34,31 @@ class RGBHistogram {
         red = new RedHistogram();
         green = new GreenHistogram();
         blue = new BlueHistogram();
+    }
+
+    // Stretch histogram, return all mapping
+    int[][] stretchHistogram(String algorithm, double redMultiplier, double greenMultiplier, double blueMultiplier) {
+        int[][] mapping = new int[3][];
+
+        if(allHasData()) {
+            switch(algorithm) {
+                case "Linear":
+                    mapping[0] = red.linearStretch(redMultiplier);
+                    mapping[1] = green.linearStretch(greenMultiplier);
+                    mapping[2] = blue.linearStretch(blueMultiplier);
+                case "CDF":
+                    mapping[0] = red.cdfStretch(redMultiplier);
+                    mapping[1] = green.cdfStretch(greenMultiplier);
+                    mapping[2] = blue.cdfStretch(blueMultiplier);
+                case "Logarithmic":
+                    mapping[0] = red.logarithmicStretch(redMultiplier);
+                    mapping[1] = green.logarithmicStretch(greenMultiplier);
+                    mapping[2] = blue.logarithmicStretch(blueMultiplier);
+                default:
+                    break;
+            }
+        }
+
+        return mapping;
     }
 }

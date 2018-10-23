@@ -18,6 +18,8 @@ class ColorHistogram extends Histogram {
     // Constructor
     ColorHistogram() {}
 
+    ColorHistogram(ColorHistogram colorHistogram) { super(colorHistogram); }
+
     // Get color value from DataPoint
     protected int getColorValue(int idx) { return (int)(data.get(idx).getX()); }
 
@@ -78,7 +80,64 @@ class ColorHistogram extends Histogram {
         Arrays.fill(CDF, 0.0);
 
         for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) CDF[idx] = (idx == MIN_VALUE)? PMF[idx] : PMF[idx] + CDF[idx - 1];
-
         return CDF;
+    }
+
+    // Linear stretching, return mapping
+    protected int[] linearStretch(double multiplier) {
+        int[] mapping = new int[NUM_OF_VALUE];
+        int[] frequency = new int[NUM_OF_VALUE];
+
+        Arrays.fill(mapping, 0);
+        Arrays.fill(frequency, 0);
+
+        int min = getMinColorValue();
+        int max = getMaxColorValue();
+
+        for(int val = min; val <= max; val++) mapping[val] = (int)((MAX_VALUE * (val - min) / (max - min)) * multiplier);
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) frequency[mapping[idx]] += getFrequency(idx);
+
+        resetData();
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) addData(idx, frequency[idx]);
+
+        return mapping;
+    }
+
+    // CDF stretching, return mapping
+    protected int[] cdfStretch(double multiplier) {
+        int[] mapping = new int[NUM_OF_VALUE];
+        int[] frequency = new int[NUM_OF_VALUE];
+
+        Arrays.fill(mapping, 0);
+        Arrays.fill(frequency, 0);
+
+        double[] CDF = getCDF();
+        for(int val = MIN_VALUE; val <= MAX_VALUE; val++) mapping[val] = (int)((Math.floor(CDF[val] * (double)MAX_VALUE)) * multiplier);
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) frequency[mapping[idx]] += getFrequency(idx);
+
+        resetData();
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) addData(idx, frequency[idx]);
+
+        return mapping;
+    }
+
+    // Logarithmic stretching, return mapping
+    protected int[] logarithmicStretch(double multiplier) {
+        int[] mapping = new int[NUM_OF_VALUE];
+        int[] frequency = new int[NUM_OF_VALUE];
+
+        Arrays.fill(mapping, 0);
+        Arrays.fill(frequency, 0);
+
+        int max = getMaxColorValue();
+        double c = 1 / Math.log10((double)(1 + max));
+
+        for(int val = MIN_VALUE; val <= max; val++) mapping[val] = (int)(Math.floor(Math.log10((double)(val + 1)) * (double)MAX_VALUE * c) * multiplier);
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) frequency[mapping[idx]] += getFrequency(idx);
+
+        resetData();
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) addData(idx, frequency[idx]);
+
+        return mapping;
     }
 }

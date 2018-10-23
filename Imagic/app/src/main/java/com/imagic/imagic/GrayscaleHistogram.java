@@ -16,6 +16,8 @@ class GrayscaleHistogram extends ColorHistogram {
     // Constructor
     GrayscaleHistogram() {}
 
+    GrayscaleHistogram(GrayscaleHistogram grayscaleHistogram) { super(grayscaleHistogram); }
+
     // Get BarGraphSeries from data with value dependent color
     @Override
     protected BarGraphSeries<DataPoint> getBarGraphSeries() {
