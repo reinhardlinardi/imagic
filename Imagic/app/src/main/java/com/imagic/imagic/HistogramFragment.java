@@ -167,7 +167,7 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
             publishProgress(countProgress(1, 2));
 
             try {
-                if(executedFromIntentResult) activity.loadImageBitmap();
+                if(executedFromIntentResult) activity.loadImageBitmap(imageView.getWidth(), imageView.getHeight());
                 publishProgress(countProgress(2, 2));
             }
             catch(Exception e) {

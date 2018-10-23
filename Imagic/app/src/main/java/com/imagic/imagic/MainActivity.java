@@ -243,8 +243,8 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
     // Get image bitmap
     public Bitmap getImageBitmap() { return image.bitmap; }
 
-    // Load image bitmap
-    public void loadImageBitmap() throws Exception { image = new Image(this, uri); }
+    // Load image bitmap and scale it down to match image view dimension if necessary
+    public void loadImageBitmap(int viewWidth, int viewHeight) throws Exception { image = new Image(this, uri, viewWidth, viewHeight); }
 
     // Get histogram bar graph series data
     public BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType) {

@@ -38,8 +38,8 @@ interface FragmentListener {
     // Get histogram bar graph series data
     BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType);
 
-    // Load image bitmap
-    void loadImageBitmap() throws Exception;
+    // Load image bitmap and scale it down to match image view dimension if necessary
+    void loadImageBitmap(int viewWidth, int viewHeight) throws Exception;
 
     // Reset all histogram data
     void resetAllHistogramData();
