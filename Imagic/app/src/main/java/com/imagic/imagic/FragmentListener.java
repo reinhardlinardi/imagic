@@ -17,8 +17,11 @@ import com.jjoe64.graphview.series.DataPoint;
  */
 interface FragmentListener {
 
-    // Update URI on image intent result
-    void onImageIntentResult(int requestCode, int resultCode, Intent data);
+    // Update URI on image intent result, return false if intent canceled
+    boolean onImageIntentResult(int requestCode, int resultCode, Intent data);
+
+    // Check if any image had been loaded
+    boolean hasImage();
 
     // Check if image has no bitmap yet
     boolean isImageHasBitmap();

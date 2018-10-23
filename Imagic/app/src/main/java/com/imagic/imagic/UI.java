@@ -28,6 +28,9 @@ class UI {
     // Set invisible (component affects layout calculation), usually for progress bar
     static void setInvisible(View view) { view.setVisibility(View.INVISIBLE); }
 
+    // Test visibility
+    static boolean isVisible(View view) { return view.getVisibility() == View.VISIBLE; }
+
     // Enable
     static void enable(View view) { view.setEnabled(true); }
 

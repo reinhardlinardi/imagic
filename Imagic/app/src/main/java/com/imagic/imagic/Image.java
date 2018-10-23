@@ -47,7 +47,7 @@ class Image {
         int scaleFactor;
 
         // If at least one of image dimension is larger than view dimension, scale it down
-        if(width > viewWidth || height > viewHeight) scaleFactor = Math.min(width/ viewWidth, height/ viewHeight);
+        if(width > viewWidth || height > viewHeight) scaleFactor = Math.min(width/viewWidth, height/viewHeight);
         else scaleFactor = 1;
 
         bitmapOptions.inJustDecodeBounds = false;
@@ -71,7 +71,7 @@ class Image {
 
     // Recycle bitmap
     private void recycleBitmap() {
-        if(bitmap != null) {
+        if(hasBitmap()) {
             if(!bitmap.isRecycled()) bitmap.recycle();
         }
     }
@@ -97,29 +97,32 @@ class Image {
 
     // Get histogram data by color type
     int[] generateHistogramDataByColorType(ColorType colorType) {
-        int[] frequencyCount = new int[ColorHistogram.NUM_OF_VALUE];
-        Arrays.fill(frequencyCount, 0);
+        if(hasBitmap()) {
+            int[] frequencyCount = new int[ColorHistogram.NUM_OF_VALUE];
+            Arrays.fill(frequencyCount, 0);
 
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
 
-        int[] pixels = new int[width * height];
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
-        for(int row = 0; row < height; row++) {
-            for(int col = 0; col < width; col++) {
-                int pixel = pixels[row * width + col];
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
 
-                switch(colorType) {
-                    case RED : frequencyCount[Color.red(pixel)]++; break;
-                    case GREEN : frequencyCount[Color.green(pixel)]++; break;
-                    case BLUE : frequencyCount[Color.blue(pixel)]++; break;
-                    case GRAYSCALE : frequencyCount[(Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3]++; break;
-                    default : break;
+                    switch (colorType) {
+                        case RED: frequencyCount[Color.red(pixel)]++; break;
+                        case GREEN: frequencyCount[Color.green(pixel)]++; break;
+                        case BLUE: frequencyCount[Color.blue(pixel)]++; break;
+                        case GRAYSCALE: frequencyCount[(Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3]++; break;
+                        default: break;
+                    }
                 }
             }
-        }
 
-        return frequencyCount;
+            return frequencyCount;
+        }
+        else return null;
     }
 }

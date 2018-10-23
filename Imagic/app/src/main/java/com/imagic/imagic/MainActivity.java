@@ -221,12 +221,21 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
         }
     }
 
-    // Update URI on image intent result
-    public void onImageIntentResult(int requestCode, int resultCode, Intent data) {
+    // Update URI on image intent result, return false if intent canceled
+    public boolean onImageIntentResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            if (requestCode == IntentRequestCode.SELECT_IMAGE.code) uri = data.getData();
+            if(requestCode == IntentRequestCode.SELECT_IMAGE.code) uri = data.getData();
+            return true;
         }
+        else if(resultCode == RESULT_CANCELED) {
+            if(!isImageHasBitmap()) uri = null;
+            return false;
+        }
+        else return false;
     }
+
+    // Check if any image had been loaded
+    public boolean hasImage() { return uri != null; }
 
     // Check if image has no bitmap yet
     public boolean isImageHasBitmap() { return image.hasBitmap(); }
@@ -244,7 +253,9 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
     public Bitmap getImageBitmap() { return image.bitmap; }
 
     // Load image bitmap and scale it down to match image view dimension if necessary
-    public void loadImageBitmap(int viewWidth, int viewHeight) throws Exception { image = new Image(this, uri, viewWidth, viewHeight); }
+    public void loadImageBitmap(int viewWidth, int viewHeight) throws Exception {
+        if(hasImage()) image = new Image(this, uri, viewWidth, viewHeight);
+    }
 
     // Get histogram bar graph series data
     public BarGraphSeries<DataPoint> getHistogramBarGraphSeriesData(ColorType colorType) {
@@ -267,12 +278,14 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
     public void updateHistogramData(ColorType colorType) {
         int[] dataArray = image.generateHistogramDataByColorType(colorType);
 
-        switch(colorType) {
-            case RED : rgb.red.setData(dataArray); break;
-            case GREEN : rgb.green.setData(dataArray); break;
-            case BLUE : rgb.blue. setData(dataArray); break;
-            case GRAYSCALE : grayscale.setData(dataArray); break;
-            default : break;
+        if(dataArray != null) {
+            switch(colorType) {
+                case RED : rgb.red.setData(dataArray); break;
+                case GREEN : rgb.green.setData(dataArray); break;
+                case BLUE : rgb.blue. setData(dataArray); break;
+                case GRAYSCALE : grayscale.setData(dataArray); break;
+                default : break;
+            }
         }
     }
 }

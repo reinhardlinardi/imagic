@@ -15,7 +15,8 @@
         android:max="100"
         android:maxHeight="@dimen/progress_bar_max_height"
         android:minHeight="@dimen/progress_bar_min_height"
-        android:progress="0" />
+        android:progress="0"
+        android:visibility="invisible" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -55,71 +56,80 @@
                 android:gravity="center_vertical|center_horizontal"
                 android:text="@string/help_text" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/reset_apply_button_space_gap" />
-
             <LinearLayout
+                android:id="@+id/histogramContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|center_horizontal"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                android:orientation="vertical"
+                android:visibility="gone">
 
-                <Button
-                    android:id="@+id/histogramResetButton"
-                    android:layout_width="0dp"
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/reset_button"
-                    android:drawableStart="@drawable/ic_reset"
                     android:gravity="center_vertical|center_horizontal"
-                    android:paddingEnd="@dimen/reset_apply_button_side_padding"
-                    android:paddingStart="@dimen/reset_apply_button_side_padding"
-                    android:text="@string/reset_button_text"
-                    android:textColor="@android:color/white" />
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <Button
+                        android:id="@+id/histogramResetButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/reset_button"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                        android:paddingStart="@dimen/reset_apply_button_side_padding"
+                        android:text="@string/reset_button_text"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/histogramRedGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/histogramGreenGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/histogramBlueGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/histogramGrayscaleGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
 
             </LinearLayout>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_gap_layout_height" />
-
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/histogramRedGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_view_layout_height"
-                app:seriesData="@string/graph_view_empty_series_data" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_gap_layout_height" />
-
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/histogramGreenGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_view_layout_height"
-                app:seriesData="@string/graph_view_empty_series_data" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_gap_layout_height" />
-
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/histogramBlueGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_view_layout_height"
-                app:seriesData="@string/graph_view_empty_series_data" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_space_gap_layout_height" />
-
-            <com.jjoe64.graphview.helper.GraphViewXML
-                android:id="@+id/histogramGrayscaleGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/graph_view_layout_height"
-                app:seriesData="@string/graph_view_empty_series_data" />
 
         </LinearLayout>
     </ScrollView>

@@ -21,5 +21,9 @@
     <dimen name="dialog_button_padding_top">5dp</dimen>
     <dimen name="reset_apply_button_space_gap">20dp</dimen>
     <dimen name="reset_apply_button_side_padding">15dp</dimen>
+    <dimen name="double_image_view_side_margin">5dp</dimen>
+    <dimen name="reset_apply_button_side_margin">5dp</dimen>
+    <dimen name="seek_bar_space_gap">15dp</dimen>
+    <dimen name="contrast_spinner_enhance_button_space_gap">20dp</dimen>
 
 </resources>
