@@ -230,7 +230,7 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
                     if(activity.hasImage()) {
                         resetSeekBar();
 
-                        UI.setImageView(getContext(), transformedImageView, activity.getImageBitmap());
+                        UI.setImageView(getContext(), imageView, activity.getImageBitmap());
                         UI.clearMemory(getContext());
                     }
                 }
