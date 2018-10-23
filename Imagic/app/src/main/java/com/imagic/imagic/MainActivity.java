@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
         public int getCount() { return menu.size(); }
     }
 
-    /* Methods */
+    /* Event listeners */
 
     // Get view pager on page change listener
     private ViewPager.OnPageChangeListener getViewPagerOnPageChangeListener() {

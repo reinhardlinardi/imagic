@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,6 +29,7 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
     private ProgressBar progressBar;
     private ImageView imageView;
     private TextView helpTextView;
+    private Button resetButton;
 
     private GraphView redGraphView;
     private GraphView greenGraphView;
@@ -72,6 +74,11 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
         UI.setGraphViewXAxisBoundary(grayscaleGraphView, ColorHistogram.MIN_VALUE, ColorHistogram.MAX_VALUE);
 
         helpTextView = view.findViewById(R.id.histogramHelpTextView);
+
+        resetButton = view.findViewById(R.id.histogramResetButton);
+        resetButton.setOnClickListener(getResetButtonOnClickListener());
+        UI.hide(resetButton);
+
         imageView = view.findViewById(R.id.histogramImageView);
         imageView.setOnClickListener(getImageViewOnClickListener());
 
@@ -114,15 +121,7 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
         }
     }
 
-    /* Methods */
-
-    // Constructor
-    public HistogramFragment() {}
-
-    // Factory method to create new instance of fragment
-    public static HistogramFragment newInstance() {
-        return new HistogramFragment();
-    }
+    /* Event listeners */
 
     // Get image view on click listener
     private View.OnClickListener getImageViewOnClickListener() {
@@ -134,6 +133,30 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
                 imageDialog.show(getFragmentManager(), ImageDialogFragment.TAG);
             }
         };
+    }
+
+    // Get reset button on click listener
+    private View.OnClickListener getResetButtonOnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Reset image
+                if(activity.getImageURI() != null) {
+                    ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
+                    imageLoadAsyncTask.execute(true);
+                }
+            }
+        };
+    }
+
+    /* Methods */
+
+    // Constructor
+    public HistogramFragment() {}
+
+    // Factory method to create new instance of fragment
+    public static HistogramFragment newInstance() {
+        return new HistogramFragment();
     }
 
     // Count progress
@@ -182,6 +205,9 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
             UI.setUnclickable(imageView);
             UI.hide(helpTextView);
 
+            UI.show(resetButton);
+            UI.disable(resetButton);
+
             progressBar.setProgress(0);
             UI.show(progressBar);
         }
@@ -216,6 +242,7 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
                 UI.show(grayscaleGraphView);
 
                 UI.setClickable(imageView);
+                UI.enable(resetButton);
             }
         }
     }
@@ -267,6 +294,7 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
 
             UI.setInvisible(progressBar);
             UI.setClickable(imageView);
+            UI.enable(resetButton);
         }
     }
 }

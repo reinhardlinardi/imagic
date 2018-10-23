@@ -19,4 +19,5 @@
     <string name="select_image_button_text">Select From\nGallery\n</string>
     <string name="capture_image_button_text">Capture Using\nCamera\n</string>
     <string name="help_text">\nWelcome to Imagic!\n\nSelect or capture image by clicking\nthe picture above.</string>
+    <string name="reset_button_text">Reset</string>
 </resources>

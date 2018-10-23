@@ -19,5 +19,7 @@
     <dimen name="dialog_button_drawable_padding">10dp</dimen>
     <dimen name="dialog_container_side_padding">20dp</dimen>
     <dimen name="dialog_button_padding_top">5dp</dimen>
+    <dimen name="reset_apply_button_space_gap">20dp</dimen>
+    <dimen name="reset_apply_button_side_padding">15dp</dimen>
 
 </resources>
