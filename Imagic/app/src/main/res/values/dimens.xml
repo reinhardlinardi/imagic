@@ -25,5 +25,8 @@
     <dimen name="reset_apply_button_side_margin">5dp</dimen>
     <dimen name="seek_bar_space_gap">15dp</dimen>
     <dimen name="contrast_spinner_enhance_button_space_gap">20dp</dimen>
+    <dimen name="spinner_relative_layout_action_button_side_margin">5dp</dimen>
+    <dimen name="arrow_down_float_side_margin">5dp</dimen>
+    <dimen name="graph_text_space_gap">10dp</dimen>
 
 </resources>

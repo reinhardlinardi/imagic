@@ -1,0 +1,11 @@
+[
+  {
+    "algorithmName" : "Linear"
+  },
+  {
+    "algorithmName" : "CDF"
+  },
+  {
+    "algorithmName" : "Logarithmic"
+  }
+]

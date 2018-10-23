@@ -27,4 +27,8 @@
     <string name="seek_bar_100_percent_text">100%</string>
     <string name="green_seek_bar_text">G</string>
     <string name="blue_seek_bar_text">B</string>
+    <string name="enhance_button_text">Enhance</string>
+    <string name="spinner_down_arrow_content_description">Spinner Down Arrow</string>
+    <string name="before_transformation_text">Before transformation</string>
+    <string name="after_transformation_text">After transformation</string>
 </resources>

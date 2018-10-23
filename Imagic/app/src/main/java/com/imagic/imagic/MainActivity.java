@@ -169,9 +169,13 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
-            // When a page is selected, get current fragment by its position and update the current fragment instance
+            // When a page is selected, get current fragment by its position and update the current fragment instance,
+            // and load image in current fragment instance automatically
             @Override
-            public void onPageSelected(int position) { currentFragment = (MainActivityListener) menuAdapter.fragments.get(position); }
+            public void onPageSelected(int position) {
+                currentFragment = (MainActivityListener) menuAdapter.fragments.get(position);
+                currentFragment.loadImageOnSelected();
+            }
 
             @Override
             public void onPageScrollStateChanged(int state) {}
@@ -264,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             case GREEN : return rgb.green.getBarGraphSeries();
             case BLUE : return rgb.blue.getBarGraphSeries();
             case GRAYSCALE : return grayscale.getBarGraphSeries();
-            default : return null;
+            default : return new BarGraphSeries<>();
         }
     }
 

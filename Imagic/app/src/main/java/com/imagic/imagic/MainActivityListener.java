@@ -17,4 +17,7 @@ interface MainActivityListener {
 
     // Send given intent to capture image
     void sendCaptureImageIntent(Intent intent);
+
+    // Load image when fragment is selected
+    void loadImageOnSelected();
 }

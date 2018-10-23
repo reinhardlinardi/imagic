@@ -78,11 +78,6 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
 
             imageView = view.findViewById(R.id.histogramImageView);
             imageView.setOnClickListener(getImageViewOnClickListener());
-
-            if(activity.isImageHasBitmap()) {
-                ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
-                imageLoadAsyncTask.execute(false);
-            }
         }
     }
 
@@ -105,6 +100,16 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
 
     // Send given intent to capture image
     public void sendCaptureImageIntent(Intent intent) { startActivityForResult(intent, IntentRequestCode.CAPTURE_IMAGE.code); }
+
+    // Load image when fragment is selected
+    public void loadImageOnSelected() {
+        if(isAttachedToMainActivity()) {
+            if(activity.isImageHasBitmap()) {
+                ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
+                imageLoadAsyncTask.execute(false);
+            }
+        }
+    }
 
     /* Intent result */
 
@@ -182,7 +187,7 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
             if(!activity.isGrayscaleHistogramDataAvailable()) missingColorTypes.add(ColorType.GRAYSCALE);
             return missingColorTypes;
         }
-        else return null;
+        else return new ArrayList<>();
     }
 
     /* Async tasks */
@@ -213,7 +218,6 @@ public class HistogramFragment extends Fragment implements MainActivityListener 
                 UI.disable(resetButton);
 
                 if(UI.isVisible(helpTextView)) UI.hide(helpTextView);
-                if(!UI.isVisible(resetButton)) UI.show(resetButton);
 
                 progressBar.setProgress(0);
                 UI.show(progressBar);
