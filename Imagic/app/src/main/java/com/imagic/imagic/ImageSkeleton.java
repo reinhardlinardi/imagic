@@ -1,6 +1,7 @@
 package com.imagic.imagic;
 
 import android.util.Log;
+import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,7 +163,7 @@ class ImageSkeleton {
 
     ArrayList<Point> vertex;
     ArrayList<Point> intersection;
-    ArrayList<Point> mergedIntersection;
+    ArrayList<Pair<Point, Point> > mergedIntersection;
     ArrayList<Point> cycle;
 
     boolean[][] visited;
@@ -400,6 +401,25 @@ class ImageSkeleton {
         }
     }
 
+    void mergeNeighborIntersection() {
+        mergedIntersection = new ArrayList<>();
+        if(intersection.size() >= 2) {
+            for (int i = 0; i < intersection.size()-1; i++) {
+                for(int j = i + 1; j < intersection.size(); j++) {
+                    if (Math.abs(intersection.get(i).row - intersection.get(j).row) == 1 ||
+                            Math.abs(intersection.get(i).col - intersection.get(j).col) == 1) {
+                        mergedIntersection.add(new Pair<>(intersection.get(i), intersection.get(j)));
+                        mergedIntersection.add(new Pair<>(intersection.get(j), intersection.get(i)));
+                    }
+                }
+            }
+        }
+    }
+
+    int getIntersectionCount() {
+        return (intersection.size() - mergedIntersection.size()/2);
+    }
+
     // Skeleton post-processing
     void postProcess() {
         resetVisited();
@@ -474,6 +494,9 @@ class ImageSkeleton {
             skeletonMatrix[p.row][p.col] = INTERSECTION_BLUE;
         }
 
+        //merge neighbor intersection
+        mergeNeighborIntersection();
+
         //count cycle
         cycleCount = countCycle();
         Log.d("Cycle count", Integer.toString(cycleCount));
@@ -481,9 +504,9 @@ class ImageSkeleton {
 
     int countCycle() {
         if(vertex.size() == 0) {
-            if(intersection.size() == 0) return 1;
-            else if(intersection.size() == 1 || intersection.size() == 2) return 2;
-        } else if(intersection.size() == 1 && (vertex.size() == 1 || vertex.size() == 2)) {
+            if(getIntersectionCount() == 0) return 1;
+            else if(getIntersectionCount() == 1 || getIntersectionCount() == 2) return 2;
+        } else if(getIntersectionCount() == 1 && (vertex.size() == 1 || vertex.size() == 2)) {
             return 1;
         }
         return 0;
@@ -585,7 +608,8 @@ class ImageSkeleton {
         } else if (countCycle() == 0){
             //Case 1,2,3,5,7
             double[] normalizedTestCodeChain = normalizeCodeChain(directionCodeCount);
-            if (vertex.size() == 3 && intersection.size() == 1) {
+            Log.d("normalized code chain", Arrays.toString(normalizedTestCodeChain));
+            if (vertex.size() == 3 && getIntersectionCount() == 1) {
                 double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
                 if (normalizedTestCodeChain[4] < 0.48) {
                     if (dIntersectionTopRatio > 0.75) {
@@ -600,7 +624,7 @@ class ImageSkeleton {
                 //Case 1,2,5,7
                 double ratio = (double)(maxCol-minCol) / (double)(maxRow-minRow);
                 if (ratio < 0.4) {
-                    if (intersection.size() >= 1) {
+                    if (getIntersectionCount() >= 1) {
                         double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
                         if (dIntersectionTopRatio <= 0.75) {
                             verdict = 3;
