@@ -162,13 +162,14 @@ class ImageSkeleton {
 
     ArrayList<Point> vertex;
     ArrayList<Point> intersection;
+    ArrayList<Point> mergedIntersection;
     ArrayList<Point> cycle;
 
     boolean[][] visited;
 
-    int minRow = 9999999;
+    int minRow = Integer.MAX_VALUE;
     int maxRow = -1;
-    int minCol = 9999999;
+    int minCol = Integer.MAX_VALUE;
     int maxCol = -1;
 
     // Constructor
@@ -343,7 +344,7 @@ class ImageSkeleton {
 
     void eliminateSkeletonNoise(Point intersectionPoint, ArrayList<Point> Points) {
         // Asumsi cuma ada 1 cabang noise setiap eliminasi
-        int minimumDistance = 9999999;
+        int minimumDistance = Integer.MAX_VALUE;
         int maximumDistance = -1;
         int indexChosenPoint = -1;
         for(int i = 0; i < Points.size(); i++) {
@@ -369,7 +370,8 @@ class ImageSkeleton {
 //        }
 
         Log.d("Distance ratio", Double.toString((double)minimumDistance / (double)maximumDistance));
-        if ((double)minimumDistance / (double)maximumDistance < 0.2) { // threshold kuli (indikator ujung palsu yg masih ccd)
+        if ((double)minimumDistance / (double)maximumDistance < 0.22 &&
+                minimumDistance != Integer.MAX_VALUE && maximumDistance != -1) {
             deleteSkeletonEdge(intersectionPoint, Points.get(indexChosenPoint));
             vertex.remove(Points.get(indexChosenPoint));
             intersection.remove(intersectionPoint);
@@ -447,7 +449,7 @@ class ImageSkeleton {
                 resetVisited();
                 eliminateSkeletonNoise(intersection.get(0), vertex);
             }
-        } else if (intersection.size() > 1 && vertex.size() > 2) {
+        } else if (intersection.size() > 1) {
             for(int i = 0; i < intersection.size(); i++) {
                 numOfIntersectNeighbor = countWhiteToBlackTransition(intersection.get(i).row, intersection.get(i).col);
                 if(numOfIntersectNeighbor == 3) {
@@ -516,7 +518,7 @@ class ImageSkeleton {
 
     private char searchTheMostSimilarChainCode(double[] normalizedTestCodeChain) {
         char result = '\0';
-        double minimumError = 99999999.0;
+        double minimumError = Double.MAX_VALUE;
         int resultIndex = 0;
         int[][] reference = new int[0][0];
 
@@ -555,7 +557,6 @@ class ImageSkeleton {
         return result;
     }
 
-    //TODO restore number prediction only feature
     int getNumberPrediction(){
         int verdict = 999;
 
@@ -583,18 +584,32 @@ class ImageSkeleton {
             }
         } else if (countCycle() == 0){
             //Case 1,2,3,5,7
+            double[] normalizedTestCodeChain = normalizeCodeChain(directionCodeCount);
             if (vertex.size() == 3 && intersection.size() == 1) {
                 double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
-                if (dIntersectionTopRatio > 0.75) {
-                    verdict = 1;
+                if (normalizedTestCodeChain[4] < 0.48) {
+                    if (dIntersectionTopRatio > 0.75) {
+                        verdict = 2;
+                    } else {
+                        verdict = 3;
+                    }
                 } else {
-                    verdict = 3;
+                    verdict = 1;
                 }
             } else {
                 //Case 1,2,5,7
                 double ratio = (double)(maxCol-minCol) / (double)(maxRow-minRow);
                 if (ratio < 0.4) {
-                    verdict = 1;
+                    if (intersection.size() >= 1) {
+                        double dIntersectionTopRatio = (double)(intersection.get(0).row-minRow) / (double)(maxRow-minRow);
+                        if (dIntersectionTopRatio <= 0.75) {
+                            verdict = 3;
+                        } else {
+                            verdict = 2;
+                        }
+                    } else {
+                        verdict = 1;
+                    }
                 } else { // 2, 5, 7
                     ratio = (double)Math.abs(vertex.get(0).col - vertex.get(1).col) / (double)(maxCol-minCol);
                     if (ratio < 0.6) {
