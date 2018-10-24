@@ -656,4 +656,9 @@ class ImageSkeleton {
         return ((vertex.get(0).col < vertex.get(1).col && vertex.get(0).row < vertex.get(1).row) ||
                 (vertex.get(1).col < vertex.get(0).col && vertex.get(1).row < vertex.get(0).row) );
     }
+
+    char getLevensheinDistPrediction() {
+        LevensheinDistanceClassifier levensheinDistanceClassifier = new LevensheinDistanceClassifier(skeletonMatrix);
+        return '\0';
+    }
 }
