@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             @Override
             public void onPageSelected(int position) {
                 currentFragment = (MainActivityListener) menuAdapter.fragments.get(position);
-                currentFragment.loadImageOnSelected();
+                if(currentFragment != null) currentFragment.loadImageOnSelected();
             }
 
             @Override

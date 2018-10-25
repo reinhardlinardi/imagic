@@ -1,7 +1,360 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".EqualizerFragment">
-</FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/equalizerProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:maxHeight="@dimen/progress_bar_max_height"
+        android:minHeight="@dimen/progress_bar_min_height"
+        android:progress="0"
+        android:visibility="invisible" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/scrollable_linear_layout_bottom_padding"
+            android:paddingEnd="@dimen/scrollable_linear_layout_side_padding"
+            android:paddingStart="@dimen/scrollable_linear_layout_side_padding"
+            android:paddingTop="@dimen/scrollable_linear_layout_top_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <ImageView
+                    android:id="@+id/equalizerImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/image_view_layout_height"
+                    android:layout_marginEnd="@dimen/double_image_view_side_margin"
+                    android:layout_marginStart="@dimen/double_image_view_side_margin"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/equalizer_image_view_content_description"
+                    android:src="@drawable/ic_mountain" />
+
+                <ImageView
+                    android:id="@+id/equalizerTransformedImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/image_view_layout_height"
+                    android:layout_marginEnd="@dimen/double_image_view_side_margin"
+                    android:layout_marginStart="@dimen/double_image_view_side_margin"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/equalizer_transformed_image_view_content_description"
+                    android:src="@drawable/ic_mountain"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/equalizerHelpTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/help_text" />
+
+            <LinearLayout
+                android:id="@+id/equalizerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <Button
+                        android:id="@+id/equalizerResetButton"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
+                        android:layout_marginStart="@dimen/reset_apply_button_side_margin"
+                        android:layout_weight="1"
+                        android:background="@drawable/reset_button"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                        android:paddingStart="@dimen/reset_apply_button_side_padding"
+                        android:text="@string/reset_button_text"
+                        android:textColor="@android:color/white" />
+
+                    <Button
+                        android:id="@+id/equalizerApplyButton"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
+                        android:layout_marginStart="@dimen/reset_apply_button_side_margin"
+                        android:layout_weight="1"
+                        android:background="@drawable/apply_button"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                        android:paddingStart="@dimen/reset_apply_button_side_padding"
+                        android:text="@string/apply_button_text"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/equalizer_user_histogram_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerUserHistogramGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:text="@string/color_seek_bar_text" />
+
+                        <SeekBar
+                            android:id="@+id/equalizerColorSeekBar"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:max="252"
+                            android:progress="0"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/equalizerColorTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:gravity="center"
+                            android:text="@string/seek_bar_0_text" />
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/seek_bar_space_gap" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:weightSum="10">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:text="@string/frequency_seek_bar_text" />
+
+                        <SeekBar
+                            android:id="@+id/equalizerFrequencySeekBar"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:max="99"
+                            android:progress="99" />
+
+                        <TextView
+                            android:id="@+id/equalizerFrequencyTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:gravity="center"
+                            android:text="@string/seek_bar_100_text" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/contrast_spinner_enhance_button_space_gap" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <Button
+                        android:id="@+id/equalizerMatchButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/primary_action_button"
+                        android:text="@string/match_button_text"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/before_transformation_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerRedGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/after_transformation_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerTransformedRedGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/before_transformation_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerGreenGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/after_transformation_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerTransformedGreenGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/before_transformation_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerBlueGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_space_gap_layout_height" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/after_transformation_text" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_text_space_gap" />
+
+                <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/equalizerTransformedBlueGraphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_view_layout_height"
+                    app:seriesData="@string/graph_view_empty_series_data" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    
+</LinearLayout>

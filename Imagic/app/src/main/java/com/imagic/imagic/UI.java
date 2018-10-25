@@ -5,12 +5,11 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
-import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.BaseSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
 /**
@@ -53,10 +52,10 @@ class UI {
     // Clear Glide memory
     static void clearMemory(Context context) { Glide.get(context).clearMemory(); }
 
-    // Set graph view with given BarGraphSeries
-    static void setGraphView(GraphView view, BarGraphSeries<DataPoint> series) {
+    // Set graph view with given series list
+    static void setGraphView(GraphView view, BaseSeries<DataPoint>... seriesList) {
         view.removeAllSeries();
-        view.addSeries(series);
+        for(BaseSeries<DataPoint> series : seriesList) view.addSeries(series);
     }
 
     // Set graph view X axis boundary

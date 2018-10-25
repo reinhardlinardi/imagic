@@ -1,8 +1,0 @@
-[
-  {
-    "algorithm" : "Edge Detection"
-  },
-  {
-    "algorithm" : "Thinning"
-  }
-]

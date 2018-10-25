@@ -118,9 +118,8 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
             greenTextView = view.findViewById(R.id.contrastGreenTextView);
             blueTextView = view.findViewById(R.id.contrastBlueTextView);
 
-            redPercentage = 100;
-            greenPercentage = 100;
-            bluePercentage = 100;
+            resetSeekBar();
+
             redSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(redTextView));
             greenSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(greenTextView));
             blueSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(blueTextView));

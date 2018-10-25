@@ -16,6 +16,8 @@
     <string name="histogram_image_view_content_description">Histogram Image View</string>
     <string name="contrast_image_view_content_description">Contrast Image View</string>
     <string name="contrast_transformed_image_view_content_description">Contrast Transformed Image View</string>
+    <string name="equalizer_image_view_content_description">Equalizer Image View</string>
+    <string name="equalizer_transformed_image_view_content_description">Equalizer Transformed Image View</string>
     <string name="graph_view_empty_series_data">0=0</string>
     <string name="image_dialog_cancel_button">Cancel</string>
     <string name="select_image_button_text">Select From\nGallery\n</string>
@@ -31,4 +33,10 @@
     <string name="spinner_down_arrow_content_description">Spinner Down Arrow</string>
     <string name="before_transformation_text">Before transformation</string>
     <string name="after_transformation_text">After transformation</string>
+    <string name="equalizer_user_histogram_text">User Defined Histogram</string>
+    <string name="match_button_text">Match</string>
+    <string name="color_seek_bar_text">Color</string>
+    <string name="seek_bar_0_text">0</string>
+    <string name="frequency_seek_bar_text">Frequency</string>
+    <string name="seek_bar_100_text">100</string>
 </resources>
