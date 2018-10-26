@@ -253,7 +253,7 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
                     }
                 }
 
-                if(selectedIndex == 0 || selectedIndex == 4) UI.hide(colorSeekBar);
+                if(selectedIndex == 0 || selectedIndex == 3) UI.hide(colorSeekBar);
                 else {
                     int colorProgress = getSeekBarProgressFromColorValue(colorValues[selectedIndex]);
                     colorSeekBar.setProgress(colorProgress);
