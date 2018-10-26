@@ -36,7 +36,6 @@ Imagic won't be amazing without support from :
   - [Gregor Cresnar](https://www.flaticon.com/authors/gregor-cresnar)
   - [Lucy G](https://www.flaticon.com/authors/lucy-g)
   - [monkik](https://www.flaticon.com/authors/monkik)
-  - [Nikita Golubev](https://www.flaticon.com/authors/nikita-golubev)
   - [Smashicons](https://www.flaticon.com/authors/smashicons)
 - [GraphView](https://github.com/jjoe64/GraphView), an Android Graph Library for creating zoomable and scrollable line and bar graphs.
 
