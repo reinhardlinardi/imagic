@@ -61,4 +61,15 @@ class RGBHistogram {
 
         return mapping;
     }
+
+    // Histogram matching, return all mapping
+    int[][] matchHistogram(double[] cdf) {
+        int[][] mapping = new int[3][];
+
+        mapping[0] = red.match(cdf);
+        mapping[1] = green.match(cdf);
+        mapping[2] = blue.match(cdf);
+
+        return mapping;
+    }
 }

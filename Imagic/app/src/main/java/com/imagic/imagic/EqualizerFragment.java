@@ -65,11 +65,14 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
     private int[] frequencyValues;
 
     // Current selected data point color array index
-    private int selectedColorArrayIndex;
+    private int selectedIndex;
 
     // Transformed image and histogram
     Image image;
     RGBHistogram rgb;
+
+    // User defined histogram
+    GrayscaleHistogram userHistogram;
 
     /* Lifecycles */
 
@@ -245,24 +248,24 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
 
                 for(int idx = 0; idx < 4; idx++) {
                     if(colorValues[idx] == (int) data.getX()) {
-                        selectedColorArrayIndex = idx;
+                        selectedIndex = idx;
                         break;
                     }
                 }
 
-                if(selectedColorArrayIndex == 1 || selectedColorArrayIndex == 2) {
-                    int colorProgress = getSeekBarProgressFromColorValue(colorValues[selectedColorArrayIndex]);
+                if(selectedIndex == 0 || selectedIndex == 4) UI.hide(colorSeekBar);
+                else {
+                    int colorProgress = getSeekBarProgressFromColorValue(colorValues[selectedIndex]);
                     colorSeekBar.setProgress(colorProgress);
 
                     UI.show(colorSeekBar);
                 }
-                else UI.hide(colorSeekBar);
 
-                colorTextView.setText(Integer.toString(colorValues[selectedColorArrayIndex]));
+                colorTextView.setText(Integer.toString(colorValues[selectedIndex]));
 
-                int frequencyProgress = getSeekBarProgressFromFrequencyValue(frequencyValues[selectedColorArrayIndex]);
+                int frequencyProgress = getSeekBarProgressFromFrequencyValue(frequencyValues[selectedIndex]);
                 frequencySeekBar.setProgress(frequencyProgress);
-                frequencyTextView.setText(Integer.toString(frequencyValues[selectedColorArrayIndex]));
+                frequencyTextView.setText(Integer.toString(frequencyValues[selectedIndex]));
             }
         };
     }
@@ -273,18 +276,18 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
+                    int value;
+
                     if(seekBar == colorSeekBar) {
-                        int colorValue = getColorValueFromSeekBarProgress(progress);
-                        colorValues[selectedColorArrayIndex] = colorValue;
-
-                        textView.setText(Integer.toString(colorValue));
+                        value = getColorValueFromSeekBarProgress(progress);
+                        colorValues[selectedIndex] = value;
                     }
-                    else if(seekBar == frequencySeekBar) {
-                        int frequencyValue = getFrequencyValueFromSeekBarProgress(progress);
-                        frequencyValues[selectedColorArrayIndex] = frequencyValue;
-
-                        textView.setText(Integer.toString(frequencyValue));
+                    else {
+                        value = getFrequencyValueFromSeekBarProgress(progress);
+                        frequencyValues[selectedIndex] = value;
                     }
+
+                    textView.setText(Integer.toString(value));
                 }
             }
 
@@ -293,8 +296,8 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(selectedColorArrayIndex == 1 && colorValues[1] >= colorValues[2]) swapValues(1, 2);
-                else if(selectedColorArrayIndex == 2 && colorValues[2] <= colorValues[1]) swapValues(2, 1);
+                if(selectedIndex == 1 && colorValues[1] >= colorValues[2]) swapValues(1, 2);
+                else if(selectedIndex == 2 && colorValues[2] <= colorValues[1]) swapValues(2, 1);
 
                 generateUserHistogram(true);
             }
@@ -311,10 +314,8 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
                         image = new Image(getContext(), activity.getImage());
                         rgb = new RGBHistogram(activity.getRGBHistogram());
 
-                        /*
                         HistogramMatchingAsyncTask histogramMatchingAsyncTask = new HistogramMatchingAsyncTask();
                         histogramMatchingAsyncTask.execute();
-                        */
                     }
                 }
             }
@@ -351,7 +352,7 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
 
     // Generate user histogram
     private void generateUserHistogram(boolean solveEquation) {
-        if(!solveEquation) selectedColorArrayIndex = 0;
+        if(!solveEquation) selectedIndex = 0;
 
         DataPoint[] pointDataArray = new DataPoint[4];
         for(int idx = 0; idx < 4; idx++) pointDataArray[idx] = new DataPoint(colorValues[idx], frequencyValues[idx]);
@@ -376,9 +377,9 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
         }
         else for(int idx = ColorHistogram.MIN_VALUE; idx <= ColorHistogram.MAX_VALUE; idx++) seriesDataArray[idx] = 100;
 
-        GrayscaleHistogram histogram = new GrayscaleHistogram();
-        histogram.setData(seriesDataArray);
-        BarGraphSeries<DataPoint> barSeries = histogram.getBarGraphSeries();
+        userHistogram = new GrayscaleHistogram();
+        userHistogram.setData(seriesDataArray);
+        BarGraphSeries<DataPoint> barSeries = userHistogram.getBarGraphSeries();
 
         UI.setGraphView(userHistogramGraphView, barSeries, pointSeries);
     }
@@ -400,9 +401,9 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
     private int getColorValueFromSeekBarProgress(int progress) {
         int colorValue = progress;
 
-        if(selectedColorArrayIndex == 1 || selectedColorArrayIndex == 2) colorValue += selectedColorArrayIndex;
-        if(selectedColorArrayIndex == 1 && colorValue >= colorValues[2]) colorValue += 1;
-        if(selectedColorArrayIndex == 2 && colorValue <= colorValues[1]) colorValue -= 1;
+        if(selectedIndex == 1 || selectedIndex == 2) colorValue += selectedIndex;
+        if(selectedIndex == 1 && colorValue >= colorValues[2]) colorValue += 1;
+        if(selectedIndex == 2 && colorValue <= colorValues[1]) colorValue -= 1;
 
         return colorValue;
     }
@@ -413,7 +414,7 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
     // Convert color value to seek bar progress
     private int getSeekBarProgressFromColorValue(int value) {
         int seekBarProgress = value;
-        if(selectedColorArrayIndex == 1 || selectedColorArrayIndex == 2) seekBarProgress -= selectedColorArrayIndex;
+        if(selectedIndex == 1 || selectedIndex == 2) seekBarProgress -= selectedIndex;
 
         return seekBarProgress;
     }
@@ -431,7 +432,7 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
         frequencyValues[srcIdx] = frequencyValues[destIdx];
         frequencyValues[destIdx] = temp;
 
-        selectedColorArrayIndex = destIdx;
+        selectedIndex = destIdx;
     }
 
     // Count progress
@@ -598,6 +599,68 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
 
                 if(!UI.isVisible(transformedImageView)) UI.show(transformedImageView);
                 if(!UI.isVisible(container)) UI.show(container);
+            }
+        }
+    }
+
+    // Histogram matching async task
+    private class HistogramMatchingAsyncTask extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(isAttachedToMainActivity()) {
+                double[] cdf = userHistogram.getCDF();
+                publishProgress(countProgress(1, 3));
+
+                int[][] mapping = rgb.matchHistogram(cdf);
+                publishProgress(countProgress(2, 3));
+
+                image.updateBitmapByColorMapping(mapping[0], mapping[1], mapping[2]);
+                publishProgress(countProgress(3, 3));
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if(isAttachedToMainActivity()) {
+                UI.setUnclickable(imageView);
+                UI.setUnclickable(userHistogramGraphView);
+                UI.disable(resetButton);
+                UI.disable(applyButton);
+
+                UI.disable(colorSeekBar);
+                UI.disable(frequencySeekBar);
+                UI.disable(matchButton);
+
+                progressBar.setProgress(0);
+                UI.show(progressBar);
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { if(isAttachedToMainActivity()) progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if(isAttachedToMainActivity()) {
+                UI.setImageView(getContext(), transformedImageView, image.bitmap);
+                UI.clearMemory(getContext());
+
+                UI.setGraphView(transformedRedGraphView, rgb.red.getBarGraphSeries());
+                UI.setGraphView(transformedGreenGraphView, rgb.green.getBarGraphSeries());
+                UI.setGraphView(transformedBlueGraphView, rgb.blue.getBarGraphSeries());
+
+                UI.setInvisible(progressBar);
+                UI.setClickable(imageView);
+                UI.setClickable(userHistogramGraphView);
+                UI.enable(resetButton);
+                UI.enable(applyButton);
+
+                UI.enable(colorSeekBar);
+                UI.enable(frequencySeekBar);
+                UI.enable(matchButton);
             }
         }
     }

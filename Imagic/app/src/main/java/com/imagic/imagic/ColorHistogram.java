@@ -61,7 +61,7 @@ class ColorHistogram extends Histogram {
     }
 
     // Get PMF (probability mass function) of histogram
-    private double[] getPMF() {
+    protected double[] getPMF() {
         int totalFrequency = 0;
 
         double[] PMF = new double[NUM_OF_VALUE];
@@ -74,7 +74,7 @@ class ColorHistogram extends Histogram {
     }
 
     // Get CDF (cumulative distribution function) of histogram
-    private double[] getCDF() {
+    protected double[] getCDF() {
         double[] PMF = getPMF();
         double[] CDF = new double[NUM_OF_VALUE];
         Arrays.fill(CDF, 0.0);
@@ -133,6 +133,37 @@ class ColorHistogram extends Histogram {
         double c = 1 / Math.log10((double)(1 + max));
 
         for(int val = MIN_VALUE; val <= max; val++) mapping[val] = (int)(Math.floor(Math.log10((double)(val + 1)) * (double)MAX_VALUE * c) * multiplier);
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) frequency[mapping[idx]] += getFrequency(idx);
+
+        resetData();
+        for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) addData(idx, frequency[idx]);
+
+        return mapping;
+    }
+
+    // Histogram matching, return mapping
+    protected int[] match(double[] userCDF) {
+        double[] cdf = getCDF();
+        double INF = 100000.0;
+
+        int[] mapping = new int[NUM_OF_VALUE];
+        int[] frequency = new int[NUM_OF_VALUE];
+
+        Arrays.fill(mapping, 0);
+        Arrays.fill(frequency, 0);
+
+        for(int cdfIdx = MIN_VALUE; cdfIdx <= MAX_VALUE; cdfIdx++) {
+            for(int userCDFIdx = MIN_VALUE; userCDFIdx <= MAX_VALUE; userCDFIdx++) {
+                if(cdf[cdfIdx] > userCDF[userCDFIdx]) {
+                    double d1 = (userCDFIdx > 0)? cdf[cdfIdx] - userCDF[userCDFIdx - 1] : INF;
+                    double d2 = userCDF[userCDFIdx] - cdf[cdfIdx];
+
+                    mapping[cdfIdx] = (d1 > d2)? userCDFIdx : userCDFIdx - 1;
+                }
+                else if(cdf[cdfIdx] == userCDF[userCDFIdx]) mapping[cdfIdx] = userCDFIdx;
+            }
+        }
+
         for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) frequency[mapping[idx]] += getFrequency(idx);
 
         resetData();
