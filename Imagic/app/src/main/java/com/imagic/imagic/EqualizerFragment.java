@@ -97,7 +97,7 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
 
             userHistogramGraphView = view.findViewById(R.id.equalizerUserHistogramGraphView);
             UI.setGraphViewXAxisBoundary(userHistogramGraphView, ColorHistogram.MIN_VALUE, ColorHistogram.MAX_VALUE);
-            UI.setGraphViewYAxisBoundary(userHistogramGraphView, 0, 200);
+            UI.setGraphViewYAxisBoundary(userHistogramGraphView, 0, 300);
 
             redGraphView = view.findViewById(R.id.equalizerRedGraphView);
             greenGraphView = view.findViewById(R.id.equalizerGreenGraphView);
@@ -362,13 +362,38 @@ public class EqualizerFragment extends Fragment implements MainActivityListener 
 
         int[] seriesDataArray = new int[ColorHistogram.NUM_OF_VALUE];
 
-        for(int idx = ColorHistogram.MIN_VALUE; idx <= ColorHistogram.MAX_VALUE; idx++) seriesDataArray[idx] = 100;
+        if(solveEquation) {
+            double[][] coefficients = new double[3][3];
+            double[] constants = new double[3];
+
+            for(int row = 0; row < 3; row++) {
+                constants[row] = frequencyValues[row + 1] - frequencyValues[0];
+                for(int col = 0; col < 3; col++) coefficients[row][col] = Math.pow(colorValues[row + 1], 3 - col);
+            }
+
+            PolynomialFunction function = getPolynomialFunction(coefficients, constants);
+            for(int idx = ColorHistogram.MIN_VALUE; idx <= ColorHistogram.MAX_VALUE; idx++) seriesDataArray[idx] = Math.max(0, (int)function.compute((double)idx));
+        }
+        else for(int idx = ColorHistogram.MIN_VALUE; idx <= ColorHistogram.MAX_VALUE; idx++) seriesDataArray[idx] = 100;
 
         GrayscaleHistogram histogram = new GrayscaleHistogram();
         histogram.setData(seriesDataArray);
         BarGraphSeries<DataPoint> barSeries = histogram.getBarGraphSeries();
 
         UI.setGraphView(userHistogramGraphView, barSeries, pointSeries);
+    }
+
+    // Get a third-degree polynomial function (cubic function) from all four points
+    private PolynomialFunction getPolynomialFunction(double[][] coefficients, double[] constants) {
+        LinearEquation equation = new LinearEquation(3);
+        equation.coefficients = coefficients;
+        equation.constants = constants;
+
+        PolynomialFunction function = new PolynomialFunction(3, frequencyValues[0]);
+        double[] result = equation.solve();
+        function.coefficients = result;
+
+        return function;
     }
 
     // Convert seek bar progress to color value
