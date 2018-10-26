@@ -30,6 +30,13 @@ You can download the latest release of Imagic [here](https://reinhardlinardi.git
 Imagic won't be amazing without support from :
 
 - [Flaticon](https://www.flaticon.com), for providing free vector icons.
-- [monkik](https://www.flaticon.com/authors/monkik), whose icon we picked to be Imagic's logo, with some modifications.
-- [Smashicons](https://www.flaticon.com/authors/smashicons) and [Nikita Golubev](https://www.flaticon.com/authors/nikita-golubev), for various icons used in Imagic.
+- Authors listed below, for various icons used in Imagic.
+  - [Becris](https://www.flaticon.com/authors/becris)
+  - [Freepik](https://www.flaticon.com/authors/freepik)
+  - [Gregor Cresnar](https://www.flaticon.com/authors/gregor-cresnar)
+  - [Lucy G](https://www.flaticon.com/authors/lucy-g)
+  - [monkik](https://www.flaticon.com/authors/monkik)
+  - [Nikita Golubev](https://www.flaticon.com/authors/nikita-golubev)
+  - [Smashicons](https://www.flaticon.com/authors/smashicons)
 - [GraphView](https://github.com/jjoe64/GraphView), an Android Graph Library for creating zoomable and scrollable line and bar graphs.
+
