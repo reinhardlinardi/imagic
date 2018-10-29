@@ -7,8 +7,8 @@ public class EdgeDetector {
     int MEDIAN = 0;
     int DIFFERENCE = 1;
     int HOMOGENOUS_DIFFERENCE = 2;
-    int[][] imageBitmap;
-    int[][] convolutedImageBitmap;
+    private int[][] imageBitmap;
+    private int[][] convolutedImageBitmap;
 
     EdgeDetector(int[][] imageBitmap) {
         int width = imageBitmap[0].length;
@@ -32,6 +32,10 @@ public class EdgeDetector {
         convolute(operatorCode);
     }
 
+    int[][] getConvolutedImageBitmap() {
+        return convolutedImageBitmap;
+    }
+
     void convolute(int operatorCode) {
         int width = imageBitmap[0].length;
         int height = imageBitmap.length;
@@ -44,7 +48,6 @@ public class EdgeDetector {
                         kernel[i][j] = imageBitmap[row - 1 + i][col - 1 + j];
                     }
                 }
-
                 convolutedImageBitmap[row - 1][col - 1] = computeNewColorValue(kernel, operatorCode);
             }
         }
@@ -87,7 +90,35 @@ public class EdgeDetector {
 
             result = max;
         } else if (operatorCode == HOMOGENOUS_DIFFERENCE) {
+            // kernel dimention must be odd num x odd num
+            int center = kernel[kernel.length / 2][kernel[0].length / 2];
 
+            int max = -1;
+            for(int i = 0; i < kernel[0].length; i++) {
+                int diff = Math.abs(kernel[0][i] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+
+                diff = Math.abs(kernel[kernel.length - 1][i] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+            }
+
+            for(int i = 0; i < kernel.length; i++) {
+                int diff = Math.abs(kernel[i][0] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+
+                diff = Math.abs(kernel[i][kernel[0].length - 1] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+            }
+
+            result = max;
         }
 
         if (result < 0) {
