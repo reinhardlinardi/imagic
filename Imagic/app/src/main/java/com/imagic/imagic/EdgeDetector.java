@@ -54,13 +54,27 @@ public class EdgeDetector {
         int result = 0;
         if (operatorCode == MEDIAN) {
             ArrayList<Integer> valueList = new ArrayList<>();
-            for(int i = 0; i < 3; i++) {
-                for(int j = 0; j < 3; j++) {
+            for(int i = 0; i < kernel.length; i++) {
+                for(int j = 0; j < kernel[0].length; j++) {
                     valueList.add(kernel[i][j]);
                 }
             }
             Collections.sort(valueList);
-            result = valueList.get(4);
+            if(valueList.size() % 2 == 0) {
+                result = (valueList.get(valueList.size() / 2 - 1) + valueList.get(valueList.size() / 2)) / 2;
+            } else {
+                result = valueList.get(valueList.size() / 2);
+            }
+        } else if (operatorCode == DIFFERENCE) {
+
+        } else if (operatorCode == HOMOGENOUS_DIFFERENCE) {
+
+        }
+
+        if (result < 0) {
+            result = 0;
+        } else if (result > 255) {
+            result = 255;
         }
 
         return result;
