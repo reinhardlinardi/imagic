@@ -66,7 +66,26 @@ public class EdgeDetector {
                 result = valueList.get(valueList.size() / 2);
             }
         } else if (operatorCode == DIFFERENCE) {
+            int max = -1;
+            int j = kernel[0].length - 1;
+            for(int i = 0; i < kernel[0].length; i++) {
+                int diff = Math.abs(kernel[0][i] - kernel[kernel.length - 1][j]);
+                if (diff > max) {
+                    max = diff;
+                }
+                j--;
+            }
 
+            j = kernel.length - 1;
+            for(int i = 0; i < kernel.length; i++) {
+                int diff = Math.abs(kernel[i][0] - kernel[j][kernel[0].length - 1]);
+                if (diff > max) {
+                    max = diff;
+                }
+                j--;
+            }
+
+            result = max;
         } else if (operatorCode == HOMOGENOUS_DIFFERENCE) {
 
         }
