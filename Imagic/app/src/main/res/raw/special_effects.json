@@ -1,0 +1,23 @@
+[
+  {
+    "effectName" : "Smoothing",
+    "algorithms" :
+    [
+      {
+        "algorithmName" : "Median"
+      }
+    ]
+  },
+  {
+    "effectName" : "Sharpen",
+    "algorithms" :
+    [
+      {
+        "algorithmName" : "Difference"
+      },
+      {
+        "algorithmName" : "Homogeneous"
+      }
+    ]
+  }
+]

@@ -14,5 +14,9 @@
   {
     "menuName" : "OCR",
     "fragmentClassName" : "OCR"
+  },
+  {
+    "menuName" : "Special Effects",
+    "fragmentClassName" : "SpecialEffects"
   }
 ]

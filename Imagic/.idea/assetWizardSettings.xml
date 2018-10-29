@@ -19,8 +19,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Pictures/ocr32.png" />
-                                      <entry key="outputName" value="ic_ocr_32" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Pictures/magic-wand.png" />
+                                      <entry key="outputName" value="ic_wand_32" />
                                       <entry key="theme" value="HOLO_DARK" />
                                     </map>
                                   </option>

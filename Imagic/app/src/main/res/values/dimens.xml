@@ -28,5 +28,7 @@
     <dimen name="spinner_relative_layout_action_button_side_margin">5dp</dimen>
     <dimen name="arrow_down_float_side_margin">5dp</dimen>
     <dimen name="graph_text_space_gap">10dp</dimen>
+    <dimen name="special_effects_apply_button_space_gap">20dp</dimen>
+    <dimen name="special_effects_spinners_space_gap">20dp</dimen>
 
 </resources>

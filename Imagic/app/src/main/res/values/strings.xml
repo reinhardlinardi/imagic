@@ -1,14 +1,6 @@
 <resources>
-    <!-- Android studio generated resources -->
-    <string name="section_format">Hello World from section: %1$d</string>
-    <!-- Custom resources -->
     <string name="app_name">Imagic</string>
-    <string name="histogram_tab_name">Histogram</string>
-    <string name="contrast_enhancement_tab_name">Contrast</string>
-    <string name="equalizer_tab_name">Equalizer</string>
-    <string name="ocr_tab_name">OCR</string>
-
-    <!-- Test text -->
+    <!-- Custom resources -->
     <string name="hello_histogram">Hello Histogram!</string>
     <string name="hello_contrast_enhancement">Hello Contrast Enhancement!</string>
     <string name="hello_equalizer">Hello Equalizer!</string>
@@ -18,6 +10,8 @@
     <string name="contrast_transformed_image_view_content_description">Contrast Transformed Image View</string>
     <string name="equalizer_image_view_content_description">Equalizer Image View</string>
     <string name="equalizer_transformed_image_view_content_description">Equalizer Transformed Image View</string>
+    <string name="special_effects_image_view_content_description">Special Effects Image View</string>
+    <string name="special_effects_transformed_image_view_content_description">Special Effects Transformed Image View</string>
     <string name="graph_view_empty_series_data">0=0</string>
     <string name="image_dialog_cancel_button">Cancel</string>
     <string name="select_image_button_text">Select From\nGallery\n</string>
@@ -39,4 +33,5 @@
     <string name="seek_bar_0_text">0</string>
     <string name="frequency_seek_bar_text">Frequency</string>
     <string name="seek_bar_100_text">100</string>
+    <string name="apply_effect_button_text">Apply Effect</string>
 </resources>

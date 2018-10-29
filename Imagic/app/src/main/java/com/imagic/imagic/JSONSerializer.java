@@ -11,10 +11,10 @@ import java.util.ArrayList;
 class JSONSerializer {
 
     // Serialize an object and return JSON string of the object
-    static String serialize(JSONSerializable serializable) throws Exception { return serializable.jsonSerialize(); }
+    static <T extends JSONSerializable> String serialize(T serializable) throws Exception { return serializable.jsonSerialize(); }
 
     // Serialize ArrayList of objects and return JSON string of the ArrayList of object
-    static String arrayListSerialize(ArrayList<JSONSerializable> serializableArrayList) throws Exception {
+    static <T extends JSONSerializable> String arrayListSerialize(ArrayList<T> serializableArrayList) throws Exception {
         JSONArray array = new JSONArray();
         for(JSONSerializable serializable : serializableArrayList) array.put(serializable.jsonSerialize());
 
