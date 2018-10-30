@@ -1,11 +1,11 @@
 [
   {
-    "algorithmName" : "Linear"
+    "algorithm" : "Linear"
   },
   {
-    "algorithmName" : "CDF"
+    "algorithm" : "CDF"
   },
   {
-    "algorithmName" : "Logarithmic"
+    "algorithm" : "Logarithmic"
   }
 ]

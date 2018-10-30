@@ -273,7 +273,7 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
                 ContrastEnhancementAlgorithm algorithm = (ContrastEnhancementAlgorithm) adapterView.getItemAtPosition(position);
                 TextView textView = (TextView) view;
 
-                if(textView != null) textView.setText(algorithm.algorithmName);
+                if(textView != null) textView.setText(algorithm.algorithm);
             }
 
             @Override
@@ -320,7 +320,7 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
             TextView optionTextView = optionView.findViewById(R.id.contrastSpinnerOptionTextView);
             ContrastEnhancementAlgorithm algorithm = getItem(position);
 
-            if(algorithm != null) optionTextView.setText(algorithm.algorithmName);
+            if(algorithm != null) optionTextView.setText(algorithm.algorithm);
             return optionView;
         }
 
@@ -535,7 +535,7 @@ public class ContrastEnhancementFragment extends Fragment implements MainActivit
         @Override
         protected Void doInBackground(Void... voids) {
             if(isAttachedToMainActivity()) {
-                String algorithm = ((ContrastEnhancementAlgorithm) spinner.getSelectedItem()).algorithmName;
+                String algorithm = ((ContrastEnhancementAlgorithm) spinner.getSelectedItem()).algorithm;
                 publishProgress(countProgress(1, 3));
 
                 int[][] mapping = rgb.stretchHistogram(algorithm, (double)redPercentage/100, (double)greenPercentage/100, (double)bluePercentage/100);

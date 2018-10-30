@@ -8,18 +8,18 @@ import org.json.JSONObject;
 class ContrastEnhancementAlgorithm implements JSONSerializable {
 
     /* Constants */
-    private static final String ALGORITHM_NAME_KEY = "algorithmName";
+    private static final String ALGORITHM_KEY = "algorithm";
 
     /* Properties */
-    String algorithmName; // Algorithm name
+    String algorithm; // Algorithm name
 
     /* Methods */
 
     // Constructors
     ContrastEnhancementAlgorithm() {}
 
-    ContrastEnhancementAlgorithm(String algorithmName) {
-        this.algorithmName = algorithmName;
+    ContrastEnhancementAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
     }
 
     // Serialization
@@ -27,7 +27,7 @@ class ContrastEnhancementAlgorithm implements JSONSerializable {
     public String jsonSerialize() throws Exception {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put(ALGORITHM_NAME_KEY, algorithmName);
+        jsonObject.put(ALGORITHM_KEY, algorithm);
         return jsonObject.toString();
     }
 
@@ -35,6 +35,6 @@ class ContrastEnhancementAlgorithm implements JSONSerializable {
     @Override
     public void jsonDeserialize(String json) throws Exception {
         JSONObject jsonObject = new JSONObject(json);
-        algorithmName = jsonObject.getString(ALGORITHM_NAME_KEY);
+        algorithm = jsonObject.getString(ALGORITHM_KEY);
     }
 }

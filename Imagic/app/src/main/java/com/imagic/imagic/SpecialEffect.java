@@ -10,11 +10,11 @@ import java.util.ArrayList;
 class SpecialEffect implements JSONSerializable {
 
     /* Constants */
-    private static final String EFFECT_NAME_KEY = "effectName";
-    private static final String ALGORITHM_NAME_KEY = "algorithms";
+    private static final String EFFECT_KEY = "effect";
+    private static final String ALGORITHM_KEY = "algorithms";
 
     /* Properties */
-    String effectName; // Effect name
+    String effect; // Effect name
     ArrayList<SpecialEffectAlgorithm> algorithms; // List of algorithms
 
     /* Methods */
@@ -22,8 +22,8 @@ class SpecialEffect implements JSONSerializable {
     // Constructors
     SpecialEffect() {}
 
-    SpecialEffect(String effectName, ArrayList<SpecialEffectAlgorithm> algorithms) {
-        this.effectName = effectName;
+    SpecialEffect(String effect, ArrayList<SpecialEffectAlgorithm> algorithms) {
+        this.effect = effect;
         this.algorithms = algorithms;
     }
 
@@ -32,8 +32,8 @@ class SpecialEffect implements JSONSerializable {
     public String jsonSerialize() throws Exception {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put(EFFECT_NAME_KEY, effectName);
-        jsonObject.put(ALGORITHM_NAME_KEY, JSONSerializer.arrayListSerialize(algorithms));
+        jsonObject.put(EFFECT_KEY, effect);
+        jsonObject.put(ALGORITHM_KEY, JSONSerializer.arrayListSerialize(algorithms));
 
         return jsonObject.toString();
     }
@@ -43,7 +43,7 @@ class SpecialEffect implements JSONSerializable {
     public void jsonDeserialize(String json) throws Exception {
         JSONObject jsonObject = new JSONObject(json);
 
-        effectName = jsonObject.getString(EFFECT_NAME_KEY);
-        algorithms = JSONSerializer.arrayListDeserialize(jsonObject.getString(ALGORITHM_NAME_KEY), SpecialEffectAlgorithm.class);
+        effect = jsonObject.getString(EFFECT_KEY);
+        algorithms = JSONSerializer.arrayListDeserialize(jsonObject.getString(ALGORITHM_KEY), SpecialEffectAlgorithm.class);
     }
 }

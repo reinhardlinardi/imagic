@@ -1,22 +1,22 @@
 [
   {
-    "effectName" : "Smoothing",
+    "effect" : "Smoothing",
     "algorithms" :
     [
       {
-        "algorithmName" : "Median"
+        "algorithm" : "Median"
       }
     ]
   },
   {
-    "effectName" : "Sharpen",
+    "effect" : "Sharpen",
     "algorithms" :
     [
       {
-        "algorithmName" : "Difference"
+        "algorithm" : "Difference"
       },
       {
-        "algorithmName" : "Homogeneous"
+        "algorithm" : "Homogeneous"
       }
     ]
   }

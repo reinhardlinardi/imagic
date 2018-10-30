@@ -220,7 +220,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 TextView textView = (TextView) view;
 
                 algorithmSpinner.setAdapter(algorithmAdapters.get(position));
-                if(textView != null) textView.setText(effect.effectName);
+                if(textView != null) textView.setText(effect.effect);
             }
 
             @Override
@@ -236,7 +236,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 SpecialEffectAlgorithm algorithm = (SpecialEffectAlgorithm) adapterView.getItemAtPosition(position);
                 TextView textView = (TextView) view;
 
-                if(textView != null) textView.setText(algorithm.algorithmName);
+                if(textView != null) textView.setText(algorithm.algorithm);
             }
 
             @Override
@@ -284,7 +284,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
             TextView optionTextView = optionView.findViewById(R.id.specialEffectEffectSpinnerOptionTextView);
             SpecialEffect effect = getItem(position);
 
-            if(effect != null) optionTextView.setText(effect.effectName);
+            if(effect != null) optionTextView.setText(effect.effect);
             return optionView;
         }
 
@@ -312,7 +312,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
             TextView optionTextView = optionView.findViewById(R.id.specialEffectAlgorithmSpinnerOptionTextView);
             SpecialEffectAlgorithm algorithm = getItem(position);
 
-            if(algorithm != null) optionTextView.setText(algorithm.algorithmName);
+            if(algorithm != null) optionTextView.setText(algorithm.algorithm);
             return optionView;
         }
 
