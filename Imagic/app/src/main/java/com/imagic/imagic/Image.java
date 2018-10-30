@@ -10,7 +10,9 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * A class representing an image.
@@ -20,6 +22,16 @@ class Image {
     /* Constants */
     static final String MIME_TYPE = "image/*";
     private static final int LOLLIPOP_SDK_INT = 24;
+
+    /* Filter Code */
+    private static final int MEDIAN = 0;
+    private static final int DIFFERENCE = 1;
+    private static final int HOMOGENOUS_DIFFERENCE = 2;
+    private static final int MEAN_BLUR = 3;
+    private static final int SOBEL = 4;
+    private static final int PREWITT = 5;
+    private static final int ROBERT = 6;
+    private static final int FREI_CHEN = 7;
 
     /* Properties */
     Bitmap bitmap;
@@ -145,5 +157,123 @@ class Image {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
         }
+    }
+
+    void convoluteBitmap(int operatorCode) {
+        // original image size
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        // padding (image size = (height + 2) * (width + 2)
+        int[][] imageBitmap = new int[height + 2][width + 2];
+        int[][] observedPointsRed = new int[3][3];
+        int[][] observedPointsGreen = new int[3][3];
+        int[][] observedPointsBlue = new int[3][3];
+
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                imageBitmap[row + 1][col + 1] = pixels[row * width + col];
+            }
+        }
+
+        // convolution
+        for(int row = 1; row < height + 1; row++) {
+            for(int col = 1; col < width + 1; col++) {
+                for(int i = 0; i < 3; i++) {
+                    for(int j = 0; j < 3; j++) {
+                        observedPointsRed[i][j] = Color.red(imageBitmap[row - 1 + i][col - 1 + j]);
+                        observedPointsGreen[i][j] = Color.green(imageBitmap[row - 1 + i][col - 1 + j]);
+                        observedPointsBlue[i][j] = Color.blue(imageBitmap[row - 1 + i][col - 1 + j]);
+                    }
+                }
+                // update pixel value
+                pixels[(row - 1) * width + (col - 1)] = Color.rgb(computeNewColorValue(observedPointsRed, operatorCode),
+                        computeNewColorValue(observedPointsGreen, operatorCode),
+                        computeNewColorValue(observedPointsBlue, operatorCode));
+            }
+        }
+
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+    }
+
+    int computeNewColorValue(int[][] observedPoints, int operatorCode) {
+        int result = 0;
+        if (operatorCode == MEDIAN) {
+            ArrayList<Integer> valueList = new ArrayList<>();
+            for(int i = 0; i < observedPoints.length; i++) {
+                for(int j = 0; j < observedPoints[0].length; j++) {
+                    valueList.add(observedPoints[i][j]);
+                }
+            }
+            Collections.sort(valueList);
+            if(valueList.size() % 2 == 0) {
+                result = (valueList.get(valueList.size() / 2 - 1) + valueList.get(valueList.size() / 2)) / 2;
+            } else {
+                result = valueList.get(valueList.size() / 2);
+            }
+        } else if (operatorCode == DIFFERENCE) {
+            int max = -1;
+            int j = observedPoints[0].length - 1;
+            for(int i = 0; i < observedPoints[0].length; i++) {
+                int diff = Math.abs(observedPoints[0][i] - observedPoints[observedPoints.length - 1][j]);
+                if (diff > max) {
+                    max = diff;
+                }
+                j--;
+            }
+
+            j = observedPoints.length - 1;
+            for(int i = 0; i < observedPoints.length; i++) {
+                int diff = Math.abs(observedPoints[i][0] - observedPoints[j][observedPoints[0].length - 1]);
+                if (diff > max) {
+                    max = diff;
+                }
+                j--;
+            }
+
+            result = max;
+        } else if (operatorCode == HOMOGENOUS_DIFFERENCE) {
+            // observedPoints dimention must be odd num x odd num
+            int center = observedPoints[observedPoints.length / 2][observedPoints[0].length / 2];
+
+            int max = -1;
+            for(int i = 0; i < observedPoints[0].length; i++) {
+                int diff = Math.abs(observedPoints[0][i] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+
+                diff = Math.abs(observedPoints[observedPoints.length - 1][i] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+            }
+
+            for(int i = 0; i < observedPoints.length; i++) {
+                int diff = Math.abs(observedPoints[i][0] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+
+                diff = Math.abs(observedPoints[i][observedPoints[0].length - 1] - center);
+                if (diff > max) {
+                    max = diff;
+                }
+            }
+
+            result = max;
+        }
+
+        if (result < 0) {
+            result = 0;
+        } else if (result > 255) {
+            result = 255;
+        }
+
+        return result;
     }
 }
