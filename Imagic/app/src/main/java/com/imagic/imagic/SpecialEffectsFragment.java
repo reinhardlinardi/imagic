@@ -253,10 +253,9 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                     if(activity.hasImage()) {
                         image = new Image(getContext(), activity.getImage());
                         rgb = new RGBHistogram(activity.getRGBHistogram());
-                        /*
-                        ContrastEnhancementAsyncTask contrastEnhancementAsyncTask = new ContrastEnhancementAsyncTask();
-                        contrastEnhancementAsyncTask.execute();
-                        */
+
+                        ConvolutionAsyncTask convolutionAsyncTask = new ConvolutionAsyncTask();
+                        convolutionAsyncTask.execute();
                     }
                 }
             }
@@ -408,21 +407,17 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
         }
     }
 
-    /*
-    // Contrast enhancement async task
-    private class ContrastEnhancementAsyncTask extends AsyncTask<Void, Integer, Void> {
+    // Image convolution async task
+    private class ConvolutionAsyncTask extends AsyncTask<Void, Integer, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
             if(isAttachedToMainActivity()) {
-                String algorithm = ((ContrastEnhancementAlgorithm) spinner.getSelectedItem()).algorithmName;
-                publishProgress(countProgress(1, 3));
+                String algorithm = ((SpecialEffectAlgorithm) algorithmSpinner.getSelectedItem()).algorithm;
+                publishProgress(countProgress(1, 2));
 
-                int[][] mapping = rgb.stretchHistogram(algorithm, (double)redPercentage/100, (double)greenPercentage/100, (double)bluePercentage/100);
-                publishProgress(countProgress(2,3));
-
-                image.updateBitmapByColorMapping(mapping[0], mapping[1], mapping[2]);
-                publishProgress(countProgress(3, 3));
+                image.convoluteBitmap(algorithm);
+                publishProgress(countProgress(2,2));
             }
 
             return null;
@@ -435,12 +430,9 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 UI.disable(resetButton);
                 UI.disable(applyButton);
 
-                UI.disable(redSeekBar);
-                UI.disable(greenSeekBar);
-                UI.disable(blueSeekBar);
-
-                UI.disable(spinnerContainer);
-                UI.disable(enhanceButton);
+                UI.disable(effectSpinnerContainer);
+                UI.disable(algorithmSpinnerContainer);
+                UI.disable(applyEffectButton);
 
                 progressBar.setProgress(0);
                 UI.show(progressBar);
@@ -456,23 +448,16 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 UI.setImageView(getContext(), transformedImageView, image.bitmap);
                 UI.clearMemory(getContext());
 
-                UI.setGraphView(transformedRedGraphView, rgb.red.getBarGraphSeries());
-                UI.setGraphView(transformedGreenGraphView, rgb.green.getBarGraphSeries());
-                UI.setGraphView(transformedBlueGraphView, rgb.blue.getBarGraphSeries());
-
                 UI.setInvisible(progressBar);
                 UI.setClickable(imageView);
                 UI.enable(resetButton);
                 UI.enable(applyButton);
 
-                UI.enable(redSeekBar);
-                UI.enable(greenSeekBar);
-                UI.enable(blueSeekBar);
-
-                UI.enable(spinnerContainer);
-                UI.enable(enhanceButton);
+                UI.enable(effectSpinnerContainer);
+                UI.enable(algorithmSpinnerContainer);
+                UI.enable(applyEffectButton);
             }
         }
     }
-    */
+
 }
