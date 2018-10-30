@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -159,7 +160,10 @@ class Image {
         }
     }
 
-    void convoluteBitmap(int operatorCode) {
+    void convoluteBitmap(String operatorStringCode) {
+        //map operatorStringCode to operatorCode
+        int operatorCode = mapOperatorCode(operatorStringCode);
+        Log.d("operator", Integer.toString(operatorCode));
         // original image size
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -168,6 +172,7 @@ class Image {
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
         // padding (image size = (height + 2) * (width + 2)
+        // TODO Change to better padding method
         int[][] imageBitmap = new int[height + 2][width + 2];
         int[][] observedPointsRed = new int[3][3];
         int[][] observedPointsGreen = new int[3][3];
@@ -193,6 +198,7 @@ class Image {
                 pixels[(row - 1) * width + (col - 1)] = Color.rgb(computeNewColorValue(observedPointsRed, operatorCode),
                         computeNewColorValue(observedPointsGreen, operatorCode),
                         computeNewColorValue(observedPointsBlue, operatorCode));
+//                Log.d("pixel", Integer.toString(Color.red(pixels[(row - 1) * width + (col - 1)])));
             }
         }
 
@@ -275,5 +281,38 @@ class Image {
         }
 
         return result;
+    }
+
+    int mapOperatorCode(String operatorStringCode) {
+        int operatorCode = 0;
+        switch(operatorStringCode) {
+            case "Median":
+                operatorCode = MEDIAN;
+                break;
+            case "Blur (Mean)":
+                operatorCode = MEAN_BLUR;
+                break;
+            case "Difference":
+                operatorCode = DIFFERENCE;
+                break;
+            case "Homogeneous":
+                operatorCode = HOMOGENOUS_DIFFERENCE;
+                break;
+            case "Sobel":
+                operatorCode = SOBEL;
+                break;
+            case "Prewitt":
+                operatorCode = PREWITT;
+                break;
+            case "Robert":
+                operatorCode = ROBERT;
+                break;
+            case "Frei-Chen":
+                operatorCode = FREI_CHEN;
+                break;
+            default:
+                break;
+        }
+        return operatorCode;
     }
 }
