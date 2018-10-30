@@ -5,11 +5,14 @@
     [
       {
         "algorithm" : "Median"
+      },
+      {
+        "algorithm" : "Blur (Mean)"
       }
     ]
   },
   {
-    "effect" : "Sharpen",
+    "effect" : "Gradient",
     "algorithms" :
     [
       {
@@ -17,6 +20,18 @@
       },
       {
         "algorithm" : "Homogeneous"
+      },
+      {
+        "algorithm" : "Sobel"
+      },
+      {
+        "algorithm" : "Prewitt"
+      },
+      {
+        "algorithm" : "Robert"
+      },
+      {
+        "algorithm" : "Frei-Chen"
       }
     ]
   }
