@@ -163,7 +163,6 @@ class Image {
     void convoluteBitmap(String operatorStringCode) {
         //map operatorStringCode to operatorCode
         int operatorCode = mapOperatorCode(operatorStringCode);
-        Log.d("operator", Integer.toString(operatorCode));
         // original image size
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -198,7 +197,6 @@ class Image {
                 pixels[(row - 1) * width + (col - 1)] = Color.rgb(computeNewColorValue(observedPointsRed, operatorCode),
                         computeNewColorValue(observedPointsGreen, operatorCode),
                         computeNewColorValue(observedPointsBlue, operatorCode));
-//                Log.d("pixel", Integer.toString(Color.red(pixels[(row - 1) * width + (col - 1)])));
             }
         }
 
