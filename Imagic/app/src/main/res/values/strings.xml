@@ -34,4 +34,8 @@
     <string name="frequency_seek_bar_text">Frequency</string>
     <string name="seek_bar_100_text">100</string>
     <string name="apply_effect_button_text">Apply Effect</string>
+    <string name="analyze_button_text">Analyze</string>
+    <string name="ocr_seek_bar_text">Black Threshold</string>
+    <string name="threshold_less_equal_seek_bar_128_text">127 or lower</string>
+    <string name="result_text">Result :</string>
 </resources>

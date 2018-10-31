@@ -30,5 +30,7 @@
     <dimen name="graph_text_space_gap">10dp</dimen>
     <dimen name="special_effects_apply_button_space_gap">20dp</dimen>
     <dimen name="special_effects_spinners_space_gap">20dp</dimen>
-
+    <dimen name="ocr_spinner_analyze_button_space_gap">20dp</dimen>
+    <dimen name="ocr_result_space_gap">20dp</dimen>
+    <dimen name="ocr_result_text_view_space_gap">10dp</dimen>
 </resources>

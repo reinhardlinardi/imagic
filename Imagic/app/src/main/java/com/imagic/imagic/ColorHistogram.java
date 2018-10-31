@@ -94,7 +94,7 @@ class ColorHistogram extends Histogram {
         int min = getMinColorValue();
         int max = getMaxColorValue();
 
-        for(int val = min; val <= max; val++) mapping[val] = (int)((MAX_VALUE * (val - min) / (max - min)) * multiplier);
+        for(int val = min; val <= max; val++) mapping[val] = (int)(((double)MAX_VALUE * (val - min) / (max - min)) * multiplier);
         for(int idx = MIN_VALUE; idx <= MAX_VALUE; idx++) frequency[mapping[idx]] += getFrequency(idx);
 
         resetData();
