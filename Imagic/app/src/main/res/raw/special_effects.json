@@ -7,7 +7,7 @@
         "algorithm" : "Median"
       },
       {
-        "algorithm" : "Blur (Mean)"
+        "algorithm" : "Mean (Blur)"
       }
     ]
   },

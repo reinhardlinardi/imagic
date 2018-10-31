@@ -1,6 +1,6 @@
 [
   {
-    "method" : "Edge Detection"
+    "method" : "Edge (Number)"
   },
   {
     "method" : "Thinning"
