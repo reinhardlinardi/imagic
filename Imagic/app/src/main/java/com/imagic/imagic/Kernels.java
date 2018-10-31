@@ -94,4 +94,12 @@ public class Kernels {
                 {1, 1, 1}
             }
     };
+
+    public static double[][][] meanBlur = {
+            {
+                {1/9, 1/9, 1/9},
+                {1/9, 1/9, 1/9},
+                {1/9, 1/9, 1/9}
+            }
+    };
 }

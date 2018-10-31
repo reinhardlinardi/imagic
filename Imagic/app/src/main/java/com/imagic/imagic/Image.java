@@ -289,6 +289,10 @@ class Image {
                     kernelValueType = 1;
                     kernelDouble = Kernels.freiChen;
                     break;
+                case MEAN_BLUR:
+                    kernelValueType = 1;
+                    kernelDouble = Kernels.meanBlur;
+                    break;
                 default:
                     break;
             }
