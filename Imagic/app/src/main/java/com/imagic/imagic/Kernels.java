@@ -2,7 +2,7 @@ package com.imagic.imagic;
 
 public class Kernels {
     // 0: sobel Gx, 1: sobel Gy
-    int[][][] sobel = {
+    public static int[][][] sobel = {
             {
                 {1, 0, -1},
                 {2, 0, -2},
@@ -15,7 +15,7 @@ public class Kernels {
     };
 
     // 0: prewitt Gx, 1: prewitt Gy
-    int[][][] prewitt = {
+    public static int[][][] prewitt = {
             {
                 {1, 0, -1},
                 {1, 0, -1},
@@ -29,7 +29,7 @@ public class Kernels {
     };
 
     // 0: robert Gx, 1: robert Gy
-    int[][][] robert = {
+    public static int[][][] robert = {
             {
                 {1, 0},
                 {0, -1}
@@ -40,11 +40,11 @@ public class Kernels {
             }
     };
 
-    double[][][] freiChen = {
+    public static double[][][] freiChen = {
             /* EDGE SUBSPACE */
             // isotropic average gradient
             {
-                {1, Math.sqrt(2), -1},
+                {1, Math.sqrt(2), 1},
                 {0, 0, 0},
                 {-1, -Math.sqrt(2), -1}
             },
