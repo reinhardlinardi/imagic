@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class OCRFragment extends Fragment implements MainActivityListener {
 
@@ -85,11 +88,10 @@ public class OCRFragment extends Fragment implements MainActivityListener {
             resetSeekBar();
             thresholdSeekBar.setOnSeekBarChangeListener(getSeekBarOnChangeListener(thresholdTextView));
 
-            /*
             try {
-                String algorithmsJSON = TextFile.readRawResourceFile(getContext(), R.raw.contrast_enhancement_algorithms);
-                ArrayList<ContrastEnhancementAlgorithm> algorithms = JSONSerializer.arrayListDeserialize(algorithmsJSON, ContrastEnhancementAlgorithm.class);
-                AlgorithmSpinnerAdapter adapter = new AlgorithmSpinnerAdapter(algorithms);
+                String methodsJSON = TextFile.readRawResourceFile(getContext(), R.raw.ocr_methods);
+                ArrayList<OCRMethod> methods = JSONSerializer.arrayListDeserialize(methodsJSON, OCRMethod.class);
+                MethodSpinnerAdapter adapter = new MethodSpinnerAdapter(methods);
 
                 spinnerContainer = view.findViewById(R.id.ocrSpinnerContainer);
                 spinner = view.findViewById(R.id.ocrSpinner);
@@ -99,7 +101,7 @@ public class OCRFragment extends Fragment implements MainActivityListener {
             catch(Exception e) {
                 Debug.ex(e);
             }
-            */
+
             analyzeButton = view.findViewById(R.id.ocrAnalyzeButton);
             analyzeButton.setOnClickListener(getAnalyzeButtonOnClickListener());
 
@@ -230,12 +232,11 @@ public class OCRFragment extends Fragment implements MainActivityListener {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                /*
-                ContrastEnhancementAlgorithm algorithm = (ContrastEnhancementAlgorithm) adapterView.getItemAtPosition(position);
+
+                OCRMethod method = (OCRMethod) adapterView.getItemAtPosition(position);
                 TextView textView = (TextView) view;
 
-                if(textView != null) textView.setText(algorithm.algorithm);
-                */
+                if(textView != null) textView.setText(method.method);
             }
 
             @Override
@@ -264,33 +265,33 @@ public class OCRFragment extends Fragment implements MainActivityListener {
 
     /* Adapters */
 
-    // Contrast enhancement spinner adapter
-    //private class AlgorithmSpinnerAdapter extends ArrayAdapter<ContrastEnhancementAlgorithm> {
+    // OCR spinner adapter
+    private class MethodSpinnerAdapter extends ArrayAdapter<OCRMethod> {
 
         /* Methods */
 
         // Constructor
-        //AlgorithmSpinnerAdapter(ArrayList<ContrastEnhancementAlgorithm> algorithms) {
-        //    super(ContrastEnhancementFragment.this.getContext(), R.layout.contrast_enhancement_spinner_option, algorithms);
-        //}
+        MethodSpinnerAdapter(ArrayList<OCRMethod> methods) {
+            super(OCRFragment.this.getContext(), R.layout.ocr_spinner_option, methods);
+        }
 
         // Get view
-        //@Override
-        //public View getView(int position, View view, ViewGroup parent) {
-        //    LayoutInflater inflater = ContrastEnhancementFragment.this.getActivity().getLayoutInflater();
-        //    View optionView = inflater.inflate(R.layout.contrast_enhancement_spinner_option, parent, false);
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            LayoutInflater inflater = OCRFragment.this.getActivity().getLayoutInflater();
+            View optionView = inflater.inflate(R.layout.ocr_spinner_option, parent, false);
 
-        //    TextView optionTextView = optionView.findViewById(R.id.ocrSpinnerOptionTextView);
-        //    ContrastEnhancementAlgorithm algorithm = getItem(position);
+            TextView optionTextView = optionView.findViewById(R.id.ocrSpinnerOptionTextView);
+            OCRMethod method = getItem(position);
 
-        //    if(algorithm != null) optionTextView.setText(algorithm.algorithm);
-        //    return optionView;
-        //}
+            if(method != null) optionTextView.setText(method.method);
+            return optionView;
+        }
 
         // Get dropdown view
-        //@Override
-        //public View getDropDownView(int position, View view, ViewGroup parent) { return getView(position, view, parent); }
-    //}
+        @Override
+        public View getDropDownView(int position, View view, ViewGroup parent) { return getView(position, view, parent); }
+    }
 
     /* Methods */
 

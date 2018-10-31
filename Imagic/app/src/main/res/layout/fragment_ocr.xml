@@ -143,7 +143,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="6"
-                        android:max="254"
+                        android:max="253"
                         android:progress="127" />
 
                     <TextView

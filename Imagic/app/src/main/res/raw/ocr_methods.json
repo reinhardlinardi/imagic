@@ -1,0 +1,8 @@
+[
+  {
+    "method" : "Edge Detection"
+  },
+  {
+    "method" : "Thinning"
+  }
+]
