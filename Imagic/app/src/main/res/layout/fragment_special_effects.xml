@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SpecialEffectsFragment">
+
+    <ProgressBar
+        android:id="@+id/specialEffectsProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:maxHeight="@dimen/progress_bar_max_height"
+        android:minHeight="@dimen/progress_bar_min_height"
+        android:progress="0"
+        android:visibility="invisible" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/scrollable_linear_layout_bottom_padding"
+            android:paddingEnd="@dimen/scrollable_linear_layout_side_padding"
+            android:paddingStart="@dimen/scrollable_linear_layout_side_padding"
+            android:paddingTop="@dimen/scrollable_linear_layout_top_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <ImageView
+                    android:id="@+id/specialEffectsImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/image_view_layout_height"
+                    android:layout_marginEnd="@dimen/double_image_view_side_margin"
+                    android:layout_marginStart="@dimen/double_image_view_side_margin"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/special_effects_image_view_content_description"
+                    android:src="@drawable/ic_mountain" />
+
+                <ImageView
+                    android:id="@+id/specialEffectsTransformedImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/image_view_layout_height"
+                    android:layout_marginEnd="@dimen/double_image_view_side_margin"
+                    android:layout_marginStart="@dimen/double_image_view_side_margin"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/special_effects_transformed_image_view_content_description"
+                    android:src="@drawable/ic_mountain"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/specialEffectsHelpTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/help_text" />
+
+            <LinearLayout
+                android:id="@+id/specialEffectsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <Button
+                        android:id="@+id/specialEffectsResetButton"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
+                        android:layout_marginStart="@dimen/reset_apply_button_side_margin"
+                        android:layout_weight="1"
+                        android:background="@drawable/reset_button"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                        android:paddingStart="@dimen/reset_apply_button_side_padding"
+                        android:text="@string/reset_button_text"
+                        android:textColor="@android:color/white" />
+
+                    <Button
+                        android:id="@+id/specialEffectsApplyButton"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
+                        android:layout_marginStart="@dimen/reset_apply_button_side_margin"
+                        android:layout_weight="1"
+                        android:background="@drawable/apply_button"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                        android:paddingStart="@dimen/reset_apply_button_side_padding"
+                        android:text="@string/apply_button_text"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/special_effects_spinners_space_gap" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <RelativeLayout
+                        android:id="@+id/specialEffectsEffectSpinnerContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spinner_relative_layout_action_button_side_margin"
+                        android:layout_marginStart="@dimen/spinner_relative_layout_action_button_side_margin"
+                        android:layout_weight="1"
+                        android:background="@drawable/spinner">
+
+                        <Spinner
+                            android:id="@+id/specialEffectsEffectSpinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:popupBackground="@android:color/holo_orange_dark" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="@dimen/arrow_down_float_side_margin"
+                            android:layout_marginStart="@dimen/arrow_down_float_side_margin"
+                            android:contentDescription="@string/spinner_down_arrow_content_description"
+                            android:src="@drawable/ic_down_arrow" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/specialEffectsAlgorithmSpinnerContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/spinner_relative_layout_action_button_side_margin"
+                        android:layout_marginStart="@dimen/spinner_relative_layout_action_button_side_margin"
+                        android:layout_weight="1"
+                        android:background="@drawable/secondary_spinner">
+
+                        <Spinner
+                            android:id="@+id/specialEffectsAlgorithmSpinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:popupBackground="@android:color/holo_blue_light" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="@dimen/arrow_down_float_side_margin"
+                            android:layout_marginStart="@dimen/arrow_down_float_side_margin"
+                            android:contentDescription="@string/spinner_down_arrow_content_description"
+                            android:src="@drawable/ic_down_arrow" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/special_effects_apply_button_space_gap" />
+
+                <Button
+                    android:id="@+id/specialEffectsApplyEffectButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/spinner_relative_layout_action_button_side_margin"
+                    android:layout_marginStart="@dimen/spinner_relative_layout_action_button_side_margin"
+                    android:background="@drawable/primary_action_button"
+                    android:text="@string/apply_effect_button_text"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

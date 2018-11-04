@@ -1,0 +1,38 @@
+[
+  {
+    "effect" : "Smoothing",
+    "algorithms" :
+    [
+      {
+        "algorithm" : "Median"
+      },
+      {
+        "algorithm" : "Mean (Blur)"
+      }
+    ]
+  },
+  {
+    "effect" : "Gradient",
+    "algorithms" :
+    [
+      {
+        "algorithm" : "Difference"
+      },
+      {
+        "algorithm" : "Homogeneous"
+      },
+      {
+        "algorithm" : "Sobel"
+      },
+      {
+        "algorithm" : "Prewitt"
+      },
+      {
+        "algorithm" : "Robert"
+      },
+      {
+        "algorithm" : "Frei-Chen"
+      }
+    ]
+  }
+]

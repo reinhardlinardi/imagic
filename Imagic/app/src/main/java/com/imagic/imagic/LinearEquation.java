@@ -1,62 +1,58 @@
 package com.imagic.imagic;
 
+/**
+ * A class representing linear equation.
+ */
 class LinearEquation {
 
-    // Properties
+    /* Properties */
 
-    // Number of unknowns
+    // Number of unknown variables
     int degree;
 
-    // Initial coefficients, right hand side, and result value
+    // Coefficients and constants
     double[][] coefficients;
-    double[] rightHandSide;
-    double[] result;
-    double equationConstant;
+    double[] constants;
+
+    /* Methods */
 
     // Constructor
-    LinearEquation(int degree, double constant) {
+    LinearEquation(int degree) {
         this.degree = degree;
-        result = new double[degree];
-        this.equationConstant = constant;
+
+        coefficients = new double[degree][];
+        for(int row = 0; row < degree; row++) coefficients[row] = new double[degree];
+
+        constants = new double[degree];
     }
 
-    // Set coefficients
-    void setCoefficients(double[][] coefficients) { this.coefficients = coefficients; }
-
-    // Set right hand side
-    void setRightHandSide(double[] rightHandSide) { this.rightHandSide = rightHandSide; }
+    // Divide row
+    private void divideRow(int row, double divisor) {
+        for(int col = 0; col < degree; col++) coefficients[row][col] /= divisor;
+        constants[row] /= divisor;
+    }
 
     // Subtract row
-    private void rowSubtract(int targetRowIdx, int withRowIdx, double multiplier) {
-        for(int col = 0; col < degree; col++) coefficients[targetRowIdx][col] -= coefficients[withRowIdx][col] * multiplier;
-        rightHandSide[targetRowIdx] -= rightHandSide[withRowIdx] * multiplier;
+    private void subtractRow(int row, int subtrahendRow, double multiplier) {
+        for(int col = 0; col < degree; col++) coefficients[row][col] -= coefficients[subtrahendRow][col] * multiplier;
+        constants[row] -= constants[subtrahendRow] * multiplier;
     }
 
-    // Divide entire row
-    private void rowDivide(int targetRowIdx, double divideWith) {
-        for(int col = 0; col < degree; col++) coefficients[targetRowIdx][col] /= divideWith;
-        rightHandSide[targetRowIdx] /= divideWith;
-    }
-
-    // Solve equation using Gauss-Jordan elimination
-    void solve() {
+    // Solve equation using Gauss-Jordan elimination (reduced row echelon form)
+    double[] solve() {
         for(int col = 0; col < degree; col++) {
-            rowDivide(col, coefficients[col][col]);
-            for(int row = col + 1; row < degree; row++) rowSubtract(row, col, coefficients[row][col] / coefficients[col][col]);
+            divideRow(col, coefficients[col][col]);
+            for(int row = col + 1; row < degree; row++) subtractRow(row, col, coefficients[row][col] / coefficients[col][col]);
         }
 
         for(int col = degree - 1; col >= 1; col--) {
-            for(int row = col - 1; row >= 0; row--) rowSubtract(row, col, coefficients[row][col] / coefficients[col][col]);
+            for(int row = col - 1; row >= 0; row--) subtractRow(row, col, coefficients[row][col] / coefficients[col][col]);
         }
 
-        for(int row = 0; row < degree; row++) result[row] = Math.round(rightHandSide[row] * 1e8) / 1e8;
+        double[] result = new double[degree];
+
+        for(int row = 0; row < degree; row++) result[row] = Math.round(constants[row] * 1e8) / 1e8;
+        return result;
     }
 
-    // Compute equation
-    double compute(int x) {
-        double total = 0;
-        for(int power = degree; power > 0; power--) total += result[degree - power] * Math.pow(x, power);
-
-        return total + equationConstant;
-    }
 }

@@ -1,22 +1,22 @@
 [
   {
-    "title" : "Histogram",
-    "description" : "Create RGB and Grayscale histogram",
-    "activityOnClick" : "Histogram"
+    "menuName" : "Histogram",
+    "fragmentClassName" : "Histogram"
   },
   {
-    "title" : "Contrast Enhancement",
-    "description" : "Enhance contrast using various histogram equalization algorithms",
-    "activityOnClick" : "ContrastEnhancement"
+    "menuName" : "Contrast Enhancement",
+    "fragmentClassName" : "ContrastEnhancement"
   },
   {
-    "title" : "Equalizer",
-    "description" : "Transform your image by creating your own histogram",
-    "activityOnClick" : "Equalizer"
+    "menuName" : "Equalizer",
+    "fragmentClassName" : "Equalizer"
   },
   {
-    "title" : "OCR",
-    "description" : "Optical character recognition for single digit number",
-    "activityOnClick" : "NumberOCR"
+    "menuName" : "OCR",
+    "fragmentClassName" : "OCR"
+  },
+  {
+    "menuName" : "Special Effects",
+    "fragmentClassName" : "SpecialEffects"
   }
 ]

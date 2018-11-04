@@ -1,60 +1,75 @@
 package com.imagic.imagic;
 
-import android.content.Context;
+/**
+ * A class representing RGB histogram by grouping one RedHistogram, one GreenHistogram, and one BlueHistogram.
+ * An image is consisted of RGB components, so any operation on one component is very likely to be applied to the others.
+ * By providing operations to all RGB components, this class will prevent loops for any RGB operation later.
+ */
+class RGBHistogram {
 
-import org.json.JSONObject;
+    /* Properties */
 
-class RGBHistogram implements JSONSerializable {
+    RedHistogram red;
+    GreenHistogram green;
+    BlueHistogram blue;
 
-    // Properties
-    protected RedHistogram red;
-    protected GreenHistogram green;
-    protected BlueHistogram blue;
+    /* Methods */
 
     // Constructor
-    RGBHistogram() { resetHistogram(); }
+    RGBHistogram() { resetData(); }
 
     RGBHistogram(RGBHistogram rgbHistogram) {
+        resetData();
+
         red = new RedHistogram(rgbHistogram.red);
         green = new GreenHistogram(rgbHistogram.green);
         blue = new BlueHistogram(rgbHistogram.blue);
     }
 
-    @Override
-    public String jsonSerialize() throws Exception {
-        JSONObject RGBHistogramJSON = new JSONObject();
+    // Check if all histogram has data
+    boolean allHasData() { return !(red.isEmpty() || green.isEmpty() || blue.isEmpty()); }
 
-        RGBHistogramJSON.put("red", new JSONObject(red.jsonSerialize()));
-        RGBHistogramJSON.put("green", new JSONObject(green.jsonSerialize()));
-        RGBHistogramJSON.put("blue", new JSONObject(blue.jsonSerialize()));
-
-        return RGBHistogramJSON.toString();
-    }
-
-    @Override
-    public void jsonDeserialize(Context context, String json) throws Exception {
-        resetHistogram();
-        JSONObject RGBHistogramJSON = new JSONObject(json);
-
-        red.jsonDeserialize(context, RGBHistogramJSON.getJSONObject("red").toString());
-        green.jsonDeserialize(context, RGBHistogramJSON.getJSONObject("green").toString());
-        blue.jsonDeserialize(context, RGBHistogramJSON.getJSONObject("blue").toString());
-    }
-
-    // Enable value dependent color for all histogram
-    void enableValueDependentColor() {
-        red.enableValueDependentColor();
-        green.enableValueDependentColor();
-        blue.enableValueDependentColor();
-    }
-
-    // Is histogram data empty
-    boolean isDataEmpty() { return red.isDataEmpty() || green.isDataEmpty() || blue.isDataEmpty(); }
-
-    // Reset histogram
-    void resetHistogram() {
+    // Reset all histogram data
+    void resetData() {
         red = new RedHistogram();
         green = new GreenHistogram();
         blue = new BlueHistogram();
+    }
+
+    // Stretch histogram, return all mapping
+    int[][] stretchHistogram(String algorithm, double redMultiplier, double greenMultiplier, double blueMultiplier) {
+        int[][] mapping = new int[3][];
+
+        if(allHasData()) {
+            switch(algorithm) {
+                case "Linear":
+                    mapping[0] = red.linearStretch(redMultiplier);
+                    mapping[1] = green.linearStretch(greenMultiplier);
+                    mapping[2] = blue.linearStretch(blueMultiplier);
+                case "CDF":
+                    mapping[0] = red.cdfStretch(redMultiplier);
+                    mapping[1] = green.cdfStretch(greenMultiplier);
+                    mapping[2] = blue.cdfStretch(blueMultiplier);
+                case "Logarithmic":
+                    mapping[0] = red.logarithmicStretch(redMultiplier);
+                    mapping[1] = green.logarithmicStretch(greenMultiplier);
+                    mapping[2] = blue.logarithmicStretch(blueMultiplier);
+                default:
+                    break;
+            }
+        }
+
+        return mapping;
+    }
+
+    // Histogram matching, return all mapping
+    int[][] matchHistogram(double[] cdf) {
+        int[][] mapping = new int[3][];
+
+        mapping[0] = red.match(cdf);
+        mapping[1] = green.match(cdf);
+        mapping[2] = blue.match(cdf);
+
+        return mapping;
     }
 }

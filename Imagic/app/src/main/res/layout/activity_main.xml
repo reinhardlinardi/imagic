@@ -1,79 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/masterLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="5"
-    tools:context="com.imagic.imagic.MainActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
 
-    <TextView
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/main_text_layout_height"
-        android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/main_above_picture_message"
-        android:textSize="@dimen/main_above_picture_text_size" />
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/appbar_padding_top"
+        android:theme="@style/ImagicTheme.AppBarOverlay">
 
-    <ImageView
-        android:id="@+id/welcomeImageView"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/main_image_layout_height"
-        android:layout_weight="1"
-        android:contentDescription="@string/welcome_image_description"
-        app:srcCompat="@drawable/ic_magic_wand_64" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/titleBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ImagicTheme.PopupOverlay"
+            app:title="@string/app_name">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/main_text_layout_height"
-        android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/main_below_picture_message"
-        android:textSize="18sp" />
+        </android.support.v7.widget.Toolbar>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/main_text_layout_height"
-        android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/welcome_message"
-        android:textSize="18sp" />
-
-    <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/main_linear_layout_height"
-        android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/selectImageButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/main_select_button_margin"
-            android:background="@android:color/holo_orange_light"
-            android:drawablePadding="@dimen/main_select_button_drawable_padding"
-            android:drawableStart="@drawable/ic_folder"
-            android:paddingLeft="@dimen/main_select_button_padding"
-            android:paddingRight="@dimen/main_select_button_padding"
-            android:text="@string/select_image_button_text"
-            android:textColor="@android:color/white" />
+            app:tabIndicatorColor="@android:color/holo_red_light"
+            app:tabMode="scrollable">
 
-        <Button
-            android:id="@+id/captureImageButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/main_capture_button_margin"
-            android:background="@android:color/holo_blue_dark"
-            android:drawablePadding="@dimen/main_capture_button_drawable_padding"
-            android:drawableStart="@drawable/ic_camera"
-            android:paddingLeft="@dimen/main_capture_button_padding"
-            android:paddingRight="@dimen/main_capture_button_padding"
-            android:text="@string/capture_image_button_text"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-</LinearLayout>
+            <android.support.design.widget.TabItem
+                android:id="@+id/histogramTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_histogram_32" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/contrastEnhancementTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_contrast_32" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/equalizerTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_equalizer_32" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/ocrTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_ocr_32" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/specialEffectsTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_wand_32" />
+
+        </android.support.design.widget.TabLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</android.support.design.widget.CoordinatorLayout>
