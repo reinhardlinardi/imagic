@@ -1,0 +1,11 @@
+[
+  {
+    "algorithm" : "Edge Detection"
+  },
+  {
+    "algorithm" : "Thinning (Number)"
+  },
+  {
+    "algorithm" : "Thinning"
+  }
+]
