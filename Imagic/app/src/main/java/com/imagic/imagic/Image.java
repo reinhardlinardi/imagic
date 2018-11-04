@@ -9,11 +9,13 @@ import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.WHITE;
 
 /**
  * A class representing an image.
@@ -108,6 +110,73 @@ class Image {
         return matrix;
     }
 
+    // Convert image to black and white
+    void convertToBlackAndWhite(int blackThreshold) {
+        if(hasBitmap()) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
+                    int grayscale = (Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3;
+
+                    pixels[row * width + col] = (grayscale <= blackThreshold)? BLACK : WHITE;
+                }
+            }
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
+    }
+
+    // Convert image to grayscale
+    void convertToGrayscale() {
+        if(hasBitmap()) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
+                    int grayscale = (Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3;
+
+                    pixels[row * width + col] = Color.rgb(grayscale, grayscale, grayscale);
+                }
+            }
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
+    }
+
+    // Update bitmap by color mapping
+    void updateBitmapByColorMapping(int[] redMapping, int[] greenMapping, int[] blueMapping) {
+        if(hasBitmap()) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
+                    pixels[row * width + col] = Color.rgb(redMapping[Color.red(pixel)], greenMapping[Color.green(pixel)], blueMapping[Color.blue(pixel)]);
+                }
+            }
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
+    }
+
     // Get histogram data by color type
     int[] generateHistogramDataByColorType(ColorType colorType) {
         if(hasBitmap()) {
@@ -137,27 +206,6 @@ class Image {
             return frequencyCount;
         }
         else return null;
-    }
-
-    // Update bitmap by color mapping
-    void updateBitmapByColorMapping(int[] redMapping, int[] greenMapping, int[] blueMapping) {
-        if(hasBitmap()) {
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-
-            int[] pixels = new int[width * height];
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-
-            for(int row = 0; row < height; row++) {
-                for(int col = 0; col < width; col++) {
-                    int pixel = pixels[row * width + col];
-                    pixels[row * width + col] = Color.rgb(redMapping[Color.red(pixel)], greenMapping[Color.green(pixel)], blueMapping[Color.blue(pixel)]);
-                }
-            }
-
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-        }
     }
 
     void convoluteBitmap(String operatorStringCode) {
