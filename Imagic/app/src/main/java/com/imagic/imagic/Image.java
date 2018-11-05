@@ -35,6 +35,10 @@ class Image {
     private static final int PREWITT = 5;
     private static final int ROBERT = 6;
     private static final int FREI_CHEN = 7;
+    private static final int CUSTOM_KERNEL = 8;
+
+    /* Custom kernel */
+    double[][][] customKernel;
 
     /* Properties */
     Bitmap bitmap;
@@ -299,6 +303,10 @@ class Image {
                     kernelValueType = 1;
                     kernelDouble = Kernels.meanBlur;
                     break;
+                case CUSTOM_KERNEL:
+                    kernelValueType = 1;
+                    kernelDouble = this.customKernel;
+                    break;
                 default:
                     break;
             }
@@ -343,6 +351,12 @@ class Image {
     // Apply special effect by convolution using specified algorithm
     void applySpecialEffect(String algorithm, double[][] customKernel) {
         if(hasBitmap()) {
+            // init custom kernel
+            this.customKernel = new double[1][3][3];
+            for(int row = 0; row < 3; row++) {
+                for(int col = 0; col < 3; col++) this.customKernel[0][row][col] = customKernel[row][col];
+            }
+
             ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
 
             int width = bitmap.getWidth();
@@ -350,11 +364,6 @@ class Image {
 
             int[] pixels = new int[width * height];
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-
-            // TODO REMOVE THIS -- TESTING ONLY
-            for(int row = 0; row < 3; row++) {
-                for(int col = 0; col < 3; col++) Debug.d("CustomKernel", "", customKernel[row][col]);
-            }
 
             // padding (image size = (height + 2) * (width + 2)
             // TODO Change to better padding method
