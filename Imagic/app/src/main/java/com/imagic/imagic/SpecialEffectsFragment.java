@@ -449,7 +449,13 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 String algorithm = ((SpecialEffectAlgorithm) algorithmSpinner.getSelectedItem()).algorithm;
                 publishProgress(countProgress(1, 2));
 
-                image.convoluteBitmap(algorithm);
+                double[][] kernelMatrix = new double[3][3];
+
+                for(int row = 0; row < 3; row++) {
+                    for(int col = 0; col < 3; col++) kernelMatrix[row][col] = Double.parseDouble(kernel[row][col].getText().toString());
+                }
+
+                image.applySpecialEffect(algorithm, kernelMatrix);
                 publishProgress(countProgress(2,2));
             }
 
@@ -492,5 +498,4 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
             }
         }
     }
-
 }

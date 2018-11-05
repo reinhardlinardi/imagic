@@ -208,53 +208,11 @@ class Image {
         else return null;
     }
 
-    void convoluteBitmap(String operatorStringCode) {
-        //map operatorStringCode to operatorCode
-        int operatorCode = mapOperatorCode(operatorStringCode);
-        // original image size
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        int[] pixels = new int[width * height];
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-
-        // padding (image size = (height + 2) * (width + 2)
-        // TODO Change to better padding method
-        int[][] imageBitmap = new int[height + 2][width + 2];
-        int[][] observedPointsRed = new int[3][3];
-        int[][] observedPointsGreen = new int[3][3];
-        int[][] observedPointsBlue = new int[3][3];
-
-        for(int row = 0; row < height; row++) {
-            for(int col = 0; col < width; col++) {
-                imageBitmap[row + 1][col + 1] = pixels[row * width + col];
-            }
-        }
-
-        // convolution
-        for(int row = 1; row < height + 1; row++) {
-            for(int col = 1; col < width + 1; col++) {
-                for(int i = 0; i < 3; i++) {
-                    for(int j = 0; j < 3; j++) {
-                        observedPointsRed[i][j] = Color.red(imageBitmap[row - 1 + i][col - 1 + j]);
-                        observedPointsGreen[i][j] = Color.green(imageBitmap[row - 1 + i][col - 1 + j]);
-                        observedPointsBlue[i][j] = Color.blue(imageBitmap[row - 1 + i][col - 1 + j]);
-                    }
-                }
-                // update pixel value
-                pixels[(row - 1) * width + (col - 1)] = Color.rgb(computeNewColorValue(observedPointsRed, operatorCode),
-                        computeNewColorValue(observedPointsGreen, operatorCode),
-                        computeNewColorValue(observedPointsBlue, operatorCode));
-            }
-        }
-
-        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-    }
-
-    int computeNewColorValue(int[][] observedPoints, int operatorCode) {
+    // Get color value after convolution
+    private int getConvolutedColor(int[][] observedPoints, ConvolutionOperator operator) {
         int result = 0;
-        if (operatorCode == MEDIAN) {
+
+        if (operator.value == MEDIAN) {
             ArrayList<Integer> valueList = new ArrayList<>();
             for(int i = 0; i < observedPoints.length; i++) {
                 for(int j = 0; j < observedPoints[0].length; j++) {
@@ -267,7 +225,7 @@ class Image {
             } else {
                 result = valueList.get(valueList.size() / 2);
             }
-        } else if (operatorCode == DIFFERENCE) {
+        } else if (operator.value == DIFFERENCE) {
             int max = -1;
             int j = observedPoints[0].length - 1;
             for(int i = 0; i < observedPoints[0].length; i++) {
@@ -288,7 +246,7 @@ class Image {
             }
 
             result = max;
-        } else if (operatorCode == HOMOGENOUS_DIFFERENCE) {
+        } else if (operator.value == HOMOGENOUS_DIFFERENCE) {
             // observedPoints dimention must be odd num x odd num
             int center = observedPoints[observedPoints.length / 2][observedPoints[0].length / 2];
 
@@ -323,7 +281,7 @@ class Image {
             double[][][] kernelDouble = new double[0][0][0];
             int kernelValueType = 0; // 0: Integer, 1: Double
 
-            switch(operatorCode) {
+            switch(operator.value) {
                 case SOBEL:
                     kernelInteger = Kernels.sobel;
                     break;
@@ -358,7 +316,7 @@ class Image {
                 }
                 result = (int) Math.sqrt((double) sumOfSquare);
             } else { // Double
-                int maxKernelIndex = (operatorCode == FREI_CHEN) ? 4 : kernelDouble.length;
+                int maxKernelIndex = (operator.value == FREI_CHEN) ? 4 : kernelDouble.length;
                 double sumOfSquare = 0;
                 for(int i = 0; i < maxKernelIndex; i++) {
                     double sum = 0;
@@ -382,36 +340,54 @@ class Image {
         return result;
     }
 
-    int mapOperatorCode(String operatorStringCode) {
-        int operatorCode = 0;
-        switch(operatorStringCode) {
-            case "Median":
-                operatorCode = MEDIAN;
-                break;
-            case "Blur (Mean)":
-                operatorCode = MEAN_BLUR;
-                break;
-            case "Difference":
-                operatorCode = DIFFERENCE;
-                break;
-            case "Homogeneous":
-                operatorCode = HOMOGENOUS_DIFFERENCE;
-                break;
-            case "Sobel":
-                operatorCode = SOBEL;
-                break;
-            case "Prewitt":
-                operatorCode = PREWITT;
-                break;
-            case "Robert":
-                operatorCode = ROBERT;
-                break;
-            case "Frei-Chen":
-                operatorCode = FREI_CHEN;
-                break;
-            default:
-                break;
+    // Apply special effect by convolution using specified algorithm
+    void applySpecialEffect(String algorithm, double[][] customKernel) {
+        if(hasBitmap()) {
+            ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
+
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            // TODO REMOVE THIS -- TESTING ONLY
+            for(int row = 0; row < 3; row++) {
+                for(int col = 0; col < 3; col++) Debug.d("CustomKernel", "", customKernel[row][col]);
+            }
+
+            // padding (image size = (height + 2) * (width + 2)
+            // TODO Change to better padding method
+            int[][] imageBitmap = new int[height + 2][width + 2];
+            int[][] observedPointsRed = new int[3][3];
+            int[][] observedPointsGreen = new int[3][3];
+            int[][] observedPointsBlue = new int[3][3];
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    imageBitmap[row + 1][col + 1] = pixels[row * width + col];
+                }
+            }
+
+            // convolution
+            for(int row = 1; row < height + 1; row++) {
+                for(int col = 1; col < width + 1; col++) {
+                    for(int i = 0; i < 3; i++) {
+                        for(int j = 0; j < 3; j++) {
+                            observedPointsRed[i][j] = Color.red(imageBitmap[row - 1 + i][col - 1 + j]);
+                            observedPointsGreen[i][j] = Color.green(imageBitmap[row - 1 + i][col - 1 + j]);
+                            observedPointsBlue[i][j] = Color.blue(imageBitmap[row - 1 + i][col - 1 + j]);
+                        }
+                    }
+                    // update pixel value
+                    pixels[(row - 1) * width + (col - 1)] = Color.rgb(getConvolutedColor(observedPointsRed, operator),
+                            getConvolutedColor(observedPointsGreen, operator),
+                            getConvolutedColor(observedPointsBlue, operator));
+                }
+            }
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
         }
-        return operatorCode;
     }
 }

@@ -227,7 +227,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
 
@@ -237,7 +237,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
 
@@ -247,7 +247,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
                     </LinearLayout>
@@ -265,7 +265,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
 
@@ -275,7 +275,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
 
@@ -285,7 +285,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
                     </LinearLayout>
@@ -303,7 +303,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
 
@@ -313,7 +313,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
 
@@ -323,7 +323,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:inputType="numberSigned"
+                            android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             android:text="@string/edit_text_1_text" />
                     </LinearLayout>
