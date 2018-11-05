@@ -458,7 +458,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 image.convertToGrayscale();
                 publishProgress(countProgress(2,3));
 
-                image.applySpecialEffect(algorithm, kernelMatrix);
+                image.applySpecialEffect(getContext(), algorithm, kernelMatrix);
                 publishProgress(countProgress(3,3));
             }
 

@@ -1,7 +1,7 @@
 package com.imagic.imagic;
 
 /**
- * An enum representing convolution operator/
+ * An enum representing convolution operator.
  */
 enum ConvolutionOperator {
 

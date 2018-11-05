@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements FragmentListener,
             final String packageDelimiter = ".";
             final String fragmentClassSuffix = "Fragment";
 
-            final String fragmentClassName = menu.get(position).fragmentClassName;
+            final String fragmentClassName = menu.get(position).fragmentClass;
             final String fragmentClassPath = packageName + packageDelimiter + fragmentClassName + fragmentClassSuffix;
 
             try {

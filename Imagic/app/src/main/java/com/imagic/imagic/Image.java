@@ -12,7 +12,6 @@ import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
@@ -201,153 +200,66 @@ class Image {
         else return null;
     }
 
-    // Get color value after convolution
-    private int getConvolutedColor(int[][] observedPoints, ConvolutionOperator operator) {
-        int result = 0;
+    /*
+    int[][][] kernelInteger = new int[0][0][0];
+    double[][][] kernelDouble = new double[0][0][0];
+    int kernelValueType = 0; // 0: Integer, 1: Double
 
-        if (operator == ConvolutionOperator.MEDIAN) {
-            /*
-            ArrayList<Integer> valueList = new ArrayList<>();
-            for(int i = 0; i < observedPoints.length; i++) {
-                for(int j = 0; j < observedPoints[0].length; j++) {
-                    valueList.add(observedPoints[i][j]);
-                }
-            }
-            Collections.sort(valueList);
-            if(valueList.size() % 2 == 0) {
-                result = (valueList.get(valueList.size() / 2 - 1) + valueList.get(valueList.size() / 2)) / 2;
-            } else {
-                result = valueList.get(valueList.size() / 2);
-            }
-            */
-        }
-        else if (operator == ConvolutionOperator.DIFFERENCE) {
-            /*
-            int max = -1;
-            int j = observedPoints[0].length - 1;
-            for(int i = 0; i < observedPoints[0].length; i++) {
-                int diff = Math.abs(observedPoints[0][i] - observedPoints[observedPoints.length - 1][j]);
-                if (diff > max) {
-                    max = diff;
-                }
-                j--;
-            }
-
-            j = observedPoints.length - 1;
-            for(int i = 0; i < observedPoints.length; i++) {
-                int diff = Math.abs(observedPoints[i][0] - observedPoints[j][observedPoints[0].length - 1]);
-                if (diff > max) {
-                    max = diff;
-                }
-                j--;
-            }
-
-            result = max;
-            */
-        }
-        else if (operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE) {
-            // observedPoints dimention must be odd num x odd num
-            /*
-            int center = observedPoints[observedPoints.length / 2][observedPoints[0].length / 2];
-
-            int max = -1;
-            for(int i = 0; i < observedPoints[0].length; i++) {
-                int diff = Math.abs(observedPoints[0][i] - center);
-                if (diff > max) {
-                    max = diff;
-                }
-
-                diff = Math.abs(observedPoints[observedPoints.length - 1][i] - center);
-                if (diff > max) {
-                    max = diff;
-                }
-            }
-
-            for(int i = 0; i < observedPoints.length; i++) {
-                int diff = Math.abs(observedPoints[i][0] - center);
-                if (diff > max) {
-                    max = diff;
-                }
-
-                diff = Math.abs(observedPoints[i][observedPoints[0].length - 1] - center);
-                if (diff > max) {
-                    max = diff;
-                }
-            }
-
-            result = max;
-            */
-        }
-        else {
-            /*
-            int[][][] kernelInteger = new int[0][0][0];
-            double[][][] kernelDouble = new double[0][0][0];
-            int kernelValueType = 0; // 0: Integer, 1: Double
-
-            switch(operator) {
-                case SOBEL:
-                    kernelInteger = Kernels.sobel;
-                    break;
-                case PREWITT:
-                    kernelInteger = Kernels.prewitt;
-                    break;
-                case ROBERT:
-                    kernelInteger = Kernels.robert;
-                    break;
-                case FREI_CHEN:
-                    kernelValueType = 1;
-                    kernelDouble = Kernels.freiChen;
-                    break;
-                case MEAN_BLUR:
-                    kernelValueType = 1;
-                    kernelDouble = Kernels.meanBlur;
-                    break;
-                case CUSTOM_KERNEL:
-                    kernelValueType = 1;
-                    kernelDouble = this.customKernel;
-                    break;
-                default:
-                    break;
-            }
-
-            if (kernelValueType == 0) { // Integer
-                int sumOfSquare = 0;
-                for(int i = 0; i < kernelInteger.length; i++) {
-                    int sum = 0;
-                    for(int row = 0; row < kernelInteger[i].length; row++) {
-                        for(int col = 0; col < kernelInteger[i][row].length; col++) {
-                            sum += kernelInteger[i][row][col] * observedPoints[row][col];
-                        }
-                    }
-                    sumOfSquare += (sum * sum);
-                }
-                result = (int) Math.sqrt((double) sumOfSquare);
-            }
-            else { // Double
-                int maxKernelIndex = (operator == ConvolutionOperator.FREI_CHEN) ? 4 : kernelDouble.length;
-                double sumOfSquare = 0;
-                for(int i = 0; i < maxKernelIndex; i++) {
-                    double sum = 0;
-                    for(int row = 0; row < kernelDouble[i].length; row++) {
-                        for(int col = 0; col < kernelDouble[i][row].length; col++) {
-                            sum += kernelDouble[i][row][col] * (double) observedPoints[row][col];
-                        }
-                    }
-                    sumOfSquare += (sum * sum);
-                }
-                result = (int) Math.sqrt(sumOfSquare);
-            }
-            */
-        }
-        /*
-        if (result < 0) {
-            result = 0;
-        } else if (result > 255) {
-            result = 255;
-        }
-        */
-        return result;
+    switch(operator) {
+        case SOBEL:
+            kernelInteger = Kernels.sobel;
+            break;
+        case PREWITT:
+            kernelInteger = Kernels.prewitt;
+            break;
+        case ROBERT:
+            kernelInteger = Kernels.robert;
+            break;
+        case FREI_CHEN:
+            kernelValueType = 1;
+            kernelDouble = Kernels.freiChen;
+            break;
+        case MEAN_BLUR:
+            kernelValueType = 1;
+            kernelDouble = Kernels.meanBlur;
+            break;
+        case CUSTOM_KERNEL:
+            kernelValueType = 1;
+            kernelDouble = this.customKernel;
+            break;
+        default:
+            break;
     }
+
+    if (kernelValueType == 0) { // Integer
+        int sumOfSquare = 0;
+        for(int i = 0; i < kernelInteger.length; i++) {
+            int sum = 0;
+            for(int row = 0; row < kernelInteger[i].length; row++) {
+                for(int col = 0; col < kernelInteger[i][row].length; col++) {
+                    sum += kernelInteger[i][row][col] * observedPoints[row][col];
+                }
+            }
+            sumOfSquare += (sum * sum);
+        }
+        result = (int) Math.sqrt((double) sumOfSquare);
+    }
+    else { // Double
+        int maxKernelIndex = (operator == ConvolutionOperator.FREI_CHEN) ? 4 : kernelDouble.length;
+        double sumOfSquare = 0;
+        for(int i = 0; i < maxKernelIndex; i++) {
+            double sum = 0;
+            for(int row = 0; row < kernelDouble[i].length; row++) {
+                for(int col = 0; col < kernelDouble[i][row].length; col++) {
+                    sum += kernelDouble[i][row][col] * (double) observedPoints[row][col];
+                }
+            }
+            sumOfSquare += (sum * sum);
+        }
+        result = (int) Math.sqrt(sumOfSquare);
+    }
+    */
+
 
     // Is (row, col) outside image bitmap bounds
     private boolean isOutsideImageBitmap(int row, int col) {
@@ -358,7 +270,7 @@ class Image {
     }
 
     // Apply special effect by convolution using specified algorithm
-    void applySpecialEffect(String algorithm, double[][] customKernel) {
+    void applySpecialEffect(Context context, String algorithm, double[][] customKernel) {
         if(hasBitmap()) {
             ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
 
@@ -462,7 +374,46 @@ class Image {
             }
             // Operators with kernel
             else {
+                try {
+                    String kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
+                    ArrayList<ConvolutionKernel> kernelList = JSONSerializer.arrayListDeserialize(kernelJSON, ConvolutionKernel.class);
 
+                    int idx = 0;
+
+                    for(ConvolutionKernel kernel : kernelList) {
+                        if(operator == ConvolutionOperator.getConvolutionOperator(kernel.name)) break;
+                        idx++;
+                    }
+
+                    ConvolutionKernel operatorKernel = kernelList.get(idx);
+                    int layers = (operator == ConvolutionOperator.FREI_CHEN)? 4 : operatorKernel.kernel.length;
+
+                    for(int row = 0; row < height; row++) {
+                        for(int col = 0; col < width; col++) {
+                            double sumOfSquare = 0;
+
+                            for(int layer = 0; layer < layers; layer++) {
+                                double sum = 0;
+
+                                for(int kernelRow = 0; kernelRow < operatorKernel.kernel[layer].length; kernelRow++) {
+                                    for(int kernelCol = 0; kernelCol < operatorKernel.kernel[layer][kernelRow].length; kernelCol++) {
+                                        double pixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)];
+                                        sum += operatorKernel.kernel[layer][kernelRow][kernelCol] * pixelValue;
+                                    }
+                                }
+                                sumOfSquare += (sum * sum);
+                            }
+
+                            int result = (int) Math.sqrt(sumOfSquare);
+                            result = (result < 0)? 0 : (result > 255)? 255 : result;
+
+                            newPixels[row * width + col] = Color.rgb(result, result, result);
+                        }
+                    }
+                }
+                catch(Exception e) {
+                    Debug.ex(e);
+                }
             }
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);

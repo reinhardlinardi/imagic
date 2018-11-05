@@ -9,22 +9,22 @@ class Menu implements JSONSerializable {
 
     /* Constants */
 
-    private static final String MENU_NAME_KEY = "menuName";
-    private static final String FRAGMENT_CLASS_NAME_KEY = "fragmentClassName";
+    private static final String MENU_KEY = "menu";
+    private static final String FRAGMENT_CLASS_KEY = "fragmentClass";
 
     /* Properties */
 
-    String menuName; // Name of menu
-    String fragmentClassName; // Name of fragment class associated with this menu
+    String menu; // Name of menu
+    String fragmentClass; // Name of fragment class associated with this menu
 
     /* Methods */
 
     // Constructors
     Menu() {}
 
-    Menu(String menuName, String fragmentClassName) {
-        this.menuName = menuName;
-        this.fragmentClassName = fragmentClassName;
+    Menu(String menu, String fragmentClass) {
+        this.menu = menu;
+        this.fragmentClass = fragmentClass;
     }
 
     // Serialization
@@ -32,8 +32,8 @@ class Menu implements JSONSerializable {
     public String jsonSerialize() throws Exception {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put(MENU_NAME_KEY, menuName);
-        jsonObject.put(FRAGMENT_CLASS_NAME_KEY, fragmentClassName);
+        jsonObject.put(MENU_KEY, menu);
+        jsonObject.put(FRAGMENT_CLASS_KEY, fragmentClass);
 
         return jsonObject.toString();
     }
@@ -43,7 +43,7 @@ class Menu implements JSONSerializable {
     public void jsonDeserialize(String json) throws Exception {
         JSONObject jsonObject = new JSONObject(json);
 
-        menuName = jsonObject.getString(MENU_NAME_KEY);
-        fragmentClassName = jsonObject.getString(FRAGMENT_CLASS_NAME_KEY);
+        menu = jsonObject.getString(MENU_KEY);
+        fragmentClass = jsonObject.getString(FRAGMENT_CLASS_KEY);
     }
 }
