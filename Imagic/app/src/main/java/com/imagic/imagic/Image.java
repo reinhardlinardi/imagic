@@ -206,6 +206,7 @@ class Image {
         int result = 0;
 
         if (operator == ConvolutionOperator.MEDIAN) {
+            /*
             ArrayList<Integer> valueList = new ArrayList<>();
             for(int i = 0; i < observedPoints.length; i++) {
                 for(int j = 0; j < observedPoints[0].length; j++) {
@@ -218,7 +219,10 @@ class Image {
             } else {
                 result = valueList.get(valueList.size() / 2);
             }
-        } else if (operator == ConvolutionOperator.DIFFERENCE) {
+            */
+        }
+        else if (operator == ConvolutionOperator.DIFFERENCE) {
+            /*
             int max = -1;
             int j = observedPoints[0].length - 1;
             for(int i = 0; i < observedPoints[0].length; i++) {
@@ -239,8 +243,11 @@ class Image {
             }
 
             result = max;
-        } else if (operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE) {
+            */
+        }
+        else if (operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE) {
             // observedPoints dimention must be odd num x odd num
+            /*
             int center = observedPoints[observedPoints.length / 2][observedPoints[0].length / 2];
 
             int max = -1;
@@ -269,7 +276,10 @@ class Image {
             }
 
             result = max;
-        } else {
+            */
+        }
+        else {
+            /*
             int[][][] kernelInteger = new int[0][0][0];
             double[][][] kernelDouble = new double[0][0][0];
             int kernelValueType = 0; // 0: Integer, 1: Double
@@ -291,14 +301,12 @@ class Image {
                 case MEAN_BLUR:
                     kernelValueType = 1;
                     kernelDouble = Kernels.meanBlur;
-                    Debug.d("TESSSSS", " ");
                     break;
                 case CUSTOM_KERNEL:
                     kernelValueType = 1;
                     kernelDouble = this.customKernel;
                     break;
                 default:
-                    Debug.d("TESSSSS", "asdfasdfasdfas ");
                     break;
             }
 
@@ -314,7 +322,8 @@ class Image {
                     sumOfSquare += (sum * sum);
                 }
                 result = (int) Math.sqrt((double) sumOfSquare);
-            } else { // Double
+            }
+            else { // Double
                 int maxKernelIndex = (operator == ConvolutionOperator.FREI_CHEN) ? 4 : kernelDouble.length;
                 double sumOfSquare = 0;
                 for(int i = 0; i < maxKernelIndex; i++) {
@@ -328,66 +337,136 @@ class Image {
                 }
                 result = (int) Math.sqrt(sumOfSquare);
             }
+            */
         }
-
+        /*
         if (result < 0) {
             result = 0;
         } else if (result > 255) {
             result = 255;
         }
-
+        */
         return result;
+    }
+
+    // Is (row, col) outside image bitmap bounds
+    private boolean isOutsideImageBitmap(int row, int col) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        return (row < 0 || row >= height || col < 0 || col >= width);
     }
 
     // Apply special effect by convolution using specified algorithm
     void applySpecialEffect(String algorithm, double[][] customKernel) {
         if(hasBitmap()) {
-            // init custom kernel
-            this.customKernel = new double[1][3][3];
-            for(int row = 0; row < 3; row++) {
-                for(int col = 0; col < 3; col++) this.customKernel[0][row][col] = customKernel[row][col];
-            }
-
             ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
 
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
 
             int[] pixels = new int[width * height];
+            int[] newPixels = new int[width * height];
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
-            // padding (image size = (height + 2) * (width + 2)
-            // TODO Change to better padding method
-            int[][] imageBitmap = new int[height + 2][width + 2];
-            int[][] observedPointsRed = new int[3][3];
-            int[][] observedPointsGreen = new int[3][3];
-            int[][] observedPointsBlue = new int[3][3];
+            // Row and col offsets for all 9 pixels
+            int[][] rowOffset = new int[][]{{-1, -1, -1}, {0, 0, 0}, {1, 1, 1}};
+            int[][] colOffset = new int[][]{{-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}};
 
-            for(int row = 0; row < height; row++) {
-                for(int col = 0; col < width; col++) {
-                    imageBitmap[row + 1][col + 1] = pixels[row * width + col];
+            // Convolution
+
+            // Operators without kernel
+            if(operator == ConvolutionOperator.MEDIAN || operator == ConvolutionOperator.DIFFERENCE || operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE) {
+                switch(operator) {
+                    case MEDIAN:
+                        int[] values = new int[9];
+
+                        for(int row = 0; row < height; row++) {
+                            for(int col = 0; col < width; col++) {
+                                for(int offsetRow = 0; offsetRow < 3; offsetRow++) {
+                                    for(int offsetCol = 0; offsetCol < 3; offsetCol++) {
+                                        // Get neighbor
+                                        int neighborRow = row + rowOffset[offsetRow][offsetCol];
+                                        int neighborCol = col + colOffset[offsetRow][offsetCol];
+
+                                        // If outside grid, use padding value (zero)
+                                        if(isOutsideImageBitmap(neighborRow, neighborCol)) values[offsetRow * 3 + offsetCol] = 0;
+                                        else values[offsetRow * 3 + offsetCol] = Color.red(pixels[neighborRow * width + neighborCol]);
+                                    }
+                                }
+
+                                // Sort and take median (5th element)
+                                Arrays.sort(values);
+                                newPixels[row * width + col] = Color.rgb(values[4], values[4], values[4]);
+                            }
+                        }
+                        break;
+                    case DIFFERENCE:
+                        for(int row = 0; row < height; row++) {
+                            for(int col = 0; col < width; col++) {
+                                int diff = 0;
+
+                                for(int offsetRow = 0; offsetRow < 3; offsetRow++) {
+                                    for(int offsetCol = 0; offsetCol < 3; offsetCol++) {
+                                        // If not the element itself
+                                        if(!(offsetRow == 1 && offsetCol == 1)) {
+                                            // Get two opposite neighbors
+                                            int firstNeighborRow = row + rowOffset[offsetRow][offsetCol];
+                                            int firstNeighborCol = col + colOffset[offsetRow][offsetCol];
+
+                                            int secondNeighborRow = row - rowOffset[offsetRow][offsetCol];
+                                            int secondNeighborCol = col - rowOffset[offsetRow][offsetCol];
+
+                                            // Get difference, check if any neighbors are outside grid
+                                            if(isOutsideImageBitmap(firstNeighborRow, firstNeighborCol) && !isOutsideImageBitmap(secondNeighborRow, secondNeighborCol)) diff = Math.max(diff, Color.red(pixels[secondNeighborRow * width + secondNeighborCol]));
+                                            else if(!isOutsideImageBitmap(firstNeighborRow, firstNeighborCol) && isOutsideImageBitmap(secondNeighborRow, secondNeighborCol)) diff = Math.max(diff, Color.red(pixels[firstNeighborRow * width + firstNeighborCol]));
+                                            else if(isOutsideImageBitmap(firstNeighborRow, firstNeighborCol) && isOutsideImageBitmap(secondNeighborRow, secondNeighborCol)) diff = Math.max(diff, 0);
+                                            else diff = Math.max(diff, Math.abs(Color.red(pixels[firstNeighborRow * width + firstNeighborCol]) - Color.red(pixels[secondNeighborRow * width + secondNeighborCol])));
+                                        }
+                                        else diff = Math.max(diff, 0);
+                                    }
+                                }
+
+                                newPixels[row * width + col] = Color.rgb(diff, diff, diff);
+                            }
+                        }
+                        break;
+                    case HOMOGENOUS_DIFFERENCE:
+                        for(int row = 0; row < height; row++) {
+                            for(int col = 0; col < width; col++) {
+                                int diff = 0;
+
+                                for(int offsetRow = 0; offsetRow < 3; offsetRow++) {
+                                    for(int offsetCol = 0; offsetCol < 3; offsetCol++) {
+                                        // If not the element itself
+                                        if(!(offsetRow == 1 && offsetCol == 1)) {
+                                            // Get neighbor
+                                            int neighborRow = row + rowOffset[offsetRow][offsetCol];
+                                            int neighborCol = col + colOffset[offsetRow][offsetCol];
+
+                                            // If outside grid, use padding value (zero)
+                                            if(isOutsideImageBitmap(neighborRow, neighborCol)) diff = Math.max(diff, Color.red(pixels[row * width + col]));
+                                            else diff = Math.max(diff, Math.abs(Color.red(pixels[row * width + col]) - Color.red(pixels[neighborRow * width + neighborCol])));
+                                        }
+                                        else diff = Math.max(diff, 0);
+                                    }
+                                }
+
+                                newPixels[row * width + col] = Color.rgb(diff, diff, diff);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
+            // Operators with kernel
+            else {
 
-            // convolution
-            for(int row = 1; row < height + 1; row++) {
-                for(int col = 1; col < width + 1; col++) {
-                    for(int i = 0; i < 3; i++) {
-                        for(int j = 0; j < 3; j++) {
-                            observedPointsRed[i][j] = Color.red(imageBitmap[row - 1 + i][col - 1 + j]);
-                            observedPointsGreen[i][j] = Color.green(imageBitmap[row - 1 + i][col - 1 + j]);
-                            observedPointsBlue[i][j] = Color.blue(imageBitmap[row - 1 + i][col - 1 + j]);
-                        }
-                    }
-                    // update pixel value
-                    pixels[(row - 1) * width + (col - 1)] = Color.rgb(getConvolutedColor(observedPointsRed, operator),
-                            getConvolutedColor(observedPointsGreen, operator),
-                            getConvolutedColor(observedPointsBlue, operator));
-                }
             }
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            bitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
         }
     }
 }
