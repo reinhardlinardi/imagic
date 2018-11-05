@@ -38,4 +38,6 @@
     <string name="ocr_seek_bar_text">Black Threshold</string>
     <string name="threshold_less_equal_seek_bar_128_text">127 or lower</string>
     <string name="result_text">Result :</string>
+    <string name="edit_text_1_text">1</string>
+    <string name="custom_kernel_text">Custom Kernel</string>
 </resources>

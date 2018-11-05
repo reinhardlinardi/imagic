@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -40,9 +41,13 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
 
     private RelativeLayout effectSpinnerContainer;
     private RelativeLayout algorithmSpinnerContainer;
+
     private Spinner effectSpinner;
     private Spinner algorithmSpinner;
     private Button applyEffectButton;
+
+    private LinearLayout kernelContainer;
+    private EditText[][] kernel;
 
     // Transformed image and histogram
     Image image;
@@ -109,6 +114,21 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
             catch(Exception e) {
                 Debug.ex(e);
             }
+
+            kernelContainer = view.findViewById(R.id.specialEffectsCustomKernelContainer);
+            kernel = new EditText[3][3];
+
+            kernel[0][0] = view.findViewById(R.id.specialEffectsEditTextTopLeft);
+            kernel[0][1] = view.findViewById(R.id.specialEffectsEditTextTopCenter);
+            kernel[0][2] = view.findViewById(R.id.specialEffectsEditTextTopRight);
+            kernel[1][0] = view.findViewById(R.id.specialEffectsEditTextMiddleLeft);
+            kernel[1][1] = view.findViewById(R.id.specialEffectsEditTextCenter);
+            kernel[1][2] = view.findViewById(R.id.specialEffectsEditTextMiddleRight);
+            kernel[2][0] = view.findViewById(R.id.specialEffectsEditTextBottomLeft);
+            kernel[2][1] = view.findViewById(R.id.specialEffectsEditTextBottomCenter);
+            kernel[2][2] = view.findViewById(R.id.specialEffectsEditTextBottomRight);
+
+            resetKernel();
 
             applyEffectButton = view.findViewById(R.id.specialEffectsApplyEffectButton);
             applyEffectButton.setOnClickListener(getApplyEffectButtonOnClickListener());
@@ -186,6 +206,8 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 if(isAttachedToMainActivity()) {
                     // Reset image
                     if(activity.hasImage()) {
+                        resetKernel();
+
                         ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
                         imageLoadAsyncTask.execute(true);
                     }
@@ -201,6 +223,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
             public void onClick(View view) {
                 if(isAttachedToMainActivity()) {
                     if(activity.hasImage()) {
+                        resetKernel();
                         activity.updateImage(image);
 
                         ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
@@ -221,6 +244,9 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
 
                 algorithmSpinner.setAdapter(algorithmAdapters.get(position));
                 if(textView != null) textView.setText(effect.effect);
+
+                if(effect.effect.equals("Custom")) UI.show(kernelContainer);
+                else UI.hide(kernelContainer);
             }
 
             @Override
@@ -330,6 +356,13 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
 
     // Check if fragment is attached to MainActivity or not
     private boolean isAttachedToMainActivity() { return activity != null; }
+
+    // Reset kernel value
+    private void resetKernel() {
+        for(int row = 0; row < 3; row++) {
+            for(int col = 0; col < 3; col++) kernel[row][col].setText(R.string.edit_text_1_text);
+        }
+    }
 
     // Count progress
     private int countProgress(int numTaskDone, int totalNumTask) {
