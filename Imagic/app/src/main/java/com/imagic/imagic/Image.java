@@ -26,17 +26,6 @@ class Image {
     static final String MIME_TYPE = "image/*";
     private static final int LOLLIPOP_SDK_INT = 24;
 
-    /* Filter Code */
-    private static final int MEDIAN = 0;
-    private static final int DIFFERENCE = 1;
-    private static final int HOMOGENOUS_DIFFERENCE = 2;
-    private static final int MEAN_BLUR = 3;
-    private static final int SOBEL = 4;
-    private static final int PREWITT = 5;
-    private static final int ROBERT = 6;
-    private static final int FREI_CHEN = 7;
-    private static final int CUSTOM_KERNEL = 8;
-
     /* Custom kernel */
     double[][][] customKernel;
 
@@ -216,7 +205,7 @@ class Image {
     private int getConvolutedColor(int[][] observedPoints, ConvolutionOperator operator) {
         int result = 0;
 
-        if (operator.value == MEDIAN) {
+        if (operator == ConvolutionOperator.MEDIAN) {
             ArrayList<Integer> valueList = new ArrayList<>();
             for(int i = 0; i < observedPoints.length; i++) {
                 for(int j = 0; j < observedPoints[0].length; j++) {
@@ -229,7 +218,7 @@ class Image {
             } else {
                 result = valueList.get(valueList.size() / 2);
             }
-        } else if (operator.value == DIFFERENCE) {
+        } else if (operator == ConvolutionOperator.DIFFERENCE) {
             int max = -1;
             int j = observedPoints[0].length - 1;
             for(int i = 0; i < observedPoints[0].length; i++) {
@@ -250,7 +239,7 @@ class Image {
             }
 
             result = max;
-        } else if (operator.value == HOMOGENOUS_DIFFERENCE) {
+        } else if (operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE) {
             // observedPoints dimention must be odd num x odd num
             int center = observedPoints[observedPoints.length / 2][observedPoints[0].length / 2];
 
@@ -285,7 +274,7 @@ class Image {
             double[][][] kernelDouble = new double[0][0][0];
             int kernelValueType = 0; // 0: Integer, 1: Double
 
-            switch(operator.value) {
+            switch(operator) {
                 case SOBEL:
                     kernelInteger = Kernels.sobel;
                     break;
@@ -302,12 +291,14 @@ class Image {
                 case MEAN_BLUR:
                     kernelValueType = 1;
                     kernelDouble = Kernels.meanBlur;
+                    Debug.d("TESSSSS", " ");
                     break;
                 case CUSTOM_KERNEL:
                     kernelValueType = 1;
                     kernelDouble = this.customKernel;
                     break;
                 default:
+                    Debug.d("TESSSSS", "asdfasdfasdfas ");
                     break;
             }
 
@@ -324,7 +315,7 @@ class Image {
                 }
                 result = (int) Math.sqrt((double) sumOfSquare);
             } else { // Double
-                int maxKernelIndex = (operator.value == FREI_CHEN) ? 4 : kernelDouble.length;
+                int maxKernelIndex = (operator == ConvolutionOperator.FREI_CHEN) ? 4 : kernelDouble.length;
                 double sumOfSquare = 0;
                 for(int i = 0; i < maxKernelIndex; i++) {
                     double sum = 0;

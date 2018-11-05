@@ -454,7 +454,7 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
                 for(int row = 0; row < 3; row++) {
                     for(int col = 0; col < 3; col++) kernelMatrix[row][col] = Double.parseDouble(kernel[row][col].getText().toString());
                 }
-
+                image.convertToGrayscale();
                 image.applySpecialEffect(algorithm, kernelMatrix);
                 publishProgress(countProgress(2,2));
             }
