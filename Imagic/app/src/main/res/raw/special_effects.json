@@ -34,5 +34,14 @@
         "algorithm" : "Frei-Chen"
       }
     ]
+  },
+  {
+    "effect" : "Custom",
+    "algorithms" :
+    [
+      {
+        "algorithm" : "Custom Kernel"
+      }
+    ]
   }
 ]

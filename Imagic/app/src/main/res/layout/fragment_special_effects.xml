@@ -194,6 +194,144 @@
 
                 <Space
                     android:layout_width="match_parent"
+                    android:layout_height="@dimen/special_effects_custom_kernel_container_space_gap" />
+
+                <LinearLayout
+                    android:id="@+id/specialEffectsCustomKernelContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="@string/custom_kernel_text" />
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/custom_kernel_text_space_gap" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:orientation="horizontal"
+                        android:weightSum="5">
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextTopLeft"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextTopCenter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextTopRight"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:orientation="horizontal"
+                        android:weightSum="5">
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextMiddleLeft"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextCenter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextMiddleRight"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:orientation="horizontal"
+                        android:weightSum="5">
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextBottomLeft"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextBottomCenter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+
+                        <EditText
+                            android:id="@+id/specialEffectsEditTextBottomRight"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            android:text="@string/edit_text_1_text" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/special_effects_apply_button_space_gap" />
 
                 <Button

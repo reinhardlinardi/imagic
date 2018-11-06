@@ -1,22 +1,22 @@
 [
   {
-    "menuName" : "Histogram",
-    "fragmentClassName" : "Histogram"
+    "menu" : "Histogram",
+    "fragmentClass" : "Histogram"
   },
   {
-    "menuName" : "Contrast Enhancement",
-    "fragmentClassName" : "ContrastEnhancement"
+    "menu" : "Contrast Enhancement",
+    "fragmentClass" : "ContrastEnhancement"
   },
   {
-    "menuName" : "Equalizer",
-    "fragmentClassName" : "Equalizer"
+    "menu" : "Equalizer",
+    "fragmentClass" : "Equalizer"
   },
   {
-    "menuName" : "OCR",
-    "fragmentClassName" : "OCR"
+    "menu" : "OCR",
+    "fragmentClass" : "OCR"
   },
   {
-    "menuName" : "Special Effects",
-    "fragmentClassName" : "SpecialEffects"
+    "menu" : "Special Effects",
+    "fragmentClass" : "SpecialEffects"
   }
 ]
