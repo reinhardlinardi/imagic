@@ -270,7 +270,7 @@ class Image {
     }
 
     // Apply special effect by convolution using specified algorithm
-    void applySpecialEffect(Context context, String algorithm, double[][] customKernel) {
+    void applySpecialEffect(Context context, String algorithm, double[][][] customKernel) {
         if(hasBitmap()) {
             ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
 
@@ -291,7 +291,9 @@ class Image {
             if(operator == ConvolutionOperator.MEDIAN || operator == ConvolutionOperator.DIFFERENCE || operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE) {
                 switch(operator) {
                     case MEDIAN:
-                        int[] values = new int[9];
+                        int[] redValues = new int[9];
+                        int[] greenValues = new int[9];
+                        int[] blueValues = new int[9];
 
                         for(int row = 0; row < height; row++) {
                             for(int col = 0; col < width; col++) {
@@ -302,18 +304,31 @@ class Image {
                                         int neighborCol = col + colOffset[offsetRow][offsetCol];
 
                                         // If outside grid, use padding value (zero)
-                                        if(isOutsideImageBitmap(neighborRow, neighborCol)) values[offsetRow * 3 + offsetCol] = 0;
-                                        else values[offsetRow * 3 + offsetCol] = Color.red(pixels[neighborRow * width + neighborCol]);
+                                        if(isOutsideImageBitmap(neighborRow, neighborCol)) {
+                                            redValues[offsetRow * 3 + offsetCol] = 0;
+                                            greenValues[offsetRow * 3 + offsetCol] = 0;
+                                            blueValues[offsetRow * 3 + offsetCol] = 0;
+                                        }
+                                        else {
+                                            redValues[offsetRow * 3 + offsetCol] = Color.red(pixels[neighborRow * width + neighborCol]);
+                                            greenValues[offsetRow * 3 + offsetCol] = Color.green(pixels[neighborRow * width + neighborCol]);
+                                            blueValues[offsetRow * 3 + offsetCol] = Color.blue(pixels[neighborRow * width + neighborCol]);
+                                        }
                                     }
                                 }
 
                                 // Sort and take median (5th element)
-                                Arrays.sort(values);
-                                newPixels[row * width + col] = Color.rgb(values[4], values[4], values[4]);
+                                Arrays.sort(redValues);
+                                Arrays.sort(greenValues);
+                                Arrays.sort(blueValues);
+
+                                newPixels[row * width + col] = Color.rgb(redValues[4], greenValues[4], blueValues[4]);
                             }
                         }
                         break;
                     case DIFFERENCE:
+                        convertToGrayscale();
+
                         for(int row = 0; row < height; row++) {
                             for(int col = 0; col < width; col++) {
                                 int diff = 0;
@@ -344,6 +359,8 @@ class Image {
                         }
                         break;
                     case HOMOGENOUS_DIFFERENCE:
+                        convertToGrayscale();
+
                         for(int row = 0; row < height; row++) {
                             for(int col = 0; col < width; col++) {
                                 int diff = 0;
@@ -378,36 +395,87 @@ class Image {
                     String kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
                     ArrayList<ConvolutionKernel> kernelList = JSONSerializer.arrayListDeserialize(kernelJSON, ConvolutionKernel.class);
 
-                    int idx = 0;
+                    ConvolutionKernel operatorKernel;
 
-                    for(ConvolutionKernel kernel : kernelList) {
-                        if(operator == ConvolutionOperator.getConvolutionOperator(kernel.name)) break;
-                        idx++;
+                    if(operator == ConvolutionOperator.CUSTOM_KERNEL) operatorKernel = new ConvolutionKernel("Custom Kernel", customKernel);
+                    else {
+                        int idx = 0;
+
+                        for(ConvolutionKernel kernel : kernelList) {
+                            if(operator == ConvolutionOperator.getConvolutionOperator(kernel.name)) break;
+                            idx++;
+                        }
+
+                        operatorKernel = kernelList.get(idx);
                     }
 
-                    ConvolutionKernel operatorKernel = kernelList.get(idx);
                     int layers = (operator == ConvolutionOperator.FREI_CHEN)? 4 : operatorKernel.kernel.length;
 
-                    for(int row = 0; row < height; row++) {
-                        for(int col = 0; col < width; col++) {
-                            double sumOfSquare = 0;
+                    if(operator != ConvolutionOperator.MEAN_BLUR) {
+                        convertToGrayscale();
 
-                            for(int layer = 0; layer < layers; layer++) {
-                                double sum = 0;
+                        for(int row = 0; row < height; row++) {
+                            for(int col = 0; col < width; col++) {
+                                double sumOfSquare = 0;
 
-                                for(int kernelRow = 0; kernelRow < operatorKernel.kernel[layer].length; kernelRow++) {
-                                    for(int kernelCol = 0; kernelCol < operatorKernel.kernel[layer][kernelRow].length; kernelCol++) {
-                                        double pixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)];
-                                        sum += operatorKernel.kernel[layer][kernelRow][kernelCol] * pixelValue;
+                                for(int layer = 0; layer < layers; layer++) {
+                                    double sum = 0;
+
+                                    for(int kernelRow = 0; kernelRow < 3; kernelRow++) {
+                                        for(int kernelCol = 0; kernelCol < 3; kernelCol++) {
+                                            double pixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : Color.red(pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)]);
+                                            sum += operatorKernel.kernel[layer][kernelRow][kernelCol] * pixelValue;
+                                        }
                                     }
+                                    sumOfSquare += (sum * sum);
                                 }
-                                sumOfSquare += (sum * sum);
+
+                                int result = (int) Math.sqrt(sumOfSquare);
+                                result = (result < 0)? 0 : (result > 255)? 255 : result;
+
+                                newPixels[row * width + col] = Color.rgb(result, result, result);
                             }
+                        }
+                    }
+                    else {
+                        for(int row = 0; row < height; row++) {
+                            for(int col = 0; col < width; col++) {
+                                double redSumOfSquare = 0;
+                                double greenSumOfSquare = 0;
+                                double blueSumOfSquare = 0;
 
-                            int result = (int) Math.sqrt(sumOfSquare);
-                            result = (result < 0)? 0 : (result > 255)? 255 : result;
+                                for(int layer = 0; layer < layers; layer++) {
+                                    double redSum = 0;
+                                    double greenSum = 0;
+                                    double blueSum = 0;
 
-                            newPixels[row * width + col] = Color.rgb(result, result, result);
+                                    for(int kernelRow = 0; kernelRow < 3; kernelRow++) {
+                                        for(int kernelCol = 0; kernelCol < 3; kernelCol++) {
+                                            double redPixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : Color.red(pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)]);
+                                            double greenPixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : Color.green(pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)]);
+                                            double bluePixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : Color.blue(pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)]);
+
+                                            redSum += operatorKernel.kernel[layer][kernelRow][kernelCol] * redPixelValue;
+                                            greenSum += operatorKernel.kernel[layer][kernelRow][kernelCol] * greenPixelValue;
+                                            blueSum += operatorKernel.kernel[layer][kernelRow][kernelCol] * bluePixelValue;
+                                        }
+                                    }
+
+                                    redSumOfSquare += (redSum * redSum);
+                                    greenSumOfSquare += (greenSum * greenSum);
+                                    blueSumOfSquare += (blueSum * blueSum);
+                                }
+
+                                int redResult = (int) Math.sqrt(redSumOfSquare);
+                                int greenResult = (int) Math.sqrt(greenSumOfSquare);
+                                int blueResult = (int) Math.sqrt(blueSumOfSquare);
+
+                                redResult = (redResult < 0)? 0 : (redResult > 255)? 255 : redResult;
+                                greenResult = (greenResult < 0)? 0 : (greenResult > 255)? 255 : greenResult;
+                                blueResult = (blueResult < 0)? 0 : (blueResult > 255)? 255 : blueResult;
+
+                                newPixels[row * width + col] = Color.rgb(redResult, greenResult, blueResult);
+                            }
                         }
                     }
                 }

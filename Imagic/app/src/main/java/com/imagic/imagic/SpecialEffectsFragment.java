@@ -447,19 +447,18 @@ public class SpecialEffectsFragment extends Fragment implements MainActivityList
         protected Void doInBackground(Void... voids) {
             if(isAttachedToMainActivity()) {
                 String algorithm = ((SpecialEffectAlgorithm) algorithmSpinner.getSelectedItem()).algorithm;
-                publishProgress(countProgress(1, 3));
+                publishProgress(countProgress(1, 2));
 
-                double[][] kernelMatrix = new double[3][3];
+                double[][][] kernelMatrix = new double[1][3][3];
 
-                for(int row = 0; row < 3; row++) {
-                    for(int col = 0; col < 3; col++) kernelMatrix[row][col] = Double.parseDouble(kernel[row][col].getText().toString());
+                for(int layer = 0; layer < 1; layer++) {
+                    for(int row = 0; row < 3; row++) {
+                        for(int col = 0; col < 3; col++) kernelMatrix[layer][row][col] = Double.parseDouble(kernel[row][col].getText().toString());
+                    }
                 }
 
-                image.convertToGrayscale();
-                publishProgress(countProgress(2,3));
-
                 image.applySpecialEffect(getContext(), algorithm, kernelMatrix);
-                publishProgress(countProgress(3,3));
+                publishProgress(countProgress(2,2));
             }
 
             return null;
