@@ -421,8 +421,8 @@ class Image {
                                 for(int layer = 0; layer < layers; layer++) {
                                     double sum = 0;
 
-                                    for(int kernelRow = 0; kernelRow < 3; kernelRow++) {
-                                        for(int kernelCol = 0; kernelCol < 3; kernelCol++) {
+                                    for(int kernelRow = 0; kernelRow < operatorKernel.kernel[layer].length; kernelRow++) {
+                                        for(int kernelCol = 0; kernelCol < operatorKernel.kernel[layer][kernelRow].length; kernelCol++) {
                                             double pixelValue = (isOutsideImageBitmap(row - 1 + kernelRow, col - 1 + kernelCol))? 0 : Color.red(pixels[(row - 1 + kernelRow) * width + (col - 1 + kernelCol)]);
                                             sum += operatorKernel.kernel[layer][kernelRow][kernelCol] * pixelValue;
                                         }
