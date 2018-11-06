@@ -200,67 +200,6 @@ class Image {
         else return null;
     }
 
-    /*
-    int[][][] kernelInteger = new int[0][0][0];
-    double[][][] kernelDouble = new double[0][0][0];
-    int kernelValueType = 0; // 0: Integer, 1: Double
-
-    switch(operator) {
-        case SOBEL:
-            kernelInteger = Kernels.sobel;
-            break;
-        case PREWITT:
-            kernelInteger = Kernels.prewitt;
-            break;
-        case ROBERT:
-            kernelInteger = Kernels.robert;
-            break;
-        case FREI_CHEN:
-            kernelValueType = 1;
-            kernelDouble = Kernels.freiChen;
-            break;
-        case MEAN_BLUR:
-            kernelValueType = 1;
-            kernelDouble = Kernels.meanBlur;
-            break;
-        case CUSTOM_KERNEL:
-            kernelValueType = 1;
-            kernelDouble = this.customKernel;
-            break;
-        default:
-            break;
-    }
-
-    if (kernelValueType == 0) { // Integer
-        int sumOfSquare = 0;
-        for(int i = 0; i < kernelInteger.length; i++) {
-            int sum = 0;
-            for(int row = 0; row < kernelInteger[i].length; row++) {
-                for(int col = 0; col < kernelInteger[i][row].length; col++) {
-                    sum += kernelInteger[i][row][col] * observedPoints[row][col];
-                }
-            }
-            sumOfSquare += (sum * sum);
-        }
-        result = (int) Math.sqrt((double) sumOfSquare);
-    }
-    else { // Double
-        int maxKernelIndex = (operator == ConvolutionOperator.FREI_CHEN) ? 4 : kernelDouble.length;
-        double sumOfSquare = 0;
-        for(int i = 0; i < maxKernelIndex; i++) {
-            double sum = 0;
-            for(int row = 0; row < kernelDouble[i].length; row++) {
-                for(int col = 0; col < kernelDouble[i][row].length; col++) {
-                    sum += kernelDouble[i][row][col] * (double) observedPoints[row][col];
-                }
-            }
-            sumOfSquare += (sum * sum);
-        }
-        result = (int) Math.sqrt(sumOfSquare);
-    }
-    */
-
-
     // Is (row, col) outside image bitmap bounds
     private boolean isOutsideImageBitmap(int row, int col) {
         int width = bitmap.getWidth();
