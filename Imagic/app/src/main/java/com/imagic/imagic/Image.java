@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -439,20 +440,25 @@ class Image {
             int[] pixels = new int[width * height];
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
+            int[] facePixels = new int[width*height];
+
             for(int row = 0; row < height; row++) {
                 for(int col = 0; col < width; col++) {
                     int pixel = pixels[row * width + col];
 //                    int grayscale = (Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3;
                     if(isFace(Color.red(pixel),Color.green(pixel),Color.blue(pixel))){
-                        pixels[row * width + col] = Color.rgb(255, 255, 255);
+                        facePixels[row * width + col] = Color.rgb(255, 255, 255);
 
                     } else {
-                        pixels[row * width + col] = Color.rgb(0, 0, 0);
+                        facePixels[row * width + col] = Color.rgb(0, 0, 0);
                     }
                 }
             }
 
+            findFaceBorder(facePixels,pixels,width,height,face);
+
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            /* NOTE: change pixels to facePixels to see the black and white version */
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
         }
     }
@@ -463,5 +469,81 @@ class Image {
 //                (Math.max(Math.max(r,g),b) - Math.min(Math.min(r,g),b))<15 &&
                 r>g && r>b && (r-g)>15
                 );
+    }
+
+    private void findFaceBorder(int[] facePixels, int[] pixels,int width, int height,Face face){
+        boolean found = false;
+        /* Find border */
+        Point upper = new Point(0,0);
+        Point lower = new Point(0,0);
+        Point left = new Point(0,0);
+        Point right = new Point(0,0);
+        /* upper */
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
+                    upper.set(col,row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found)break;
+        }
+        found = false;
+
+        /* lower */
+        for(int row = height-1; row >=0; row--) {
+            for(int col = 0; col < width; col++) {
+                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
+                    lower.set(col,row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found)break;
+        }
+        found = false;
+
+        /* left */
+        for(int col = 0; col < width; col++) {
+            for(int row = 0; row < height; row++) {
+                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
+                    left.set(col,row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found)break;
+        }
+        found = false;
+
+        /* right */
+        for(int col = width-1; col >=0; col--) {
+            for(int row = 0; row < height; row++) {
+                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
+                    right.set(col,row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found)break;
+        }
+
+        /* set borders in face object */
+        face.setBorder(upper,lower,left,right);
+
+        /* sets border in pixels */
+        for(int col=left.x;col<=right.x;col++){
+            pixels[upper.y * width + col] = Color.rgb(0,0,255);
+        }
+        for(int col=left.x;col<=right.x;col++){
+            pixels[lower.y * width + col] = Color.rgb(0,0,255);
+        }
+        for(int row = upper.y;row<=lower.y;row++){
+            pixels[row * width + left.x] = Color.rgb(0,0,255);
+        }
+        for(int row = upper.y;row<=lower.y;row++){
+            pixels[row * width + right.x] = Color.rgb(0,0,255);
+        }
     }
 }

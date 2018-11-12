@@ -142,7 +142,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
     //Constructor
     public FaceRecognitionFragment(){}
 
-    public static SpecialEffectsFragment newInstance(){return new SpecialEffectsFragment();}
+    public static FaceRecognitionFragment newInstance(){return new FaceRecognitionFragment();}
 
     // Check if fragment is attached to MainActivity or not
     private boolean isAttachedToMainActivity() { return activity != null; }
