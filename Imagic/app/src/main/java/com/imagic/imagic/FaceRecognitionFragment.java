@@ -213,6 +213,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
             if(isAttachedToMainActivity()){
                 progressBar.setProgress(countProgress(1,2));
                 /*WOY IMPLEMENT */
+                image.findFace();
                 System.out.println("WOY IMPLEMENT");
                 progressBar.setProgress(countProgress(2,2));
             }

@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -426,5 +427,41 @@ class Image {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
         }
+    }
+
+    public void findFace(){
+        if(hasBitmap()) {
+            Face face = new Face();
+
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
+//                    int grayscale = (Color.red(pixel) + Color.green(pixel) + Color.blue(pixel)) / 3;
+                    if(isFace(Color.red(pixel),Color.green(pixel),Color.blue(pixel))){
+                        pixels[row * width + col] = Color.rgb(255, 255, 255);
+
+                    } else {
+                        pixels[row * width + col] = Color.rgb(0, 0, 0);
+                    }
+                }
+            }
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
+    }
+
+    private boolean isFace(int r,int g,int b){
+        return (
+                r > 95 && g > 40 && b > 20 &&
+//                (Math.max(Math.max(r,g),b) - Math.min(Math.min(r,g),b))<15 &&
+                r>g && r>b && (r-g)>15
+                );
     }
 }
