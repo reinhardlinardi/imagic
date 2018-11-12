@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -30,6 +31,8 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
     private ImageView transformedImageView;
 
     private TextView helpTextView;
+
+    private Button detectButton;
 
     Image image;
 
@@ -60,6 +63,9 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
             transformedImageView = view.findViewById(R.id.faceRecognitionTransformedImageView);
             imageView = view.findViewById(R.id.faceRecognitionImageView);
             imageView.setOnClickListener(getImageViewOnClickListener());
+
+            detectButton = view.findViewById(R.id.faceRecognitionButton);
+            detectButton.setOnClickListener(getDetectButtonOnClickListener());
         }
     }
 
@@ -112,6 +118,21 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
                 if(isAttachedToMainActivity()){
                     ImageDialogFragment imageDialog = new ImageDialogFragment();
                     imageDialog.show(getFragmentManager(),ImageDialogFragment.TAG);
+                }
+            }
+        };
+    }
+
+    private View.OnClickListener getDetectButtonOnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isAttachedToMainActivity()){
+                    if(activity.hasImage()){
+                        image = new Image(getContext(),activity.getImage());
+                        FaceDetectionAsynctask faceDetectionAsynctask = new FaceDetectionAsynctask();
+                        faceDetectionAsynctask.execute();
+                    }
                 }
             }
         };
@@ -182,6 +203,48 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
                 if(!UI.isVisible(transformedImageView)) UI.show(transformedImageView);
                 if(!UI.isVisible(container)) UI.show(container);
 
+            }
+        }
+    }
+
+    private class FaceDetectionAsynctask extends AsyncTask<Void, Integer,Void>{
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(isAttachedToMainActivity()){
+                progressBar.setProgress(countProgress(1,2));
+                /*WOY IMPLEMENT */
+                System.out.println("WOY IMPLEMENT");
+                progressBar.setProgress(countProgress(2,2));
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if(isAttachedToMainActivity()){
+                UI.setUnclickable(imageView);
+                UI.disable(detectButton);
+                progressBar.setProgress(0);
+                UI.show(progressBar);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if(isAttachedToMainActivity()){
+                UI.setImageView(getContext(),transformedImageView,image.bitmap);
+                UI.clearMemory(getContext());
+
+                UI.setInvisible(progressBar);
+                UI.setClickable(imageView);
+                UI.enable(detectButton);
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            if(isAttachedToMainActivity()){
+                progressBar.setProgress(progress[0]);
             }
         }
     }

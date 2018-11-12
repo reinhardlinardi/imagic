@@ -67,19 +67,29 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="@string/help_text" />
-        <LinearLayout
-            android:id="@+id/faceRecognitionContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical|center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone">
 
-            <Button
+            <LinearLayout
+                android:id="@+id/faceRecognitionContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-        </LinearLayout>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/faceRecognitionButton"
+                    android:text="Detect Face!"
+                    android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
+                    android:layout_marginStart="@dimen/reset_apply_button_side_margin"
+                    android:background="@drawable/apply_button"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                    android:paddingStart="@dimen/reset_apply_button_side_padding"
+                    android:textColor="@android:color/white"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
