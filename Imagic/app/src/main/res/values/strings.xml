@@ -40,4 +40,6 @@
     <string name="result_text">Result :</string>
     <string name="edit_text_1_text">1</string>
     <string name="custom_kernel_text">Custom Kernel</string>
+    <string name="face_recognition_transformed_image_view_content_description">Face Recognition Transformed Image View</string>
+    <string name="face_recognition_image_view_content_description">Face Recognition Image View</string>
 </resources>

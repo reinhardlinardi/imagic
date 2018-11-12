@@ -18,5 +18,9 @@
   {
     "menu" : "Special Effects",
     "fragmentClass" : "SpecialEffects"
+  },
+  {
+    "menu" : "Face Recognition",
+    "fragmentClass" : "FaceRecognition"
   }
 ]
