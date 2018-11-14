@@ -249,7 +249,7 @@ class Image {
                 Debug.ex(e);
             }
         }
-        Bitmap dummyBitmap = Bitmap.createBitmap(0, 0, Bitmap.Config.ARGB_8888);
+        Bitmap dummyBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
         applySpecialEffect(operator, customKernel, kernelJSON, dummyBitmap, true);
     }
 
@@ -513,6 +513,8 @@ class Image {
             int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
             int faceMidY = face.faceBorder[0].y + (int) ((double) (faceHeight) / 2.0);
             int faceMidX = face.faceBorder[2].x + (int) ((double) (faceWidth) / 2.0);
+            Log.d("Face Mid", Integer.toString(faceMidX) + " " + Integer.toString(faceMidY));
+            Log.d("Picture Size", Integer.toString(width) + " " + Integer.toString(height));
             Bitmap outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             int[] outlinePixels = new int[width * height];
             String kernelJSON = "";
@@ -529,13 +531,82 @@ class Image {
             int[] verticalWhiteHistogram = new int[height];
             for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
                 for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-                    horizontalWhiteHistogram[col]++;
-                    verticalWhiteHistogram[row]++;
+                    int pixel = outlinePixels[row * width + col];
+                    int colorPixel = pixels[row * width + col];
+//                    System.out.print(Integer.toString(Color.red(pixel)) + " ");
+                    if(Color.red(pixel) > 60) {
+                        horizontalWhiteHistogram[col]++;
+                        verticalWhiteHistogram[row]++;
+                    }
                 }
             }
 
+            int maxRowLength = -1;
+            int maxColLength = -1;
+            int startRowMax = 0;
+            int endRowMax = 0;
+            int startColMax = 0;
+            int endColMax = 0;
+            int countRow = 0;
+            int countCol = 0;
+            int numberOfWhiteThreshold = 18;
+
+//            for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+//                if(horizontalWhiteHistogram[col] >= numberOfWhiteThreshold) {
+//                    if (countCol == 0) {
+//                        startColMax = col;
+//                    }
+//                    countCol++;
+//                } else {
+//                    if(countCol > maxColLength) {
+//                        maxColLength = countCol;
+//                        endColMax = startColMax + maxColLength;
+//                    }
+//                    countCol = 0;
+//                }
+//            }
+//            startColMax = endColMax - maxColLength;
+//
+            startColMax = faceMidX - (int) (0.25 * faceWidth);
+            endColMax = startColMax + (int) (0.5 * faceWidth);
+
+            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
+                if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
+                    startRowMax = row;
+                    break;
+                }
+            }
+
+            for(int row = face.faceBorder[1].y; row >= faceMidY; row--) {
+                if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
+                    endRowMax = row;
+                    break;
+                }
+            }
+//            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
+//                if(verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
+//                    if (countRow == 0) {
+//                        startRowMax = row;
+//                    }
+//                    countRow++;
+//                } else {
+//                    if(countRow > maxRowLength) {
+//                        maxRowLength = countRow;
+//                        endRowMax = startRowMax + maxRowLength;
+//                    }
+//                    countRow = 0;
+//                }
+//            }
+//            startRowMax = endRowMax - maxRowLength;
+
+            Point[] mouthBoundary = new Point[2];
+            mouthBoundary[0] = new Point(startColMax, startRowMax);
+            mouthBoundary[1] = new Point(endColMax, endRowMax);
+
             Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
             Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
+            Log.d("MOUTH BOUNDARY", Arrays.toString(mouthBoundary));
+
 
             //TODO Find Eye
 //            for(int row = face.faceBorder[0].y; row <= faceMidY; row++) {
@@ -545,11 +616,11 @@ class Image {
 //            }
 
             //Final Touch
-            drawFaceBorderPixels(pixels, face);
+            drawFaceBorderPixels(pixels, face, mouthBoundary);
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             /* NOTE: change pixels to facePixels to see the black and white version */
-//            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-            bitmap.setPixels(outlinePixels, 0, width, 0, 0, width, height);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+//            bitmap.setPixels(outlinePixels, 0, width, 0, 0, width, height);
         }
     }
 
@@ -673,7 +744,7 @@ class Image {
         face.setBorder(upper,lower,left,right);
     }
 
-    void drawFaceBorderPixels (int[] pixels, Face face) {
+    void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary) {
         /* sets border in pixels */
         int width = bitmap.getWidth();
         for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++){
@@ -684,6 +755,16 @@ class Image {
         for(int row = face.faceBorder[0].y; row <= face.faceBorder[1].y; row++){
             pixels[row * width + face.faceBorder[2].x] = Color.rgb(0,0,255);
             pixels[row * width + face.faceBorder[3].x] = Color.rgb(0,0,255);
+        }
+
+        for(int col = mouthBoundary[0].x; col <= mouthBoundary[1].x; col++){
+            pixels[mouthBoundary[0].y * width + col] = Color.rgb(255,0,0);
+            pixels[mouthBoundary[1].y * width + col] = Color.rgb(255,0,0);
+        }
+
+        for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++){
+            pixels[row * width + mouthBoundary[0].x] = Color.rgb(255,0,0);
+            pixels[row * width + mouthBoundary[1].x] = Color.rgb(255,0,0);
         }
     }
 }
