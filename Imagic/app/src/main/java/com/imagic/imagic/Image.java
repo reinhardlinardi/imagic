@@ -1,17 +1,46 @@
 package com.imagic.imagic;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.UserHandle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Display;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -210,10 +239,23 @@ class Image {
         return (row < 0 || row >= height || col < 0 || col >= width);
     }
 
-    // Apply special effect by convolution using specified algorithm
     void applySpecialEffect(Context context, String algorithm, double[][][] customKernel) {
+        ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
+        String kernelJSON = "";
+        if(!(operator == ConvolutionOperator.MEDIAN || operator == ConvolutionOperator.DIFFERENCE || operator == ConvolutionOperator.HOMOGENOUS_DIFFERENCE)) {
+            try {
+                kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
+            } catch(Exception e) {
+                Debug.ex(e);
+            }
+        }
+        applySpecialEffect(operator, customKernel, kernelJSON);
+    }
+
+    // Apply special effect by convolution using specified algorithm
+    void applySpecialEffect(ConvolutionOperator operator, double[][][] customKernel, String kernelJson) {
         if(hasBitmap()) {
-            ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
+//            ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
 
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
@@ -333,7 +375,7 @@ class Image {
             // Operators with kernel
             else {
                 try {
-                    String kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
+                    String kernelJSON = kernelJson;
                     ArrayList<ConvolutionKernel> kernelList = JSONSerializer.arrayListDeserialize(kernelJSON, ConvolutionKernel.class);
 
                     ConvolutionKernel operatorKernel;
@@ -455,12 +497,86 @@ class Image {
                 }
             }
 
-            findFaceBorder(facePixels,pixels,width,height,face);
+            //TODO RESTORE
+            findFaceBorder(facePixels,width,height,face);
+            Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
+            cleanUpNonFaceRegion(facePixels, face);
+            Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
 
+            //Find MidPoint
+            int faceMidY = face.faceBorder[0].y + (int) ((double) (face.faceBorder[1].y - face.faceBorder[0].y) / 2.0);
+            int faceMidX = face.faceBorder[2].x + (int) ((double) (face.faceBorder[3].x - face.faceBorder[2].x) / 2.0);
+
+            //TODO Find Mouth
+            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
+                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+
+                }
+            }
+
+            //TODO Find Eye
+            for(int row = face.faceBorder[0].y; row <= faceMidY; row++) {
+                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+
+                }
+            }
+
+            //Final Touch
+            drawFaceBorderPixels(pixels, face);
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             /* NOTE: change pixels to facePixels to see the black and white version */
-            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+//            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            bitmap.setPixels(facePixels, 0, width, 0, 0, width, height);
         }
+    }
+
+    void cleanUpNonFaceRegion(int[] facePixels, Face face) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        // PLOT VERTICAL + HORIZONTAL HISTOGRAM
+        int[] horizontalWhiteHistogram = new int[width];
+        int[] verticalWhiteHistogram = new int[height];
+        for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+            for(int row = face.faceBorder[1].y; row >= face.faceBorder[0].y; row--) {
+                int pixel = facePixels[row * width + col];
+                if(Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255) {
+                    horizontalWhiteHistogram[col]++;
+                    verticalWhiteHistogram[row]++;
+                }
+            }
+        }
+
+        int noiseThreshold = 25;
+        for(int row = face.faceBorder[1].y; row >= face.faceBorder[0].y; row--) {
+            for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+                int pixel = facePixels[row * width + col];
+                if(Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255) {
+                    if(horizontalWhiteHistogram[col] < noiseThreshold || verticalWhiteHistogram[row] < noiseThreshold) {
+                        facePixels[row * width + col] = Color.rgb(0, 0, 0);
+                    }
+                }
+            }
+        }
+
+        findFaceBorder(facePixels,width,height,face);
+        int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
+        //TODO DELETE NECK: Need to be improved
+        double heightThreshold = 1.15;
+        int faceHeight = (int) (heightThreshold * (double) faceWidth);
+
+        for(int row = face.faceBorder[0].y + faceHeight; row <= face.faceBorder[1].y; row++) {
+            for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+                int pixel = facePixels[row * width + col];
+                if(Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255) {
+                    facePixels[row * width + col] = Color.rgb(0, 0, 0);
+                }
+            }
+        }
+        findFaceBorder(facePixels,width,height,face);
+
+        Log.d("Horizontal", Arrays.toString(horizontalWhiteHistogram));
+        Log.d("Vertical", Arrays.toString(verticalWhiteHistogram));
     }
 
     private boolean isFace(int r,int g,int b){
@@ -471,8 +587,9 @@ class Image {
                 );
     }
 
-    private void findFaceBorder(int[] facePixels, int[] pixels,int width, int height,Face face){
+    private void findFaceBorder(int[] facePixels,int width, int height,Face face){
         boolean found = false;
+        //TODO REFACTOR !!!
         /* Find border */
         Point upper = new Point(0,0);
         Point lower = new Point(0,0);
@@ -531,19 +648,19 @@ class Image {
 
         /* set borders in face object */
         face.setBorder(upper,lower,left,right);
+    }
 
+    void drawFaceBorderPixels (int[] pixels, Face face) {
         /* sets border in pixels */
-        for(int col=left.x;col<=right.x;col++){
-            pixels[upper.y * width + col] = Color.rgb(0,0,255);
+        int width = bitmap.getWidth();
+        for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++){
+            pixels[face.faceBorder[0].y * width + col] = Color.rgb(0,0,255);
+            pixels[face.faceBorder[1].y * width + col] = Color.rgb(0,0,255);
         }
-        for(int col=left.x;col<=right.x;col++){
-            pixels[lower.y * width + col] = Color.rgb(0,0,255);
-        }
-        for(int row = upper.y;row<=lower.y;row++){
-            pixels[row * width + left.x] = Color.rgb(0,0,255);
-        }
-        for(int row = upper.y;row<=lower.y;row++){
-            pixels[row * width + right.x] = Color.rgb(0,0,255);
+
+        for(int row = face.faceBorder[0].y; row <= face.faceBorder[1].y; row++){
+            pixels[row * width + face.faceBorder[2].x] = Color.rgb(0,0,255);
+            pixels[row * width + face.faceBorder[3].x] = Color.rgb(0,0,255);
         }
     }
 }

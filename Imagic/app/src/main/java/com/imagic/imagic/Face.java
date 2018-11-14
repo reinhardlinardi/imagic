@@ -9,7 +9,7 @@ public class Face {
     public static final int LEFT = 2;
     public static final int RIGHT = 3;
 
-    private Point[] faceBorder;
+    public Point[] faceBorder;
 
     public Face(){
         faceBorder = new Point[4];
