@@ -253,7 +253,7 @@ class Image {
     }
 
     // Apply special effect by convolution using specified algorithm
-    void applySpecialEffect(ConvolutionOperator operator, double[][][] customKernel, String kernelJson) {
+    void applySpecialEffect(ConvolutionOperator operator, double[][][] customKernel, String kernelJson, Bitmap outBitmap, boolean applyChange) {
         if(hasBitmap()) {
 //            ConvolutionOperator operator = ConvolutionOperator.getConvolutionOperator(algorithm);
 
@@ -467,8 +467,13 @@ class Image {
                 }
             }
 
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
+            if(applyChange) {
+                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                bitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
+            } else {
+                outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                outBitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
+            }
         }
     }
 
