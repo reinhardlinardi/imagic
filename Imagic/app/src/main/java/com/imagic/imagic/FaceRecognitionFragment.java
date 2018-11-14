@@ -212,9 +212,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
         protected Void doInBackground(Void... voids) {
             if(isAttachedToMainActivity()){
                 progressBar.setProgress(countProgress(1,2));
-                /*WOY IMPLEMENT */
-                image.findFace();
-                System.out.println("WOY IMPLEMENT");
+                image.findFace(getContext());
                 progressBar.setProgress(countProgress(2,2));
             }
             return null;
