@@ -249,7 +249,8 @@ class Image {
                 Debug.ex(e);
             }
         }
-        applySpecialEffect(operator, customKernel, kernelJSON);
+        Bitmap dummyBitmap = Bitmap.createBitmap(0, 0, Bitmap.Config.ARGB_8888);
+        applySpecialEffect(operator, customKernel, kernelJSON, dummyBitmap, true);
     }
 
     // Apply special effect by convolution using specified algorithm
@@ -471,13 +472,12 @@ class Image {
                 bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                 bitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
             } else {
-                outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                 outBitmap.setPixels(newPixels, 0, width, 0, 0, width, height);
             }
         }
     }
 
-    public void findFace(){
+    public void findFace(Context context){
         if(hasBitmap()) {
             Face face = new Face();
 
@@ -509,29 +509,47 @@ class Image {
             Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
 
             //Find MidPoint
-            int faceMidY = face.faceBorder[0].y + (int) ((double) (face.faceBorder[1].y - face.faceBorder[0].y) / 2.0);
-            int faceMidX = face.faceBorder[2].x + (int) ((double) (face.faceBorder[3].x - face.faceBorder[2].x) / 2.0);
+            int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
+            int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
+            int faceMidY = face.faceBorder[0].y + (int) ((double) (faceHeight) / 2.0);
+            int faceMidX = face.faceBorder[2].x + (int) ((double) (faceWidth) / 2.0);
+            Bitmap outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            int[] outlinePixels = new int[width * height];
+            String kernelJSON = "";
+            try {
+                kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
+            } catch (Exception e) {
+                Debug.ex(e); // do nothing
+            }
+            applySpecialEffect(ConvolutionOperator.SOBEL, customKernel, kernelJSON, outBitmap, false);
+            outBitmap.getPixels(outlinePixels, 0, width, 0, 0, width, height);
 
             //TODO Find Mouth
+            int[] horizontalWhiteHistogram = new int[width];
+            int[] verticalWhiteHistogram = new int[height];
             for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
                 for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-
+                    horizontalWhiteHistogram[col]++;
+                    verticalWhiteHistogram[row]++;
                 }
             }
+
+            Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
+            Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
 
             //TODO Find Eye
-            for(int row = face.faceBorder[0].y; row <= faceMidY; row++) {
-                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-
-                }
-            }
+//            for(int row = face.faceBorder[0].y; row <= faceMidY; row++) {
+//                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+//
+//                }
+//            }
 
             //Final Touch
             drawFaceBorderPixels(pixels, face);
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             /* NOTE: change pixels to facePixels to see the black and white version */
 //            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-            bitmap.setPixels(facePixels, 0, width, 0, 0, width, height);
+            bitmap.setPixels(outlinePixels, 0, width, 0, 0, width, height);
         }
     }
 
