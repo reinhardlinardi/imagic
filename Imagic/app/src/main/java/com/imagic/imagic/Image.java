@@ -629,11 +629,47 @@ class Image {
                 }
             }
 
-            Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
-            Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
+            int counter = 0;
+            int bottomEyeBoundary = -1;
+            int topEyeBoundary = -1;
+            for(int row = faceMidY; row >= face.faceBorder[0].y; row--) {
+                if(verticalWhiteHistogram[row] > 50) {
+                    counter++;
+                    bottomEyeBoundary = (counter == 1)? row:bottomEyeBoundary;
+                    topEyeBoundary = (counter == 2)? row:topEyeBoundary;
+                }
+                if(counter == 2) {
+                    break;
+                }
+            }
+            counter = 0;
+            int leftEyeBoundary = -1;
+            int rightEyeBoundary = -1;
+            for(int col = faceMidX; col <= face.faceBorder[3].x; col++) {
+                if(horizontalWhiteHistogram[col] > 25) {
+                    counter++;
+                    leftEyeBoundary = (counter == 1)? col:leftEyeBoundary;
+//                    rightEyeBoundary = (counter == 2)? col:rightEyeBoundary;
+                }
+                if(counter == 1) {
+                    break;
+                }
+            }
+            rightEyeBoundary = leftEyeBoundary + (int) (0.2 * (double) faceWidth);
+            Log.d("left boundary", Integer.toString(leftEyeBoundary) + " " + Double.toString(0.2 * (double) faceWidth));
+            Point[][] eyeBoundary = new Point[2][2];
+            eyeBoundary[1][0] = new Point(leftEyeBoundary, topEyeBoundary);
+            eyeBoundary[1][1] = new Point(rightEyeBoundary, bottomEyeBoundary);
+            eyeBoundary[0][1] = new Point(faceMidX - (leftEyeBoundary - faceMidX), bottomEyeBoundary);
+            eyeBoundary[0][0] = new Point(faceMidX - (rightEyeBoundary - faceMidX), topEyeBoundary);
+            Log.d("LEFT EYE", Arrays.toString(eyeBoundary[0]));
+            Log.d("RIGHT EYE", Arrays.toString(eyeBoundary[1]));
+
+            Log.d("Horizontal EYE", Arrays.toString(horizontalWhiteHistogram));
+            Log.d("Vertical EYE", Arrays.toString(verticalWhiteHistogram));
 
             //Final Touch
-            drawFaceBorderPixels(pixels, face, mouthBoundary);
+            drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary);
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             /* NOTE: change pixels to facePixels to see the black and white version */
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
@@ -761,7 +797,7 @@ class Image {
         face.setBorder(upper,lower,left,right);
     }
 
-    void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary) {
+    void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary, Point[][] eyeBoundary) {
         /* sets border in pixels */
         int width = bitmap.getWidth();
         for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++){
@@ -782,6 +818,24 @@ class Image {
         for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++){
             pixels[row * width + mouthBoundary[0].x] = Color.rgb(255,0,0);
             pixels[row * width + mouthBoundary[1].x] = Color.rgb(255,0,0);
+        }
+
+        //EYE
+        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
+            pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(0,255,0);
+            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(0,255,0);
+        }
+
+        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
+            pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(0,255,0);
+            pixels[eyeBoundary[1][1].y * width + col] = Color.rgb(0,255,0);
+        }
+
+        for(int row = eyeBoundary[0][0].y; row <= eyeBoundary[0][1].y; row++){
+            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(0,255,0);
+            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(0,255,0);
+            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(0,255,0);
+            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(0,255,0);
         }
     }
 }
