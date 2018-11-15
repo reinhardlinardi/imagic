@@ -857,5 +857,17 @@ class Image {
             pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,0,255);
             pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(255,0,255);
         }
+
+        //NOSE
+        int noseHeight = (int)(0.31*(double)(face.faceBorder[0].y - face.faceBorder[1].y));
+        for(int col = eyeBoundary[0][1].x; col <= eyeBoundary[1][0].x; col++){
+            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(0,255,255);
+            pixels[(eyeBoundary[0][1].y + noseHeight) * width + col] = Color.rgb(0,255,255);
+        }
+
+        for(int row = eyeBoundary[0][1].y; row <= eyeBoundary[0][1].y + noseHeight; row++){
+            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(0, 255,255);
+            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(0, 255,255);
+        }
     }
 }
