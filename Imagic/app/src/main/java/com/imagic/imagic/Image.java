@@ -609,11 +609,28 @@ class Image {
 
 
             //TODO Find Eye
-//            for(int row = face.faceBorder[0].y; row <= faceMidY; row++) {
-//                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-//
-//                }
-//            }
+            //RESET Histogram
+            for(int row = 0; row < height; row++) {
+                verticalWhiteHistogram[row] = 0;
+            }
+            for(int col = 0; col < width; col++) {
+                horizontalWhiteHistogram[col] = 0;
+            }
+
+            for(int row = faceMidY; row >= face.faceBorder[0].y; row--) {
+                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+                    int pixel = outlinePixels[row * width + col];
+                    int colorPixel = pixels[row * width + col];
+//                    System.out.print(Integer.toString(Color.red(pixel)) + " ");
+                    if(Color.red(pixel) > 60) {
+                        horizontalWhiteHistogram[col]++;
+                        verticalWhiteHistogram[row]++;
+                    }
+                }
+            }
+
+            Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
+            Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
 
             //Final Touch
             drawFaceBorderPixels(pixels, face, mouthBoundary);
@@ -676,7 +693,7 @@ class Image {
     private boolean isFace(int r,int g,int b){
         return (
                 r > 95 && g > 40 && b > 20 &&
-//                (Math.max(Math.max(r,g),b) - Math.min(Math.min(r,g),b))<15 &&
+                (Math.max(Math.max(r,g),b) - Math.min(Math.min(r,g),b))>15 &&
                 r>g && r>b && (r-g)>15
                 );
     }
