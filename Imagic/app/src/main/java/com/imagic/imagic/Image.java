@@ -636,12 +636,13 @@ class Image {
                 if(verticalWhiteHistogram[row] > 50) {
                     counter++;
                     bottomEyeBoundary = (counter == 1)? row:bottomEyeBoundary;
-                    topEyeBoundary = (counter == 2)? row:topEyeBoundary;
+//                    topEyeBoundary = (counter == 2)? row:topEyeBoundary;
                 }
-                if(counter == 2) {
+                if(counter == 1) {
                     break;
                 }
             }
+            topEyeBoundary = bottomEyeBoundary - (int)(0.1 * (double) faceHeight);
             counter = 0;
             int leftEyeBoundary = -1;
             int rightEyeBoundary = -1;
@@ -836,6 +837,25 @@ class Image {
             pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(0,255,0);
             pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(0,255,0);
             pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(0,255,0);
+        }
+
+        //EYELASH
+        int eyelashHeight = (int)(0.65*(double)(eyeBoundary[0][1].y - eyeBoundary[0][0].y));
+        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
+            pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(255,0,255);
+            pixels[(eyeBoundary[0][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
+        }
+
+        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
+            pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(255,0,255);
+            pixels[(eyeBoundary[1][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
+        }
+
+        for(int row = (eyeBoundary[0][0].y - eyelashHeight); row <= eyeBoundary[0][0].y; row++){
+            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(255,0,255);
+            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,0,255);
+            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,0,255);
+            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(255,0,255);
         }
     }
 }
