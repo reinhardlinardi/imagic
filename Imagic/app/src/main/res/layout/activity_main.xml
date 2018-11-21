@@ -64,6 +64,12 @@
                 android:layout_height="wrap_content"
                 android:icon="@drawable/ic_wand_32" />
 
+            <android.support.design.widget.TabItem
+                android:id="@+id/faceRecognitionTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_face_detection" />
+
         </android.support.design.widget.TabLayout>
     </android.support.design.widget.AppBarLayout>
 

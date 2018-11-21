@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".OCRFragment">
+
+    <ProgressBar
+        android:id="@+id/faceRecognitionProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:maxHeight="@dimen/progress_bar_max_height"
+        android:minHeight="@dimen/progress_bar_min_height"
+        android:progress="0"
+        android:visibility="invisible" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/scrollable_linear_layout_bottom_padding"
+            android:paddingEnd="@dimen/scrollable_linear_layout_side_padding"
+            android:paddingStart="@dimen/scrollable_linear_layout_side_padding"
+            android:paddingTop="@dimen/scrollable_linear_layout_top_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <ImageView
+                    android:id="@+id/faceRecognitionImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/image_view_layout_height"
+                    android:layout_marginEnd="@dimen/double_image_view_side_margin"
+                    android:layout_marginStart="@dimen/double_image_view_side_margin"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/face_recognition_image_view_content_description"
+                    android:src="@drawable/ic_mountain" />
+
+                <ImageView
+                    android:id="@+id/faceRecognitionTransformedImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/image_view_layout_height"
+                    android:layout_marginEnd="@dimen/double_image_view_side_margin"
+                    android:layout_marginStart="@dimen/double_image_view_side_margin"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/face_recognition_transformed_image_view_content_description"
+                    android:src="@drawable/ic_mountain"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/faceRecognitionHelpTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/help_text" />
+
+            <LinearLayout
+                android:id="@+id/faceRecognitionContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/faceRecognitionButton"
+                    android:text="Detect Face!"
+                    android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
+                    android:layout_marginStart="@dimen/reset_apply_button_side_margin"
+                    android:background="@drawable/apply_button"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingEnd="@dimen/reset_apply_button_side_padding"
+                    android:paddingStart="@dimen/reset_apply_button_side_padding"
+                    android:textColor="@android:color/white"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>
