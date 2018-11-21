@@ -884,32 +884,31 @@ class Image {
     }
 
     private Face findFaceBorder(int width, int height, Face face){
-        boolean found = false;
-        int startRow = -1;
-        int startCol = -1;
-        for(int row = face.faceBorder[0].y; row < face.faceBorder[1].y; row++) {
-            for(int col = face.faceBorder[0].x; col < face.faceBorder[1].x; col++) {
-                int pixel = facePixels[row * visitedPixel[0].length + col];
-                if(isWhite(pixel)) {
-                    startRow = row;
-                    startCol = col;
-                    found = true;
-                    break;
-                }
-            }
-            if(found) {
-                break;
-            }
-        }
-
-        resetVisited();
-        //reset boundary for next face
         tempFaceBoundary[0] = visitedPixel.length-1;
         tempFaceBoundary[1] = 0;
         tempFaceBoundary[2] = visitedPixel[0].length-1;
         tempFaceBoundary[3] = 0;
 
-        dfsCandidateFace(startRow, startCol);
+        for(int row = face.faceBorder[0].y; row < face.faceBorder[1].y; row++) {
+            for(int col = face.faceBorder[0].x; col < face.faceBorder[1].x; col++) {
+                int pixel = facePixels[row * visitedPixel[0].length + col];
+                if(isWhite(pixel)) {
+                    if(row < tempFaceBoundary[0]) {
+                        tempFaceBoundary[0] = row;
+                    }
+                    if(row > tempFaceBoundary[1]) {
+                        tempFaceBoundary[1] = row;
+                    }
+                    if(col < tempFaceBoundary[2]) {
+                        tempFaceBoundary[2] = col;
+                    }
+                    if(col > tempFaceBoundary[3]) {
+                        tempFaceBoundary[3] = col;
+                    }
+                }
+            }
+        }
+
         face.setBorder(new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
                 new Point(tempFaceBoundary[3], tempFaceBoundary[1]),
                 new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
