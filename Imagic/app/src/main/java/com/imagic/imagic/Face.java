@@ -9,6 +9,7 @@ public class Face {
     public static final int LEFT = 2;
     public static final int RIGHT = 3;
 
+    //TODO REFACTOR FACEBORDER ATTRIBUTE ASAP
     public Point[] faceBorder;
 
     public Face(){
