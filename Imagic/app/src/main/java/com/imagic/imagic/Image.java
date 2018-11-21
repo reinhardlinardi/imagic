@@ -66,7 +66,8 @@ class Image {
     int[][] visitedPixel;
     int[] facePixels;
     int PIXEL_VISITED = 1;
-    int[][] neighbor = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    int[][] neighbor = {{1, 0}, {0, 1}, {-1, 0}, {0, -1},
+            {1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
     int[] tempFaceBoundary;
 
     /* Methods */
@@ -514,15 +515,26 @@ class Image {
             //TODO IN DEVELOPMENT: DETECT MULTIPLE FACES
             faces = findFaceCandidates(width, height);
             Log.d("FACE CANDIDATES", Integer.toString(faces.size()));
+
+            Log.d("FACE 1", Arrays.toString(faces.get(0).faceBorder));
+            Log.d("FACE 2", Arrays.toString(faces.get(1).faceBorder));
             for(Face face : faces) {
-//                findFaceBorder(width,height,face);
+                int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
+                int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
+                if (isNoise(faceWidth, faceHeight)) {
+//                    Log.d("CONTINUE", "TES");
+                    continue;
+                } else {
+                    Log.d("CONTINUE", Integer.toString(faceWidth) + " " + Integer.toString(faceHeight));
+                }
+
                 Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
-                cleanUpNonFaceRegion(face);
+                face = cleanUpNonFaceRegion(face);
                 Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
 
                 //Find MidPoint
-                int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
-                int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
+                faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
+                faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
                 int faceMidY = face.faceBorder[0].y + (int) ((double) (faceHeight) / 2.0);
                 int faceMidX = face.faceBorder[2].x + (int) ((double) (faceWidth) / 2.0);
                 Log.d("Face Mid", Integer.toString(faceMidX) + " " + Integer.toString(faceMidY));
@@ -683,17 +695,18 @@ class Image {
 
                 //Final Touch
                 drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary);
-                break;
+//                break;
             }
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             /* NOTE: change pixels to facePixels to see the black and white version */
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
 //            bitmap.setPixels(outlinePixels, 0, width, 0, 0, width, height);
+//            bitmap.setPixels(facePixels, 0, width, 0, 0, width, height);
         }
     }
 
-    void cleanUpNonFaceRegion(Face face) {
+    Face cleanUpNonFaceRegion(Face face) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
@@ -722,7 +735,9 @@ class Image {
             }
         }
 
-        findFaceBorder(width,height,face);
+        Log.d("FaceBorders", Arrays.toString(face.faceBorder));
+        face = findFaceBorder(width,height,face);
+        Log.d("FaceBordersAFTER", Arrays.toString(face.faceBorder));
         int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
         //TODO DELETE NECK: Need to be improved
         double heightThreshold = 1.15;
@@ -736,10 +751,32 @@ class Image {
                 }
             }
         }
-        findFaceBorder(width,height,face);
+        face = findFaceBorder(width,height,face);
 
         Log.d("Horizontal", Arrays.toString(horizontalWhiteHistogram));
         Log.d("Vertical", Arrays.toString(verticalWhiteHistogram));
+
+        return face;
+    }
+
+    private boolean isNoise(int faceWidth, int faceHeight) {
+        boolean result = true;
+        if(faceWidth > 0 && faceHeight > 0) {
+            double maxThresholdHeightWidth = 3;
+            double minThresholdHeightWidth = 0.8;
+            double faceHeightWidthRatio = (double) faceHeight / (double) faceWidth;
+            int faceArea = faceHeight * faceWidth;
+            int pictureArea = visitedPixel.length * visitedPixel[0].length;
+            double areaRatio = (double) faceArea / (double) pictureArea;
+            double thresholdArea = 0.005;
+//            Log.d("height width ratio", Double.toString(faceHeightWidthRatio));
+//            Log.d("area ratio", Double.toString(areaRatio));
+
+            result = (faceHeightWidthRatio > maxThresholdHeightWidth ||
+                    faceHeightWidthRatio < minThresholdHeightWidth ||
+                    areaRatio < thresholdArea);
+        }
+        return result;
     }
 
     private boolean isFace(int r,int g,int b){
@@ -814,7 +851,7 @@ class Image {
 
     private boolean isLegalPixel(int row, int col) {
         boolean isLegalNeighbor = false;
-        for(int i = 0; i < neighbor.length; i++) {
+        for(int i = 0; i < 4; i++) {
             int pixel = facePixels[row * visitedPixel[0].length + col];
             int nextRow = row + neighbor[i][0];
             int nextCol = col + neighbor[i][1];
@@ -838,15 +875,54 @@ class Image {
         return (Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255);
     }
 
-    private void findFaceBorder(int width, int height, Face face){
+    private void resetVisited() {
+        for(int i = 0; i < visitedPixel.length; i++) {
+            for(int j = 0; j < visitedPixel[0].length; j++) {
+                visitedPixel[i][j] = 0;
+            }
+        }
+    }
+
+    private Face findFaceBorder(int width, int height, Face face){
         boolean found = false;
+        int startRow = -1;
+        int startCol = -1;
+        for(int row = face.faceBorder[0].y; row < face.faceBorder[1].y; row++) {
+            for(int col = face.faceBorder[0].x; col < face.faceBorder[1].x; col++) {
+                int pixel = facePixels[row * visitedPixel[0].length + col];
+                if(isWhite(pixel)) {
+                    startRow = row;
+                    startCol = col;
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        resetVisited();
+        //reset boundary for next face
+        tempFaceBoundary[0] = visitedPixel.length-1;
+        tempFaceBoundary[1] = 0;
+        tempFaceBoundary[2] = visitedPixel[0].length-1;
+        tempFaceBoundary[3] = 0;
+
+        dfsCandidateFace(startRow, startCol);
+        face.setBorder(new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
+                new Point(tempFaceBoundary[3], tempFaceBoundary[1]),
+                new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
+                new Point(tempFaceBoundary[3], tempFaceBoundary[1]));
+        return face;
+        /*
         //TODO REFACTOR !!!
-        /* Find border */
+        /* Find border
         Point upper = new Point(0,0);
         Point lower = new Point(0,0);
         Point left = new Point(0,0);
         Point right = new Point(0,0);
-        /* upper */
+        /* upper
         for(int row = 0; row < height; row++) {
             for(int col = 0; col < width; col++) {
                 if(facePixels[row * width + col] == Color.rgb(255,255,255)){
@@ -859,7 +935,7 @@ class Image {
         }
         found = false;
 
-        /* lower */
+        /* lower
         for(int row = height-1; row >=0; row--) {
             for(int col = 0; col < width; col++) {
                 if(facePixels[row * width + col] == Color.rgb(255,255,255)){
@@ -872,7 +948,7 @@ class Image {
         }
         found = false;
 
-        /* left */
+        /* left
         for(int col = 0; col < width; col++) {
             for(int row = 0; row < height; row++) {
                 if(facePixels[row * width + col] == Color.rgb(255,255,255)){
@@ -885,7 +961,7 @@ class Image {
         }
         found = false;
 
-        /* right */
+        /* right
         for(int col = width-1; col >=0; col--) {
             for(int row = 0; row < height; row++) {
                 if(facePixels[row * width + col] == Color.rgb(255,255,255)){
@@ -897,8 +973,8 @@ class Image {
             if(found)break;
         }
 
-        /* set borders in face object */
-        face.setBorder(upper,lower,left,right);
+        /* set borders in face object
+        face.setBorder(upper,lower,left,right); */
     }
 
     void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary, Point[][] eyeBoundary) {
@@ -925,52 +1001,52 @@ class Image {
         }
 
         //EYE
-        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
-            pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(0,255,0);
-            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(0,255,0);
-        }
-
-        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
-            pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(0,255,0);
-            pixels[eyeBoundary[1][1].y * width + col] = Color.rgb(0,255,0);
-        }
-
-        for(int row = eyeBoundary[0][0].y; row <= eyeBoundary[0][1].y; row++){
-            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(0,255,0);
-            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(0,255,0);
-            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(0,255,0);
-            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(0,255,0);
-        }
-
-        //EYELASH
-        int eyelashHeight = (int)(0.65*(double)(eyeBoundary[0][1].y - eyeBoundary[0][0].y));
-        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
-            pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(255,0,255);
-            pixels[(eyeBoundary[0][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
-        }
-
-        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
-            pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(255,0,255);
-            pixels[(eyeBoundary[1][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
-        }
-
-        for(int row = (eyeBoundary[0][0].y - eyelashHeight); row <= eyeBoundary[0][0].y; row++){
-            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(255,0,255);
-            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,0,255);
-            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,0,255);
-            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(255,0,255);
-        }
-
-        //NOSE
-        int noseHeight = (int)(0.31*(double)(face.faceBorder[1].y - face.faceBorder[0].y));
-        for(int col = eyeBoundary[0][1].x; col <= eyeBoundary[1][0].x; col++){
-            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(255,255,0);
-            pixels[(eyeBoundary[0][1].y + noseHeight) * width + col] = Color.rgb(255,255,0);
-        }
-
-        for(int row = eyeBoundary[0][1].y; row <= eyeBoundary[0][1].y + noseHeight; row++){
-            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,255,0);
-            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,255,0);
-        }
+//        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
+//            pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(0,255,0);
+//            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(0,255,0);
+//        }
+//
+//        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
+//            pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(0,255,0);
+//            pixels[eyeBoundary[1][1].y * width + col] = Color.rgb(0,255,0);
+//        }
+//
+//        for(int row = eyeBoundary[0][0].y; row <= eyeBoundary[0][1].y; row++){
+//            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(0,255,0);
+//            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(0,255,0);
+//            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(0,255,0);
+//            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(0,255,0);
+//        }
+//
+//        //EYELASH
+//        int eyelashHeight = (int)(0.65*(double)(eyeBoundary[0][1].y - eyeBoundary[0][0].y));
+//        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
+//            pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(255,0,255);
+//            pixels[(eyeBoundary[0][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
+//        }
+//
+//        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
+//            pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(255,0,255);
+//            pixels[(eyeBoundary[1][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
+//        }
+//
+//        for(int row = (eyeBoundary[0][0].y - eyelashHeight); row <= eyeBoundary[0][0].y; row++){
+//            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(255,0,255);
+//            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,0,255);
+//            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,0,255);
+//            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(255,0,255);
+//        }
+//
+//        //NOSE
+//        int noseHeight = (int)(0.31*(double)(face.faceBorder[1].y - face.faceBorder[0].y));
+//        for(int col = eyeBoundary[0][1].x; col <= eyeBoundary[1][0].x; col++){
+//            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(255,255,0);
+//            pixels[(eyeBoundary[0][1].y + noseHeight) * width + col] = Color.rgb(255,255,0);
+//        }
+//
+//        for(int row = eyeBoundary[0][1].y; row <= eyeBoundary[0][1].y + noseHeight; row++){
+//            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,255,0);
+//            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,255,0);
+//        }
     }
 }
