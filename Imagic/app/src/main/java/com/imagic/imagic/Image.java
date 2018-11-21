@@ -62,6 +62,13 @@ class Image {
     /* Properties */
     Bitmap bitmap;
 
+    /* Face recognition things */
+    int[][] visitedPixel;
+    int[] facePixels;
+    int PIXEL_VISITED = 1;
+    int[][] neighbor = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    int[] tempFaceBoundary;
+
     /* Methods */
 
     // Constructors
@@ -479,7 +486,8 @@ class Image {
 
     public void findFace(Context context){
         if(hasBitmap()) {
-            Face face = new Face();
+            ArrayList<Face> faces = new ArrayList<Face>();
+//            Face face = new Face();
 
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();
@@ -487,7 +495,8 @@ class Image {
             int[] pixels = new int[width * height];
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 
-            int[] facePixels = new int[width*height];
+            facePixels = new int[width*height];
+            visitedPixel = new int[height][width];
 
             for(int row = 0; row < height; row++) {
                 for(int col = 0; col < width; col++) {
@@ -502,54 +511,57 @@ class Image {
                 }
             }
 
-            //TODO RESTORE
-            findFaceBorder(facePixels,width,height,face);
-            Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
-            cleanUpNonFaceRegion(facePixels, face);
-            Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
+            //TODO IN DEVELOPMENT: DETECT MULTIPLE FACES
+            faces = findFaceCandidates(width, height);
 
-            //Find MidPoint
-            int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
-            int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
-            int faceMidY = face.faceBorder[0].y + (int) ((double) (faceHeight) / 2.0);
-            int faceMidX = face.faceBorder[2].x + (int) ((double) (faceWidth) / 2.0);
-            Log.d("Face Mid", Integer.toString(faceMidX) + " " + Integer.toString(faceMidY));
-            Log.d("Picture Size", Integer.toString(width) + " " + Integer.toString(height));
-            Bitmap outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            int[] outlinePixels = new int[width * height];
-            String kernelJSON = "";
-            try {
-                kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
-            } catch (Exception e) {
-                Debug.ex(e); // do nothing
-            }
-            applySpecialEffect(ConvolutionOperator.SOBEL, customKernel, kernelJSON, outBitmap, false);
-            outBitmap.getPixels(outlinePixels, 0, width, 0, 0, width, height);
+            for(Face face : faces) {
+                findFaceBorder(width,height,face);
+                Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
+                cleanUpNonFaceRegion(face);
+                Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
 
-            //TODO Find Mouth
-            int[] horizontalWhiteHistogram = new int[width];
-            int[] verticalWhiteHistogram = new int[height];
-            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
-                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-                    int pixel = outlinePixels[row * width + col];
-                    int colorPixel = pixels[row * width + col];
+                //Find MidPoint
+                int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
+                int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
+                int faceMidY = face.faceBorder[0].y + (int) ((double) (faceHeight) / 2.0);
+                int faceMidX = face.faceBorder[2].x + (int) ((double) (faceWidth) / 2.0);
+                Log.d("Face Mid", Integer.toString(faceMidX) + " " + Integer.toString(faceMidY));
+                Log.d("Picture Size", Integer.toString(width) + " " + Integer.toString(height));
+                Bitmap outBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                int[] outlinePixels = new int[width * height];
+                String kernelJSON = "";
+                try {
+                    kernelJSON = TextFile.readRawResourceFile(context, R.raw.convolution_kernels);
+                } catch (Exception e) {
+                    Debug.ex(e); // do nothing
+                }
+                applySpecialEffect(ConvolutionOperator.SOBEL, customKernel, kernelJSON, outBitmap, false);
+                outBitmap.getPixels(outlinePixels, 0, width, 0, 0, width, height);
+
+                //TODO Find Mouth
+                int[] horizontalWhiteHistogram = new int[width];
+                int[] verticalWhiteHistogram = new int[height];
+                for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
+                    for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+                        int pixel = outlinePixels[row * width + col];
+                        int colorPixel = pixels[row * width + col];
 //                    System.out.print(Integer.toString(Color.red(pixel)) + " ");
-                    if(Color.red(pixel) > 60) {
-                        horizontalWhiteHistogram[col]++;
-                        verticalWhiteHistogram[row]++;
+                        if(Color.red(pixel) > 60) {
+                            horizontalWhiteHistogram[col]++;
+                            verticalWhiteHistogram[row]++;
+                        }
                     }
                 }
-            }
 
-            int maxRowLength = -1;
-            int maxColLength = -1;
-            int startRowMax = 0;
-            int endRowMax = 0;
-            int startColMax = 0;
-            int endColMax = 0;
-            int countRow = 0;
-            int countCol = 0;
-            int numberOfWhiteThreshold = 18;
+                int maxRowLength = -1;
+                int maxColLength = -1;
+                int startRowMax = 0;
+                int endRowMax = 0;
+                int startColMax = 0;
+                int endColMax = 0;
+                int countRow = 0;
+                int countCol = 0;
+                int numberOfWhiteThreshold = 18;
 
 //            for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
 //                if(horizontalWhiteHistogram[col] >= numberOfWhiteThreshold) {
@@ -567,22 +579,22 @@ class Image {
 //            }
 //            startColMax = endColMax - maxColLength;
 //
-            startColMax = faceMidX - (int) (0.25 * faceWidth);
-            endColMax = startColMax + (int) (0.5 * faceWidth);
+                startColMax = faceMidX - (int) (0.25 * faceWidth);
+                endColMax = startColMax + (int) (0.5 * faceWidth);
 
-            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
-                if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
-                    startRowMax = row;
-                    break;
+                for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
+                    if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
+                        startRowMax = row;
+                        break;
+                    }
                 }
-            }
 
-            for(int row = face.faceBorder[1].y; row >= faceMidY; row--) {
-                if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
-                    endRowMax = row;
-                    break;
+                for(int row = face.faceBorder[1].y; row >= faceMidY; row--) {
+                    if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
+                        endRowMax = row;
+                        break;
+                    }
                 }
-            }
 //            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
 //                if(verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
 //                    if (countRow == 0) {
@@ -599,78 +611,80 @@ class Image {
 //            }
 //            startRowMax = endRowMax - maxRowLength;
 
-            Point[] mouthBoundary = new Point[2];
-            mouthBoundary[0] = new Point(startColMax, startRowMax);
-            mouthBoundary[1] = new Point(endColMax, endRowMax);
+                Point[] mouthBoundary = new Point[2];
+                mouthBoundary[0] = new Point(startColMax, startRowMax);
+                mouthBoundary[1] = new Point(endColMax, endRowMax);
 
-            Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
-            Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
-            Log.d("MOUTH BOUNDARY", Arrays.toString(mouthBoundary));
+                Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
+                Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
+                Log.d("MOUTH BOUNDARY", Arrays.toString(mouthBoundary));
 
 
-            //TODO Find Eye
-            //RESET Histogram
-            for(int row = 0; row < height; row++) {
-                verticalWhiteHistogram[row] = 0;
-            }
-            for(int col = 0; col < width; col++) {
-                horizontalWhiteHistogram[col] = 0;
-            }
+                //TODO Find Eye
+                //RESET Histogram
+                for(int row = 0; row < height; row++) {
+                    verticalWhiteHistogram[row] = 0;
+                }
+                for(int col = 0; col < width; col++) {
+                    horizontalWhiteHistogram[col] = 0;
+                }
 
-            for(int row = faceMidY; row >= face.faceBorder[0].y; row--) {
-                for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-                    int pixel = outlinePixels[row * width + col];
-                    int colorPixel = pixels[row * width + col];
+                for(int row = faceMidY; row >= face.faceBorder[0].y; row--) {
+                    for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
+                        int pixel = outlinePixels[row * width + col];
+                        int colorPixel = pixels[row * width + col];
 //                    System.out.print(Integer.toString(Color.red(pixel)) + " ");
-                    if(Color.red(pixel) > 60) {
-                        horizontalWhiteHistogram[col]++;
-                        verticalWhiteHistogram[row]++;
+                        if(Color.red(pixel) > 60) {
+                            horizontalWhiteHistogram[col]++;
+                            verticalWhiteHistogram[row]++;
+                        }
                     }
                 }
-            }
 
-            int counter = 0;
-            int bottomEyeBoundary = -1;
-            int topEyeBoundary = -1;
-            for(int row = faceMidY; row >= face.faceBorder[0].y; row--) {
-                if(verticalWhiteHistogram[row] > 50) {
-                    counter++;
-                    bottomEyeBoundary = (counter == 1)? row:bottomEyeBoundary;
+                int counter = 0;
+                int bottomEyeBoundary = -1;
+                int topEyeBoundary = -1;
+                for(int row = faceMidY; row >= face.faceBorder[0].y; row--) {
+                    if(verticalWhiteHistogram[row] > 50) {
+                        counter++;
+                        bottomEyeBoundary = (counter == 1)? row:bottomEyeBoundary;
 //                    topEyeBoundary = (counter == 2)? row:topEyeBoundary;
+                    }
+                    if(counter == 1) {
+                        break;
+                    }
                 }
-                if(counter == 1) {
-                    break;
-                }
-            }
-            topEyeBoundary = bottomEyeBoundary - (int)(0.1 * (double) faceHeight);
-            counter = 0;
-            int leftEyeBoundary = -1;
-            int rightEyeBoundary = -1;
-            for(int col = faceMidX; col <= face.faceBorder[3].x; col++) {
-                if(horizontalWhiteHistogram[col] > 25) {
-                    counter++;
-                    leftEyeBoundary = (counter == 1)? col:leftEyeBoundary;
+                topEyeBoundary = bottomEyeBoundary - (int)(0.1 * (double) faceHeight);
+                counter = 0;
+                int leftEyeBoundary = -1;
+                int rightEyeBoundary = -1;
+                for(int col = faceMidX; col <= face.faceBorder[3].x; col++) {
+                    if(horizontalWhiteHistogram[col] > 25) {
+                        counter++;
+                        leftEyeBoundary = (counter == 1)? col:leftEyeBoundary;
 //                    rightEyeBoundary = (counter == 2)? col:rightEyeBoundary;
+                    }
+                    if(counter == 1) {
+                        break;
+                    }
                 }
-                if(counter == 1) {
-                    break;
-                }
+                rightEyeBoundary = leftEyeBoundary + (int) (0.2 * (double) faceWidth);
+                Log.d("left boundary", Integer.toString(leftEyeBoundary) + " " + Double.toString(0.2 * (double) faceWidth));
+                Point[][] eyeBoundary = new Point[2][2];
+                eyeBoundary[1][0] = new Point(leftEyeBoundary, topEyeBoundary);
+                eyeBoundary[1][1] = new Point(rightEyeBoundary, bottomEyeBoundary);
+                eyeBoundary[0][1] = new Point(faceMidX - (leftEyeBoundary - faceMidX), bottomEyeBoundary);
+                eyeBoundary[0][0] = new Point(faceMidX - (rightEyeBoundary - faceMidX), topEyeBoundary);
+                Log.d("LEFT EYE", Arrays.toString(eyeBoundary[0]));
+                Log.d("RIGHT EYE", Arrays.toString(eyeBoundary[1]));
+
+                Log.d("Horizontal EYE", Arrays.toString(horizontalWhiteHistogram));
+                Log.d("Vertical EYE", Arrays.toString(verticalWhiteHistogram));
+
+                //Final Touch
+                drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary);
             }
-            rightEyeBoundary = leftEyeBoundary + (int) (0.2 * (double) faceWidth);
-            Log.d("left boundary", Integer.toString(leftEyeBoundary) + " " + Double.toString(0.2 * (double) faceWidth));
-            Point[][] eyeBoundary = new Point[2][2];
-            eyeBoundary[1][0] = new Point(leftEyeBoundary, topEyeBoundary);
-            eyeBoundary[1][1] = new Point(rightEyeBoundary, bottomEyeBoundary);
-            eyeBoundary[0][1] = new Point(faceMidX - (leftEyeBoundary - faceMidX), bottomEyeBoundary);
-            eyeBoundary[0][0] = new Point(faceMidX - (rightEyeBoundary - faceMidX), topEyeBoundary);
-            Log.d("LEFT EYE", Arrays.toString(eyeBoundary[0]));
-            Log.d("RIGHT EYE", Arrays.toString(eyeBoundary[1]));
 
-            Log.d("Horizontal EYE", Arrays.toString(horizontalWhiteHistogram));
-            Log.d("Vertical EYE", Arrays.toString(verticalWhiteHistogram));
-
-            //Final Touch
-            drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary);
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             /* NOTE: change pixels to facePixels to see the black and white version */
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
@@ -678,7 +692,7 @@ class Image {
         }
     }
 
-    void cleanUpNonFaceRegion(int[] facePixels, Face face) {
+    void cleanUpNonFaceRegion(Face face) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
@@ -707,7 +721,7 @@ class Image {
             }
         }
 
-        findFaceBorder(facePixels,width,height,face);
+        findFaceBorder(width,height,face);
         int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
         //TODO DELETE NECK: Need to be improved
         double heightThreshold = 1.15;
@@ -721,7 +735,7 @@ class Image {
                 }
             }
         }
-        findFaceBorder(facePixels,width,height,face);
+        findFaceBorder(width,height,face);
 
         Log.d("Horizontal", Arrays.toString(horizontalWhiteHistogram));
         Log.d("Vertical", Arrays.toString(verticalWhiteHistogram));
@@ -735,7 +749,70 @@ class Image {
                 );
     }
 
-    private void findFaceBorder(int[] facePixels,int width, int height,Face face){
+    private ArrayList<Face> findFaceCandidates(int width, int height) {
+        ArrayList<Face> faces = new ArrayList<Face>();
+        tempFaceBoundary = new int[4]; //UPPER, LOWER, LEFT, RIGHT
+        tempFaceBoundary[0] = visitedPixel.length-1;
+        tempFaceBoundary[1] = 0;
+        tempFaceBoundary[2] = visitedPixel[0].length-1;
+        tempFaceBoundary[3] = 0;
+
+        //TODO DFS
+        for(int row = 0; row < height; row++) {
+            for(int col = 0; col < width; col++) {
+                int pixel = facePixels[row * width + col];
+                if(Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255 &&
+                        visitedPixel[row][col] != PIXEL_VISITED) {
+                    Face tempFace = new Face();
+                    dfsCandidateFace(row, col);
+                    tempFace.setBorder(new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
+                            new Point(tempFaceBoundary[3], tempFaceBoundary[1]),
+                            new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
+                            new Point(tempFaceBoundary[3], tempFaceBoundary[1]));
+                    faces.add(tempFace);
+
+                    //reset boundary for next face
+                    tempFaceBoundary[0] = visitedPixel.length-1;
+                    tempFaceBoundary[1] = 0;
+                    tempFaceBoundary[2] = visitedPixel[0].length-1;
+                    tempFaceBoundary[3] = 0;
+                }
+            }
+        }
+
+        return faces;
+    }
+
+    private void dfsCandidateFace(int row, int col) {
+        if(row < tempFaceBoundary[0]) {
+            tempFaceBoundary[0] = row;
+        }
+        if(row > tempFaceBoundary[1]) {
+            tempFaceBoundary[1] = row;
+        }
+        if(col < tempFaceBoundary[2]) {
+            tempFaceBoundary[2] = col;
+        }
+        if(col > tempFaceBoundary[3]) {
+            tempFaceBoundary[3] = col;
+        }
+        visitedPixel[row][col] = PIXEL_VISITED;
+        for(int i = 0; i < neighbor.length; i++) {
+            int pixel = facePixels[row * visitedPixel[0].length + col];
+            int nextRow = row + neighbor[i][0];
+            int nextCol = col + neighbor[i][1];
+            if (nextRow >= 0 && nextRow < visitedPixel.length &&
+                    nextCol >= 0 && nextCol < visitedPixel[0].length) {
+                if (Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255 &&
+                        visitedPixel[nextRow][nextCol] != PIXEL_VISITED) {
+                    dfsCandidateFace(row + neighbor[i][0], col + neighbor[i][1]);
+                }
+            }
+        }
+
+    }
+
+    private void findFaceBorder(int width, int height,Face face){
         boolean found = false;
         //TODO REFACTOR !!!
         /* Find border */
@@ -859,15 +936,15 @@ class Image {
         }
 
         //NOSE
-        int noseHeight = (int)(0.31*(double)(face.faceBorder[0].y - face.faceBorder[1].y));
+        int noseHeight = (int)(0.31*(double)(face.faceBorder[1].y - face.faceBorder[0].y));
         for(int col = eyeBoundary[0][1].x; col <= eyeBoundary[1][0].x; col++){
-            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(0,255,255);
-            pixels[(eyeBoundary[0][1].y + noseHeight) * width + col] = Color.rgb(0,255,255);
+            pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(255,255,0);
+            pixels[(eyeBoundary[0][1].y + noseHeight) * width + col] = Color.rgb(255,255,0);
         }
 
         for(int row = eyeBoundary[0][1].y; row <= eyeBoundary[0][1].y + noseHeight; row++){
-            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(0, 255,255);
-            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(0, 255,255);
+            pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,255,0);
+            pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,255,0);
         }
     }
 }
