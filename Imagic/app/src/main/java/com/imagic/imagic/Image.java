@@ -513,9 +513,9 @@ class Image {
 
             //TODO IN DEVELOPMENT: DETECT MULTIPLE FACES
             faces = findFaceCandidates(width, height);
-
+            Log.d("FACE CANDIDATES", Integer.toString(faces.size()));
             for(Face face : faces) {
-                findFaceBorder(width,height,face);
+//                findFaceBorder(width,height,face);
                 Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
                 cleanUpNonFaceRegion(face);
                 Log.d("FACE VALUE", Arrays.toString(face.faceBorder));
@@ -683,6 +683,7 @@ class Image {
 
                 //Final Touch
                 drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary);
+                break;
             }
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -803,8 +804,7 @@ class Image {
             int nextCol = col + neighbor[i][1];
             if (nextRow >= 0 && nextRow < visitedPixel.length &&
                     nextCol >= 0 && nextCol < visitedPixel[0].length) {
-                if (Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255 &&
-                        visitedPixel[nextRow][nextCol] != PIXEL_VISITED) {
+                if (isLegalPixel(nextRow, nextCol)) {
                     dfsCandidateFace(row + neighbor[i][0], col + neighbor[i][1]);
                 }
             }
@@ -812,7 +812,33 @@ class Image {
 
     }
 
-    private void findFaceBorder(int width, int height,Face face){
+    private boolean isLegalPixel(int row, int col) {
+        boolean isLegalNeighbor = false;
+        for(int i = 0; i < neighbor.length; i++) {
+            int pixel = facePixels[row * visitedPixel[0].length + col];
+            int nextRow = row + neighbor[i][0];
+            int nextCol = col + neighbor[i][1];
+            if (nextRow >= 0 && nextRow < visitedPixel.length &&
+                    nextCol >= 0 && nextCol < visitedPixel[0].length) {
+                if (isBlack(facePixels[nextRow * visitedPixel[0].length + nextCol])) {
+                    isLegalNeighbor = true;
+                }
+            }
+        }
+        return (visitedPixel[row][col] != PIXEL_VISITED &&
+                isWhite(facePixels[row * visitedPixel[0].length + col]) &&
+                isLegalNeighbor);
+    }
+
+    private boolean isBlack(int pixel) {
+        return (Color.red(pixel) == 0 && Color.green(pixel) == 0 && Color.blue(pixel) == 0);
+    }
+
+    private boolean isWhite(int pixel) {
+        return (Color.red(pixel) == 255 && Color.green(pixel) == 255 && Color.blue(pixel) == 255);
+    }
+
+    private void findFaceBorder(int width, int height, Face face){
         boolean found = false;
         //TODO REFACTOR !!!
         /* Find border */
