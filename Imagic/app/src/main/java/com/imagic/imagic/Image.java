@@ -69,6 +69,10 @@ class Image {
     int[][] neighbor = {{1, 0}, {0, 1}, {-1, 0}, {0, -1},
             {1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
     int[] tempFaceBoundary;
+    int sumOfFaceHeight = 0;
+    int sumOfFaceWidth = 0;
+    int numOfFace = 0;
+
 
     /* Methods */
 
@@ -535,6 +539,14 @@ class Image {
                 //Find MidPoint
                 faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
                 faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
+
+                //SECOND SIZE FILTER
+                if (isNoise(faceWidth, faceHeight)) {
+                    continue;
+                } else {
+                    Log.d("CONTINUE", Integer.toString(faceWidth) + " " + Integer.toString(faceHeight));
+                }
+
                 int faceMidY = face.faceBorder[0].y + (int) ((double) (faceHeight) / 2.0);
                 int faceMidX = face.faceBorder[2].x + (int) ((double) (faceWidth) / 2.0);
                 Log.d("Face Mid", Integer.toString(faceMidX) + " " + Integer.toString(faceMidY));
@@ -768,7 +780,7 @@ class Image {
             int faceArea = faceHeight * faceWidth;
             int pictureArea = visitedPixel.length * visitedPixel[0].length;
             double areaRatio = (double) faceArea / (double) pictureArea;
-            double thresholdArea = 0.005;
+            double thresholdArea = 0.01;
 //            Log.d("height width ratio", Double.toString(faceHeightWidthRatio));
 //            Log.d("area ratio", Double.toString(areaRatio));
 
