@@ -873,7 +873,7 @@ class Image {
         cb = (-0.168) * (double)r + (-0.331) * (double)g + 0.5 * (double)b + 128.0;
         cr = 0.5 * (double)r + (-0.418) * (double)g + (-0.081) * (double)b + 128.0;
 
-        return (cb > 85.0 && cb < 135.0 &&
+        return (cb > 90.0 && cb < 125.0 &&
                 cr > 135.0 && cr < 180.0);
     }
 
