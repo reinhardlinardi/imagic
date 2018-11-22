@@ -516,8 +516,8 @@ class Image {
             faces = findFaceCandidates(width, height);
             Log.d("FACE CANDIDATES", Integer.toString(faces.size()));
 
-            Log.d("FACE 1", Arrays.toString(faces.get(0).faceBorder));
-            Log.d("FACE 2", Arrays.toString(faces.get(1).faceBorder));
+//            Log.d("FACE 1", Arrays.toString(faces.get(0).faceBorder));
+//            Log.d("FACE 2", Arrays.toString(faces.get(1).faceBorder));
             for(Face face : faces) {
                 int faceWidth = face.faceBorder[3].x - face.faceBorder[2].x;
                 int faceHeight = face.faceBorder[1].y - face.faceBorder[0].y;
@@ -763,7 +763,7 @@ class Image {
         boolean result = true;
         if(faceWidth > 0 && faceHeight > 0) {
             double maxThresholdHeightWidth = 3;
-            double minThresholdHeightWidth = 0.8;
+            double minThresholdHeightWidth = 0.85;
             double faceHeightWidthRatio = (double) faceHeight / (double) faceWidth;
             int faceArea = faceHeight * faceWidth;
             int pictureArea = visitedPixel.length * visitedPixel[0].length;
@@ -780,11 +780,13 @@ class Image {
     }
 
     private boolean isFace(int r,int g,int b){
-        return (
-                r > 95 && g > 40 && b > 20 &&
-                (Math.max(Math.max(r,g),b) - Math.min(Math.min(r,g),b))>15 &&
-                r>g && r>b && (r-g)>15
-                );
+        double y, cb, cr;
+        y = 0.299 * (double)r + (-0.587) * (double)g + 0.114 * (double)b;
+        cb = (-0.168) * (double)r + (-0.331) * (double)g + 0.5 * (double)b + 128.0;
+        cr = 0.5 * (double)r + (-0.418) * (double)g + (-0.081) * (double)b + 128.0;
+
+        return (cb > 85.0 && cb < 135.0 &&
+                cr > 135.0 && cr < 180.0);
     }
 
     private ArrayList<Face> findFaceCandidates(int width, int height) {
