@@ -562,148 +562,125 @@ class Image {
                 applySpecialEffect(ConvolutionOperator.SOBEL, customKernel, kernelJSON, outBitmap, false);
                 outBitmap.getPixels(outlinePixels, 0, width, 0, 0, width, height);
 
-                //TODO Find Mouth
                 int[] horizontalWhiteHistogram = new int[width];
                 int[] verticalWhiteHistogram = new int[height];
+                Point[] mouthBoundary = new Point[2];
+                //TODO Find Mouth
+                //TODO NEW METHOD
+
                 int startRow = face.faceBorder[1].y;
                 int startColMax = faceMidX - (int) (0.25 * faceWidth);
                 int endColMax = startColMax + (int) (0.5 * faceWidth);
                 int maxColorValue = -1;
                 int maxColorRow = -1;
                 int maxColorCol = -1;
-                for(int row = startRow; row >= faceMidY + (0.2 * faceHeight); row--) {
-                    for(int col = startColMax; col <= endColMax; col++) {
-                        int pixel = outlinePixels[row * width + col];
-                        int colorPixel = pixels[row * width + col];
-                        if(Color.red(pixel) > maxColorValue){
-                            maxColorValue = Color.red(pixel);
-                            maxColorCol = col;
-                            maxColorRow = row;
+
+                int defaultMouthWidth = (int)(0.45 * (double) faceWidth);
+                int defaultMouthHeight = (int)(0.2 * (double) faceHeight);
+
+                int maxScore = -1;
+                int maxRow = -1;
+                int maxCol = -1;
+                int bottomBoundary = (face.faceBorder[1].y + (int) (0.2 * (double)defaultMouthHeight) < width)?
+                        face.faceBorder[1].y - defaultMouthHeight: face.faceBorder[1].y - (int) (0.8 * (double)defaultMouthHeight);
+                //FIND NOSE HOLE
+////                int noseWidth = 0;
+//////                int maxNoseWidth = 0;
+////                int noseRow = 0;
+////                for(int row = faceMidY + (int) (0.15 * (double) faceHeight); row < faceMidY + (int) (0.25 * (double) faceHeight); row++) {
+////                    for(int col = startColMax; col < endColMax; col++) {
+////                        int pixel = outlinePixels[row * width + col];
+////                        int colorPixel = pixels[row * width + col];
+////                        if(Color.red(pixel) > 50 && noseWidth == 0) {
+////                            noseWidth++;
+////                        }
+////                        if(Color.red(pixel) < 10 && noseWidth > 0) {
+////                            break;
+////                        }
+////                    }
+////                    if(noseWidth < 0.3 * (endColMax-startColMax)) {
+////                        Log.d("noseRow", Integer.toString(noseWidth));
+////                        noseWidth = 0;
+////                    } else {
+////                        noseRow = row;
+////                        break;
+////                    }
+////                }
+//                Log.d("noseRow", Integer.toString(noseRow));
+//                int startMouthSearchRow = (noseRow > 0)?
+//                        noseRow + (int) (0.08 * (double) faceHeight): faceMidY + (int) (0.15 * (double) faceHeight);
+//                for(int row = startMouthSearchRow; row < bottomBoundary; row++) {
+                for(int row = faceMidY + (int) (0.12 * (double) faceHeight); row < bottomBoundary; row++) {
+                    for(int col = startColMax; col < endColMax - defaultMouthWidth; col++) {
+                        for(int rowIn = row; rowIn < row + defaultMouthHeight-1; rowIn++) {
+                            verticalWhiteHistogram[rowIn] = 0;
                         }
-//                    System.out.print(Integer.toString(Color.red(pixel)) + " ");
-//                        if(Color.red(pixel) > 60) {
-//                            horizontalWhiteHistogram[col]++;
-//                            verticalWhiteHistogram[row]++;
-//                        }
-                    }
-                }
-                Log.d("maxColorCol Row", Integer.toString(maxColorCol) + " " + Integer.toString(maxColorRow));
+                        for(int colIn = col; colIn < col + defaultMouthWidth-1; colIn++) {
+                            horizontalWhiteHistogram[colIn] = 0;
+                        }
 
-                int maxRowLength = -1;
-                int maxColLength = -1;
-                int startRowMax = 0;
-                int endRowMax = 0;
-                int countRow = 0;
-                int countCol = 0;
-                int numberOfWhiteThreshold = 30;
-
-//            for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++) {
-//                if(horizontalWhiteHistogram[col] >= numberOfWhiteThreshold) {
-//                    if (countCol == 0) {
-//                        startColMax = col;
-//                    }
-//                    countCol++;
-//                } else {
-//                    if(countCol > maxColLength) {
-//                        maxColLength = countCol;
-//                        endColMax = startColMax + maxColLength;
-//                    }
-//                    countCol = 0;
-//                }
-//            }
-//            startColMax = endColMax - maxColLength;
-//
-                int lowCount = 0;
-                for(int row = maxColorRow; row >= faceMidY + (0.2 * faceHeight); row--) {
-                    int pixel = outlinePixels[row * width + maxColorCol];
-                    if(Color.red(pixel) < 10){
-                        startRowMax = row;
-                        break;
-                    }
-                }
-                if(startRowMax == 0) {
-                    startRowMax = maxColorRow - (int)(0.1 * faceHeight);
-                }
-
-                for(int row = maxColorRow; row < face.faceBorder[1].y; row++) {
-                    int pixel = outlinePixels[row * width + maxColorCol];
-                    if(Color.red(pixel) < 7){
-                        endRowMax = row;
-                        break;
-                    }
-                }
-                if(endRowMax == 0) {
-                    endRowMax = maxColorRow + (int)(0.12 * faceHeight);
-                }
-
-//TODO TOBE RESTORED
-//                for(int row = startRow; row <= face.faceBorder[1].y; row++) {
-//                    if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
-//                        startRowMax = row;
-//                        break;
-//                    }
-//                }
-//
-//                for(int row = face.faceBorder[1].y; row >= startRow; row--) {
-//                    if (verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
-//                        endRowMax = row;
-//                        break;
-//                    }
-//                }
-//            for(int row = faceMidY; row <= face.faceBorder[1].y; row++) {
-//                if(verticalWhiteHistogram[row] >= numberOfWhiteThreshold) {
-//                    if (countRow == 0) {
-//                        startRowMax = row;
-//                    }
-//                    countRow++;
-//                } else {
-//                    if(countRow > maxRowLength) {
-//                        maxRowLength = countRow;
-//                        endRowMax = startRowMax + maxRowLength;
-//                    }
-//                    countRow = 0;
-//                }
-//            }
-//            startRowMax = endRowMax - maxRowLength;
-
-                Point[] mouthBoundary = new Point[2];
-                mouthBoundary[0] = new Point(startColMax, startRowMax);
-                mouthBoundary[1] = new Point(endColMax, endRowMax);
-
-                if(mouthBoundary[0].y < faceMidY + (int) (0.16 * (double) faceHeight) ||
-                        mouthBoundary[1].y > face.faceBorder[1].y ||
-                        mouthBoundary[1].y - mouthBoundary[0].y < 0.03 * faceHeight) {
-                    int defaultMouthWidth = (int)(0.4 * (double) faceWidth);
-                    int defaultMouthHeight = (int)(0.2 * (double) faceHeight);
-
-                    int maxScore = -1;
-                    int maxRow = -1;
-                    int maxCol = -1;
-                    for(int row = faceMidY + (int) (0.17 * (double) faceHeight); row < face.faceBorder[1].y - defaultMouthHeight; row++) {
-                        for(int col = startColMax; col < endColMax; col++) {
-                            int score = 0;
-                            for(int rowIn = row; rowIn < row + defaultMouthHeight; rowIn++) {
-                                for(int colIn = col; colIn < col + defaultMouthWidth; colIn++) {
-                                    int pixel = outlinePixels[row * width + maxColorCol];
-                                    score += Color.red(pixel);
+                        for(int rowIn = row; rowIn < row + defaultMouthHeight-1; rowIn++) {
+                            for(int colIn = col; colIn < col + defaultMouthWidth-1; colIn++) {
+                                int pixel = outlinePixels[rowIn * width + colIn];
+                                int colorPixel = pixels[rowIn * width + colIn];
+                                if(Color.red(pixel) > 45) {
+                                    horizontalWhiteHistogram[colIn]++;
+                                    verticalWhiteHistogram[rowIn]++;
                                 }
                             }
-                            if(maxScore < score) {
-                                maxScore = score;
-                                maxRow = row;
-                                maxCol = col;
+                        }
+
+                        int score = 0;
+                        double mouthWidthEstimation = 0.8;
+                        for(int rowIn = row + (int) (0.5 * (double) defaultMouthHeight); rowIn < row + defaultMouthHeight-1; rowIn++) {
+                            if(verticalWhiteHistogram[rowIn] > mouthWidthEstimation * defaultMouthWidth) {
+                                score++;
+                                mouthWidthEstimation -= 0.08;
+                            } else {
+                                break;
                             }
                         }
-                    }
 
-                    mouthBoundary[0] = new Point(maxCol, maxRow);
-                    mouthBoundary[1] = new Point(maxCol + defaultMouthWidth, maxRow + defaultMouthHeight);
+                        mouthWidthEstimation = 0.7;
+                        for(int rowIn = row + (int) (0.5 * (double) defaultMouthHeight) - 1; rowIn >= row + (int) (0.2 * (double) defaultMouthHeight); rowIn--) {
+                            if(verticalWhiteHistogram[rowIn] > mouthWidthEstimation * defaultMouthWidth) {
+                                score++;
+                                mouthWidthEstimation -= 0.08;
+                            } else {
+                                break;
+                            }
+                        }
+                        for(int colIn = col + (int) (0.5 * (double) defaultMouthWidth); colIn < col + defaultMouthWidth-1; colIn++) {
+                            if(horizontalWhiteHistogram[colIn] > 0.6 * defaultMouthHeight) {
+                                score++;
+                            }
+                            if(horizontalWhiteHistogram[colIn] < 0.25 * defaultMouthHeight) {
+                                break;
+                            }
+                        }
+                        for(int colIn = col + (int) (0.5 * (double) defaultMouthWidth) - 1; colIn >= col; colIn--) {
+                            if(horizontalWhiteHistogram[colIn] > 0.6 * defaultMouthHeight) {
+                                score++;
+                            }
+                            if(horizontalWhiteHistogram[colIn] < 0.25 * defaultMouthHeight) {
+                                break;
+                            }
+                        }
+                        if(maxScore < score) {
+                            maxScore = score;
+                            maxRow = row;
+                            maxCol = col;
+                            Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
+                            Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
+                        }
+                    }
                 }
 
-                Log.d("Horizontal MOUTH", Arrays.toString(horizontalWhiteHistogram));
-                Log.d("Vertical MOUTH", Arrays.toString(verticalWhiteHistogram));
-                Log.d("MOUTH BOUNDARY", Arrays.toString(mouthBoundary));
+                mouthBoundary[0] = new Point(maxCol, maxRow);
+                mouthBoundary[1] = new Point(maxCol + defaultMouthWidth, maxRow + defaultMouthHeight);
 
+                Log.d("MOUTH", Arrays.toString(mouthBoundary));
+//                Log.d("RIGHT EYE", Arrays.toString(eyeBoundary[1]));
 
                 //TODO Find Eye
                 //RESET Histogram
