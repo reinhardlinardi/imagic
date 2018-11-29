@@ -583,33 +583,7 @@ class Image {
                 int maxCol = -1;
                 int bottomBoundary = (face.faceBorder[1].y + (int) (0.2 * (double)defaultMouthHeight) < width)?
                         face.faceBorder[1].y - defaultMouthHeight: face.faceBorder[1].y - (int) (0.8 * (double)defaultMouthHeight);
-                //FIND NOSE HOLE
-////                int noseWidth = 0;
-//////                int maxNoseWidth = 0;
-////                int noseRow = 0;
-////                for(int row = faceMidY + (int) (0.15 * (double) faceHeight); row < faceMidY + (int) (0.25 * (double) faceHeight); row++) {
-////                    for(int col = startColMax; col < endColMax; col++) {
-////                        int pixel = outlinePixels[row * width + col];
-////                        int colorPixel = pixels[row * width + col];
-////                        if(Color.red(pixel) > 50 && noseWidth == 0) {
-////                            noseWidth++;
-////                        }
-////                        if(Color.red(pixel) < 10 && noseWidth > 0) {
-////                            break;
-////                        }
-////                    }
-////                    if(noseWidth < 0.3 * (endColMax-startColMax)) {
-////                        Log.d("noseRow", Integer.toString(noseWidth));
-////                        noseWidth = 0;
-////                    } else {
-////                        noseRow = row;
-////                        break;
-////                    }
-////                }
-//                Log.d("noseRow", Integer.toString(noseRow));
-//                int startMouthSearchRow = (noseRow > 0)?
-//                        noseRow + (int) (0.08 * (double) faceHeight): faceMidY + (int) (0.15 * (double) faceHeight);
-//                for(int row = startMouthSearchRow; row < bottomBoundary; row++) {
+
                 for(int row = faceMidY + (int) (0.12 * (double) faceHeight); row < bottomBoundary; row++) {
                     for(int col = startColMax; col < endColMax - defaultMouthWidth; col++) {
                         for(int rowIn = row; rowIn < row + defaultMouthHeight-1; rowIn++) {
@@ -981,66 +955,6 @@ class Image {
                 new Point(tempFaceBoundary[2], tempFaceBoundary[0]),
                 new Point(tempFaceBoundary[3], tempFaceBoundary[1]));
         return face;
-        /*
-        //TODO REFACTOR !!!
-        /* Find border
-        Point upper = new Point(0,0);
-        Point lower = new Point(0,0);
-        Point left = new Point(0,0);
-        Point right = new Point(0,0);
-        /* upper
-        for(int row = 0; row < height; row++) {
-            for(int col = 0; col < width; col++) {
-                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
-                    upper.set(col,row);
-                    found = true;
-                    break;
-                }
-            }
-            if(found)break;
-        }
-        found = false;
-
-        /* lower
-        for(int row = height-1; row >=0; row--) {
-            for(int col = 0; col < width; col++) {
-                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
-                    lower.set(col,row);
-                    found = true;
-                    break;
-                }
-            }
-            if(found)break;
-        }
-        found = false;
-
-        /* left
-        for(int col = 0; col < width; col++) {
-            for(int row = 0; row < height; row++) {
-                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
-                    left.set(col,row);
-                    found = true;
-                    break;
-                }
-            }
-            if(found)break;
-        }
-        found = false;
-
-        /* right
-        for(int col = width-1; col >=0; col--) {
-            for(int row = 0; row < height; row++) {
-                if(facePixels[row * width + col] == Color.rgb(255,255,255)){
-                    right.set(col,row);
-                    found = true;
-                    break;
-                }
-            }
-            if(found)break;
-        }
-
-        /* set borders in face object
-        face.setBorder(upper,lower,left,right); */
     }
 
     void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary, Point[][] eyeBoundary) {
