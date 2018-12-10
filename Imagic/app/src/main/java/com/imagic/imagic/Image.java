@@ -709,18 +709,18 @@ class Image {
                     }
                 }
 
-
+                double eyeWidthPercentage = 0.2;
                 if(leftEyeBoundary < faceMidX + (0.12 * (double) faceWidth)) {
                     leftEyeBoundary = faceMidX + (int) (0.125 * (double) faceWidth);
                 }
-                rightEyeBoundary = leftEyeBoundary + (int) (0.2 * (double) faceWidth);
+                rightEyeBoundary = leftEyeBoundary + (int) (eyeWidthPercentage * (double) faceWidth);
 
-                if(rightEyeBoundary > face.faceBorder[3].x - (0.18 * (double) faceWidth)) {
+                if(rightEyeBoundary > face.faceBorder[3].x - (0.16 * (double) faceWidth)) {
                     rightEyeBoundary = faceMidX + (int) (0.3 * (double) faceWidth);
-                    leftEyeBoundary = rightEyeBoundary - (int) (0.2 * (double) faceWidth);
+                    leftEyeBoundary = rightEyeBoundary - (int) (eyeWidthPercentage * (double) faceWidth);
                 }
 
-                Log.d("left boundary", Integer.toString(leftEyeBoundary) + " " + Double.toString(0.2 * (double) faceWidth));
+                Log.d("left boundary", Integer.toString(leftEyeBoundary) + " " + Double.toString(eyeWidthPercentage * (double) faceWidth));
                 Point[][] eyeBoundary = new Point[2][2];
                 eyeBoundary[1][0] = new Point(leftEyeBoundary, topEyeBoundary);
                 eyeBoundary[1][1] = new Point(rightEyeBoundary, bottomEyeBoundary);
@@ -732,8 +732,13 @@ class Image {
                 Log.d("Horizontal EYE", Arrays.toString(horizontalWhiteHistogram));
                 Log.d("Vertical EYE", Arrays.toString(verticalWhiteHistogram));
 
+                Point[][] eyebrowBoundary = new Point[2][2];
+                Point[] noseBoundary = new Point[2];
                 //Final Touch
-                drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary);
+                drawFaceBorderPixels(pixels, face, mouthBoundary, eyeBoundary, eyebrowBoundary, noseBoundary);
+                Log.d("eyebrow left", Arrays.toString(eyebrowBoundary[0]));
+                Log.d("eyebrow right", Arrays.toString(eyebrowBoundary[1]));
+                Log.d("nose", Arrays.toString(noseBoundary));
 //                break;
             }
 
@@ -957,7 +962,7 @@ class Image {
         return face;
     }
 
-    void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary, Point[][] eyeBoundary) {
+    void drawFaceBorderPixels (int[] pixels, Face face, Point[] mouthBoundary, Point[][] eyeBoundary, Point[][] eyebrowBoundary, Point[] noseBoundary) {
         /* sets border in pixels */
         int width = bitmap.getWidth();
         for(int col = face.faceBorder[2].x; col <= face.faceBorder[3].x; col++){
@@ -999,26 +1004,33 @@ class Image {
         }
 
         //EYELASH
-        int eyelashHeight = (int)(0.65*(double)(eyeBoundary[0][1].y - eyeBoundary[0][0].y));
-        for(int col = eyeBoundary[0][0].x; col <= eyeBoundary[0][1].x; col++){
+        int eyelashHeight = (int)(0.7*(double)(eyeBoundary[0][1].y - eyeBoundary[0][0].y));
+        int eyelashWidth = (int)(1.25*(double)(eyeBoundary[0][1].x - eyeBoundary[0][0].x));
+        eyebrowBoundary[0][0] = new Point(eyeBoundary[0][1].x - eyelashWidth, eyeBoundary[0][0].y - eyelashHeight);
+        eyebrowBoundary[0][1] = new Point(eyeBoundary[0][1].x, eyeBoundary[0][0].y);
+        for(int col = eyeBoundary[0][1].x - eyelashWidth; col <= eyeBoundary[0][1].x; col++){
             pixels[eyeBoundary[0][0].y * width + col] = Color.rgb(255,0,255);
             pixels[(eyeBoundary[0][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
         }
 
-        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][1].x; col++){
+        eyebrowBoundary[1][0] = new Point(eyeBoundary[1][0].x, eyeBoundary[0][0].y - eyelashHeight);
+        eyebrowBoundary[1][1] = new Point(eyeBoundary[1][0].x + eyelashWidth, eyeBoundary[0][0].y);
+        for(int col = eyeBoundary[1][0].x; col <= eyeBoundary[1][0].x + eyelashWidth; col++){
             pixels[eyeBoundary[1][0].y * width + col] = Color.rgb(255,0,255);
             pixels[(eyeBoundary[1][0].y - eyelashHeight) * width + col] = Color.rgb(255,0,255);
         }
 
         for(int row = (eyeBoundary[0][0].y - eyelashHeight); row <= eyeBoundary[0][0].y; row++){
-            pixels[row * width + eyeBoundary[0][0].x] = Color.rgb(255,0,255);
+            pixels[row * width + eyeBoundary[0][1].x - eyelashWidth] = Color.rgb(255,0,255);
             pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,0,255);
             pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,0,255);
-            pixels[row * width + eyeBoundary[1][1].x] = Color.rgb(255,0,255);
+            pixels[row * width + eyeBoundary[1][0].x + eyelashWidth] = Color.rgb(255,0,255);
         }
 
         //NOSE
         int noseHeight = (int)(0.31*(double)(face.faceBorder[1].y - face.faceBorder[0].y));
+        noseBoundary[0] = new Point(eyeBoundary[0][1].x, eyeBoundary[0][1].y);
+        noseBoundary[1] = new Point(eyeBoundary[1][0].x, eyeBoundary[0][1].y + noseHeight);
         for(int col = eyeBoundary[0][1].x; col <= eyeBoundary[1][0].x; col++){
             pixels[eyeBoundary[0][1].y * width + col] = Color.rgb(255,255,0);
             pixels[(eyeBoundary[0][1].y + noseHeight) * width + col] = Color.rgb(255,255,0);
