@@ -75,7 +75,7 @@ class Image {
     int numOfFace = 0;
     Point[] mouthControlPoints = new Point[16];
     Point[][] eyesControlPoints = new Point[2][10];
-    Point[][] eyebrowsControlPoints = new Point[2][10];
+    Point[][] eyebrowsControlPoints = new Point[2][7];
 //    Point[] noseControlPoints = new Point[10];
 
 
@@ -1364,7 +1364,160 @@ class Image {
 
         Log.d("R Eye control points", Arrays.toString(eyesControlPoints[1]));
 
+        /******************************************************************************************/
         //TODO EYEBROW CONTROL POINT
+        //normalize left eyebrow outline color
+        sumOfColorValue = 0;
+        countElmt = 0;
+        for(int row = eyebrowBoundary[0][0].y; row < eyebrowBoundary[0][1].y; row++) {
+            for(int col = eyebrowBoundary[0][0].x; col < eyebrowBoundary[0][1].x; col++) {
+                int pixel = outlinePixels[row * width + col];
+                countElmt++;
+                sumOfColorValue += Color.red(pixel);
+            }
+        }
+        blackWhiteThreshold = (int)((double)sumOfColorValue / (double)countElmt);
+        Log.d("BlackWhite Threshold 31", Integer.toString(blackWhiteThreshold));
+
+        //get eyebrow left boundary
+        eyeLeftBoundary = new Point(0,0);
+        eyeRightBoundary = new Point(0, 0);
+        found = false;
+        for(int col = eyebrowBoundary[0][0].x; col <= eyebrowBoundary[0][1].x; col++) {
+            for(int row = eyebrowBoundary[0][1].y; row >= eyebrowBoundary[0][0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //left eye boundary found
+                    eyeLeftBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        found = false;
+        for(int col = eyebrowBoundary[0][1].x; col >= eyebrowBoundary[0][0].x; col--) {
+            for(int row = eyebrowBoundary[0][1].y; row >= eyebrowBoundary[0][0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //left eye boundary found
+                    eyeRightBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        eyebrowsControlPoints[0][0] = eyeLeftBoundary;
+        eyebrowsControlPoints[0][6] = eyeRightBoundary;
+
+        //set lower control point
+        idx = 1;
+        found = false;
+        stride = (eyeRightBoundary.x - eyeLeftBoundary.x) / 6;
+        stridePlus = (eyeRightBoundary.x - eyeLeftBoundary.x) % 6;
+        if(stridePlus > 0) {
+            stride++;
+        }
+        for(int col = eyeLeftBoundary.x + stride; col < eyeRightBoundary.x; col += stride) {
+            for(int row = eyebrowBoundary[0][1].y; row >= eyebrowBoundary[0][0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
+                    eyebrowsControlPoints[0][idx] = new Point(col, row);
+                    idx++;
+                    if(stridePlus == 0 && !found) {
+                        found = true;
+                        stride--;
+                    } else if (stridePlus > 0) {
+                        stridePlus--;
+                    }
+                    break;
+                }
+            }
+        }
+
+        Log.d("L EyeB control points", Arrays.toString(eyebrowsControlPoints[0]));
+
+        //normalize right eyebrow outline color
+        sumOfColorValue = 0;
+        countElmt = 0;
+        for(int row = eyebrowBoundary[1][0].y; row < eyebrowBoundary[1][1].y; row++) {
+            for(int col = eyebrowBoundary[1][0].x; col < eyebrowBoundary[1][1].x; col++) {
+                int pixel = outlinePixels[row * width + col];
+                countElmt++;
+                sumOfColorValue += Color.red(pixel);
+            }
+        }
+        blackWhiteThreshold = (int)((double)sumOfColorValue / (double)countElmt);
+        Log.d("BlackWhite Threshold 31", Integer.toString(blackWhiteThreshold));
+
+        //get eyebrow left boundary
+        eyeLeftBoundary = new Point(0,0);
+        eyeRightBoundary = new Point(0, 0);
+        found = false;
+        for(int col = eyebrowBoundary[1][0].x; col <= eyebrowBoundary[1][1].x; col++) {
+            for(int row = eyebrowBoundary[1][1].y; row >= eyebrowBoundary[1][0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //left eye boundary found
+                    eyeLeftBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        found = false;
+        for(int col = eyebrowBoundary[1][1].x; col >= eyebrowBoundary[1][0].x; col--) {
+            for(int row = eyebrowBoundary[1][1].y; row >= eyebrowBoundary[1][0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //left eye boundary found
+                    eyeRightBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        eyebrowsControlPoints[1][0] = eyeLeftBoundary;
+        eyebrowsControlPoints[1][6] = eyeRightBoundary;
+
+        //set lower control point
+        idx = 1;
+        found = false;
+        stride = (eyeRightBoundary.x - eyeLeftBoundary.x) / 6;
+        stridePlus = (eyeRightBoundary.x - eyeLeftBoundary.x) % 6;
+        if(stridePlus > 0) {
+            stride++;
+        }
+        for(int col = eyeLeftBoundary.x + stride; col < eyeRightBoundary.x; col += stride) {
+            for(int row = eyebrowBoundary[1][1].y; row >= eyebrowBoundary[1][0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
+                    eyebrowsControlPoints[1][idx] = new Point(col, row);
+                    idx++;
+                    if(stridePlus == 0 && !found) {
+                        found = true;
+                        stride--;
+                    } else if (stridePlus > 0) {
+                        stridePlus--;
+                    }
+                    break;
+                }
+            }
+        }
+        Log.d("R EyeB control points", Arrays.toString(eyebrowsControlPoints[1]));
+
+        /******************************************************************************************/
         //TODO NOSE CONTROL POINT
         return result;
     }
@@ -1381,6 +1534,13 @@ class Image {
         for(int i = 0; i < eyesControlPoints.length; i++) {
             for(int j = 0; j < eyesControlPoints[i].length; j++) {
                 pixels[eyesControlPoints[i][j].y * width + eyesControlPoints[i][j].x] = Color.rgb(0,255,100);
+            }
+        }
+
+        //EYEBROW
+        for(int i = 0; i < eyebrowsControlPoints.length; i++) {
+            for(int j = 0; j < eyebrowsControlPoints[i].length; j++) {
+                pixels[eyebrowsControlPoints[i][j].y * width + eyebrowsControlPoints[i][j].x] = Color.rgb(0,255,100);
             }
         }
 
