@@ -41,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -72,6 +73,10 @@ class Image {
     int sumOfFaceHeight = 0;
     int sumOfFaceWidth = 0;
     int numOfFace = 0;
+    Point[] mouthControlPoints = new Point[16];
+    Point[][] eyesControlPoints = new Point[2][10];
+    Point[][] eyebrowsControlPoints = new Point[2][10];
+//    Point[] noseControlPoints = new Point[10];
 
 
     /* Methods */
@@ -739,7 +744,9 @@ class Image {
                 Log.d("eyebrow left", Arrays.toString(eyebrowBoundary[0]));
                 Log.d("eyebrow right", Arrays.toString(eyebrowBoundary[1]));
                 Log.d("nose", Arrays.toString(noseBoundary));
-//                break;
+
+                String result = analyzeFace(outlinePixels, face, mouthBoundary, eyeBoundary, eyebrowBoundary, noseBoundary);
+                Log.d("Identity", result);
             }
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -1040,5 +1047,114 @@ class Image {
             pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,255,0);
             pixels[row * width + eyeBoundary[1][0].x] = Color.rgb(255,255,0);
         }
+    }
+
+    String analyzeFace(int[] outlinePixels, Face face, Point[] mouthBoundary, Point[][] eyeBoundary, Point[][] eyebrowBoundary, Point[] noseBoundary) {
+        String result = "";
+        int width = bitmap.getWidth();
+
+        //Get Mouth Control Point
+        //normalize mouth outline color
+        int sumOfColorValue = 0;
+        int countElmt = 0;
+        for(int row = mouthBoundary[0].y; row < mouthBoundary[1].y; row++) {
+            for(int col = mouthBoundary[0].x; col < mouthBoundary[1].x; col++) {
+                int pixel = outlinePixels[row * width + col];
+                countElmt++;
+                sumOfColorValue += Color.red(pixel);
+            }
+        }
+        int blackWhiteThreshold = (int)((double)sumOfColorValue / (double)countElmt);
+        Log.d("BlackWhite Threshold", Integer.toString(blackWhiteThreshold));
+
+        //get mouth left boundary
+        Point mouthLeftBoundary = new Point(0,0);
+        Point mouthRightBoundary = new Point(0, 0);
+        boolean found = false;
+        for(int col = mouthBoundary[0].x; col <= mouthBoundary[1].x; col++) {
+            for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //left mouth boundary found
+                    mouthLeftBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        found = false;
+        for(int col = mouthBoundary[1].x; col >= mouthBoundary[0].x; col--) {
+            for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //right mouth boundary found
+                    mouthRightBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        mouthControlPoints[0] = mouthLeftBoundary;
+        mouthControlPoints[8] = mouthRightBoundary;
+
+        int stride = (mouthRightBoundary.x - mouthLeftBoundary.x) / 8;
+        int stridePlus = (mouthRightBoundary.x - mouthLeftBoundary.x) % 8;
+        if(stridePlus > 0) {
+            stride++;
+        }
+
+        //set upper control point
+        int idx = 1;
+        found = false;
+        for(int col = mouthLeftBoundary.x + stride; col < mouthRightBoundary.x; col += stride) {
+            for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
+                    mouthControlPoints[idx] = new Point(col, row);
+                    idx++;
+                    if(stridePlus == 0 && !found) {
+                        found = true;
+                        stride--;
+                    } else if (stridePlus > 0) {
+                        stridePlus--;
+                    }
+                    break;
+                }
+            }
+        }
+
+        //set lower control point
+        idx = 15;
+        found = false;
+        stride = (mouthRightBoundary.x - mouthLeftBoundary.x) / 8;
+        stridePlus = (mouthRightBoundary.x - mouthLeftBoundary.x) % 8;
+        if(stridePlus > 0) {
+            stride++;
+        }
+        for(int col = mouthLeftBoundary.x + stride; col < mouthRightBoundary.x; col += stride) {
+            for(int row = mouthBoundary[1].y; row >= mouthBoundary[0].y; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
+                    mouthControlPoints[idx] = new Point(col, row);
+                    idx--;
+                    if(stridePlus == 0 && !found) {
+                        found = true;
+                        stride--;
+                    } else if (stridePlus > 0) {
+                        stridePlus--;
+                    }
+                    break;
+                }
+            }
+        }
+
+        Log.d("Mouth control points", Arrays.toString(mouthControlPoints));
+        return result;
     }
 }
