@@ -1084,22 +1084,26 @@ class Image {
         //normalize mouth outline color
         int sumOfColorValue = 0;
         int countElmt = 0;
+        int[][] temp = new int[mouthBoundary[1].y-mouthBoundary[0].y][mouthBoundary[1].x-mouthBoundary[0].x];
         for(int row = mouthBoundary[0].y; row < mouthBoundary[1].y; row++) {
             for(int col = mouthBoundary[0].x; col < mouthBoundary[1].x; col++) {
                 int pixel = outlinePixels[row * width + col];
                 countElmt++;
                 sumOfColorValue += Color.red(pixel);
+                temp[row-mouthBoundary[0].y][col-mouthBoundary[0].x] = Color.red(pixel);
             }
+            Log.d("MOUTH SOBEL MATRIX", Arrays.toString(temp[row-mouthBoundary[0].y]));
         }
-        int blackWhiteThreshold = (int)((double)sumOfColorValue / (double)countElmt);
+        int blackWhiteThreshold = (int) (1.23 * (double)sumOfColorValue / (double)countElmt);
         Log.d("BlackWhite Threshold 1", Integer.toString(blackWhiteThreshold));
 
         //get mouth left boundary
         Point mouthLeftBoundary = new Point(0,0);
         Point mouthRightBoundary = new Point(0, 0);
+        int upperOffset = (int)(0.13 * (double)(mouthBoundary[1].y-mouthBoundary[0].y));
         boolean found = false;
         for(int col = mouthBoundary[0].x; col <= mouthBoundary[1].x; col++) {
-            for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++) {
+            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y; row++) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //left mouth boundary found
                     mouthLeftBoundary = new Point(col, row);
@@ -1114,7 +1118,7 @@ class Image {
 
         found = false;
         for(int col = mouthBoundary[1].x; col >= mouthBoundary[0].x; col--) {
-            for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++) {
+            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y; row++) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //right mouth boundary found
                     mouthRightBoundary = new Point(col, row);
@@ -1140,7 +1144,7 @@ class Image {
         int idx = 1;
         found = false;
         for(int col = mouthLeftBoundary.x + stride; col < mouthRightBoundary.x; col += stride) {
-            for(int row = mouthBoundary[0].y; row <= mouthBoundary[1].y; row++) {
+            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y; row++) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
                     mouthControlPoints[idx] = new Point(col, row);
@@ -1165,7 +1169,7 @@ class Image {
             stride++;
         }
         for(int col = mouthLeftBoundary.x + stride; col < mouthRightBoundary.x; col += stride) {
-            for(int row = mouthBoundary[1].y; row >= mouthBoundary[0].y; row--) {
+            for(int row = mouthBoundary[1].y; row >= mouthBoundary[0].y + upperOffset; row--) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
                     mouthControlPoints[idx] = new Point(col, row);
