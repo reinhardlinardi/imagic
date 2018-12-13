@@ -76,7 +76,7 @@ class Image {
     Point[] mouthControlPoints = new Point[16];
     Point[][] eyesControlPoints = new Point[2][10];
     Point[][] eyebrowsControlPoints = new Point[2][7];
-//    Point[] noseControlPoints = new Point[10];
+    Point[] noseControlPoints = new Point[12];
 
     //Templates
     double mouthScoreWeight = 1.0;
@@ -1092,7 +1092,7 @@ class Image {
                 sumOfColorValue += Color.red(pixel);
                 temp[row-mouthBoundary[0].y][col-mouthBoundary[0].x] = Color.red(pixel);
             }
-            Log.d("MOUTH SOBEL MATRIX", Arrays.toString(temp[row-mouthBoundary[0].y]));
+//            Log.d("MOUTH SOBEL MATRIX", Arrays.toString(temp[row-mouthBoundary[0].y]));
         }
         int blackWhiteThreshold = (int) (1.23 * (double)sumOfColorValue / (double)countElmt);
         Log.d("BlackWhite Threshold 1", Integer.toString(blackWhiteThreshold));
@@ -1549,6 +1549,122 @@ class Image {
 
         /******************************************************************************************/
         //TODO NOSE CONTROL POINT
+        //normalize right eyebrow outline color
+        sumOfColorValue = 0;
+        countElmt = 0;
+        upperOffset = (noseBoundary[1].y-noseBoundary[0].y)/2 + (noseBoundary[1].y-noseBoundary[0].y)/10;
+        int bottomOffset = (noseBoundary[1].y-noseBoundary[0].y)/10;
+        for(int row = noseBoundary[0].y + upperOffset; row < noseBoundary[1].y - bottomOffset; row++) {
+            for(int col = noseBoundary[0].x; col < noseBoundary[1].x; col++) {
+                int pixel = outlinePixels[row * width + col];
+                countElmt++;
+                sumOfColorValue += Color.red(pixel);
+            }
+        }
+        blackWhiteThreshold = (int) (1.23 * (double)sumOfColorValue / (double)countElmt);
+        Log.d("BlackWhite Threshold N", Integer.toString(blackWhiteThreshold));
+
+        //get mouth left boundary
+        Point noseLeftBoundary = new Point(0,0);
+        Point noseRightBoundary = new Point(0, 0);
+
+        found = false;
+        for(int col = noseBoundary[0].x; col <= noseBoundary[1].x; col++) {
+            for(int row = noseBoundary[0].y + upperOffset; row < noseBoundary[1].y - bottomOffset; row++) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //left mouth boundary found
+                    noseLeftBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+
+        found = false;
+        for(int col = noseBoundary[1].x; col >= noseBoundary[0].x; col--) {
+            for(int row = noseBoundary[0].y + upperOffset; row < noseBoundary[1].y - bottomOffset; row++) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //right mouth boundary found
+                    noseRightBoundary = new Point(col, row);
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                break;
+            }
+        }
+        noseControlPoints[0] = noseLeftBoundary;
+        noseControlPoints[6] = noseRightBoundary;
+
+        stride = (noseRightBoundary.x - noseLeftBoundary.x) / 6;
+        stridePlus = (noseRightBoundary.x - noseLeftBoundary.x) % 6;
+        if(stridePlus > 0) {
+            stride++;
+        }
+
+        //set upper control point
+        idx = 1;
+        found = false;
+        for(int col = noseLeftBoundary.x + stride; col < noseRightBoundary.x; col += stride) {
+            for(int row = noseBoundary[0].y + upperOffset; row < noseBoundary[1].y - bottomOffset; row++) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //upper nose boundary found
+                    noseControlPoints[idx] = new Point(col, row);
+                    idx++;
+                    if(stridePlus == 0 && !found) {
+                        found = true;
+                        stride--;
+                    } else if (stridePlus > 0) {
+                        stridePlus--;
+                    }
+                    break;
+                }
+                if(row == noseBoundary[1].y - bottomOffset - 1 &&
+                        col <= noseLeftBoundary.x + 5 * stride/2 &&
+                        col >= noseLeftBoundary.x + 7 * stride/2) {
+                    noseControlPoints[idx] = new Point(col, noseLeftBoundary.y);
+                    idx++;
+                }
+            }
+        }
+
+        //set lower control point
+        idx = 11;
+        found = false;
+        stride = (noseRightBoundary.x - noseLeftBoundary.x) / 6;
+        stridePlus = (noseRightBoundary.x - noseLeftBoundary.x) % 6;
+        if(stridePlus > 0) {
+            stride++;
+        }
+        for(int col = noseLeftBoundary.x + stride; col < noseRightBoundary.x; col += stride) {
+            for(int row = noseBoundary[1].y - bottomOffset - 1; row >= noseBoundary[0].y + upperOffset; row--) {
+                int pixel = outlinePixels[row * width + col];
+                if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
+                    noseControlPoints[idx] = new Point(col, row);
+                    idx--;
+                    if(stridePlus == 0 && !found) {
+                        found = true;
+                        stride--;
+                    } else if (stridePlus > 0) {
+                        stridePlus--;
+                    }
+                    break;
+                }
+                if(row == noseBoundary[0].y + upperOffset &&
+                        col <= noseLeftBoundary.x + 5 * stride/2 &&
+                        col >= noseLeftBoundary.x + 7 * stride/2) {
+                    noseControlPoints[idx] = new Point(col, noseLeftBoundary.y);
+                    idx--;
+                }
+            }
+        }
+
+        Log.d("Nose control points", Arrays.toString(noseControlPoints));
+
         /******************************************************************************************/
 
         //TODO Calculate Similarity according to gradient difference
@@ -1643,7 +1759,10 @@ class Image {
             }
         }
 
-//        pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,255,0);
+        //NOSE
+        for(int i = 0; i < noseControlPoints.length; i++) {
+            pixels[noseControlPoints[i].y * width + noseControlPoints[i].x] = Color.rgb(0,255,100);
+        }
     }
 
     void calculateAllGradients() {
@@ -1680,6 +1799,16 @@ class Image {
                     eyebrowTemplateGradients[faceID][pos][i] = gradient;
                 }
             }
+
+//            for(int i = 0; i < mouthCPTemplate[faceID].length; i++) {
+//                double gradient = 0.0;
+//                if (i != mouthCPTemplate[faceID].length - 1) {
+//                    gradient = (double)(mouthCPTemplate[faceID][i + 1].y - mouthCPTemplate[faceID][i].y) / (double)(mouthCPTemplate[faceID][i + 1].x - mouthCPTemplate[faceID][i].x);
+//                } else {
+//                    gradient = (double)(mouthCPTemplate[faceID][0].y - mouthCPTemplate[faceID][i].y) / (double)(mouthCPTemplate[faceID][0].x - mouthCPTemplate[faceID][i].x);
+//                }
+//                mouthTemplateGradients[faceID][i] = gradient;
+//            }
         }
     }
 }
