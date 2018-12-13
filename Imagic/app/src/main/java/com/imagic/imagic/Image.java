@@ -518,7 +518,7 @@ class Image {
         }
     }
 
-    public void findFace(Context context){
+    public void findFace(Context context, String[] identity){
         if(hasBitmap()) {
             calculateAllGradients();
             ArrayList<Face> faces = new ArrayList<Face>();
@@ -773,6 +773,7 @@ class Image {
                 String result = analyzeFace(outlinePixels, face, mouthBoundary, eyeBoundary, eyebrowBoundary, noseBoundary);
                 drawControlPoints(pixels);
                 Log.d("Identity", result);
+                identity[0] = result;
             }
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
