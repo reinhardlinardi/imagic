@@ -42,4 +42,7 @@
     <string name="custom_kernel_text">Custom Kernel</string>
     <string name="face_recognition_transformed_image_view_content_description">Face Recognition Transformed Image View</string>
     <string name="face_recognition_image_view_content_description">Face Recognition Image View</string>
+    <string name="extract_face_button_text">Extract Face!</string>
+    <string name="detect_face_button_text">Detect Face!</string>
+    <string name="this_face_text">This Face is...</string>
 </resources>
