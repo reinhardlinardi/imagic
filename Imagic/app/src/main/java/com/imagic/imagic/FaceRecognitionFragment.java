@@ -31,7 +31,10 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
     private ImageView transformedImageView;
 
     private TextView helpTextView;
+    private TextView faceDetectionTextView;
+    private TextView faceDetectionIntroductoryText;
 
+//    private Button extractButton;
     private Button detectButton;
 
     Image image;
@@ -59,13 +62,21 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
 
             progressBar = view.findViewById(R.id.faceRecognitionProgressBar);
             helpTextView = view.findViewById(R.id.faceRecognitionHelpTextView);
+            faceDetectionTextView = view.findViewById(R.id.faceDetectionResultText);
+            faceDetectionIntroductoryText = view.findViewById(R.id.faceDetectionIntroductoryText);
 
             transformedImageView = view.findViewById(R.id.faceRecognitionTransformedImageView);
             imageView = view.findViewById(R.id.faceRecognitionImageView);
             imageView.setOnClickListener(getImageViewOnClickListener());
 
-            detectButton = view.findViewById(R.id.faceRecognitionButton);
+//            extractButton = view.findViewById(R.id.faceExtractionButton);
+//            extractButton.setOnClickListener(getExtractButtonOnClickListener());
+
+            detectButton = view.findViewById(R.id.faceDetectionButton);
             detectButton.setOnClickListener(getDetectButtonOnClickListener());
+
+            UI.setInvisible(faceDetectionIntroductoryText);
+            UI.setInvisible(faceDetectionTextView);
         }
     }
 
@@ -138,6 +149,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
         };
     }
 
+
     /* Methods */
     //Constructor
     public FaceRecognitionFragment(){}
@@ -152,6 +164,8 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
         float taskDoneFraction = (float) numTaskDone / totalNumTask;
         return (int)(taskDoneFraction * 100);
     }
+
+
 
     /* Async tasks */
     //Image load Asynctask
@@ -212,6 +226,8 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
         protected Void doInBackground(Void... voids) {
             if(isAttachedToMainActivity()){
                 progressBar.setProgress(countProgress(1,2));
+                //HEY ROLAND
+//                faceDetectionTextView = something
                 image.findFace(getContext());
                 progressBar.setProgress(countProgress(2,2));
             }
@@ -237,6 +253,8 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
                 UI.setInvisible(progressBar);
                 UI.setClickable(imageView);
                 UI.enable(detectButton);
+                UI.show(faceDetectionIntroductoryText);
+                UI.show(faceDetectionTextView);
             }
         }
 
@@ -247,4 +265,23 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
             }
         }
     }
+
+//    private class FaceDetectionAsyncTask extends AsyncTask<Void,Integer,Void>{
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+//        }
+//
+//
+//    }
 }

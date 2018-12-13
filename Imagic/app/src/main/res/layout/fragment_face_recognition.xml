@@ -76,11 +76,15 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/faceRecognitionButton"
-                    android:text="Detect Face!"
+                    android:id="@+id/faceDetectionButton"
+                    android:text="@string/detect_face_button_text"
                     android:layout_marginEnd="@dimen/reset_apply_button_side_margin"
                     android:layout_marginStart="@dimen/reset_apply_button_side_margin"
                     android:background="@drawable/apply_button"
@@ -89,6 +93,48 @@
                     android:paddingStart="@dimen/reset_apply_button_side_padding"
                     android:textColor="@android:color/white"/>
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <!--<Button-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:id="@+id/faceDetectionButton"-->
+                    <!--android:text="@string/detect_face_button_text"-->
+                    <!--android:layout_marginEnd="@dimen/reset_apply_button_side_margin"-->
+                    <!--android:layout_marginStart="@dimen/reset_apply_button_side_margin"-->
+                    <!--android:background="@drawable/primary_action_button"-->
+                    <!--android:gravity="center_vertical|center_horizontal"-->
+                    <!--android:paddingEnd="@dimen/reset_apply_button_side_padding"-->
+                    <!--android:paddingStart="@dimen/reset_apply_button_side_padding"-->
+                    <!--android:textColor="@android:color/white"-->
+                    <!--/>-->
+
+                <!--<Space-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="@dimen/reset_apply_button_space_gap" />-->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/faceDetectionIntroductoryText"
+                    android:gravity="center"
+                    android:text="@string/this_face_text"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/reset_apply_button_space_gap" />
+
+                <TextView
+                    android:id="@+id/faceDetectionResultText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Unknown"
+                    android:textColor="@android:color/holo_blue_light"
+                    android:textSize="24sp" />
             </LinearLayout>
 
         </LinearLayout>
