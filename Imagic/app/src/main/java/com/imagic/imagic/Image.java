@@ -102,6 +102,9 @@ class Image {
                     {new Point(255, 248), new Point(264, 255), new Point(273, 254), new Point(282, 253), new Point(291, 254), new Point(300, 257), new Point(308, 260)}
             }
     };
+    Point[][] noseCPTemplate = {
+            {new Point(170, 324), new Point(177, 318), new Point(184, 319), new Point(191, 320), new Point(198, 318), new Point(205, 318), new Point(210, 319), new Point(205, 326), new Point(198, 325), new Point(191, 326), new Point(184, 326), new Point(177, 326)}
+    };
 
     /* Methods */
 
@@ -1630,6 +1633,10 @@ class Image {
                     idx++;
                 }
             }
+            if(noseControlPoints[idx] == null) {
+                noseControlPoints[idx] = new Point(col, noseControlPoints[idx-1].y);
+                idx++;
+            }
         }
 
         //set lower control point
@@ -1660,6 +1667,14 @@ class Image {
                     noseControlPoints[idx] = new Point(col, noseLeftBoundary.y);
                     idx--;
                 }
+            }
+            if(noseControlPoints[idx] == null) {
+                if(idx == 11) {
+                    noseControlPoints[idx] = new Point(col, noseControlPoints[0].y);
+                }else {
+                    noseControlPoints[idx] = new Point(col, noseControlPoints[idx+1].y);
+                }
+                idx--;
             }
         }
 
