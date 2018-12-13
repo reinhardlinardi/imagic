@@ -78,6 +78,30 @@ class Image {
     Point[][] eyebrowsControlPoints = new Point[2][7];
 //    Point[] noseControlPoints = new Point[10];
 
+    //Templates
+    double mouthScoreWeight = 1.0;
+    double eyesScoreWeight = 1.0;
+    double eyebrowsScoreWeight = 1.0;
+
+    String[] labels = {"Roland"};
+    double[][] mouthTemplateGradients = new double[1][16];
+    double[][][] eyeTemplateGradients = new double[1][2][10];
+    double[][][] eyebrowTemplateGradients = new double[1][2][6];
+    Point[][] mouthCPTemplate = {
+        {new Point(179, 371), new Point(192, 367), new Point(205, 366), new Point(218, 368), new Point(230, 368), new Point(242, 368), new Point(254, 373), new Point(266, 383), new Point(277, 369), new Point(266, 394), new Point(254, 410), new Point(242, 416), new Point(230, 416), new Point(218, 411), new Point(205, 393), new Point(192, 390)}
+    };
+    Point[][][] eyesCPTemplate = {
+            {
+                    {new Point(168, 273), new Point(176, 271), new Point(184, 270), new Point(192, 270), new Point(200, 273), new Point(207, 281), new Point(200, 284), new Point(192, 286), new Point(184, 287), new Point(176, 287)},
+                    {new Point(262, 280), new Point(270, 272), new Point(278, 269), new Point(285, 269), new Point(292, 270), new Point(298, 272), new Point(292, 287), new Point(285, 287), new Point(278, 286), new Point(270, 285)}
+            }
+    };
+    Point[][][] eyebrowsCPTemplate = {
+            {
+                    {new Point(158, 261), new Point(167, 257), new Point(176, 255), new Point(185, 253), new Point(194, 254), new Point(203, 254), new Point(211, 246)},
+                    {new Point(255, 248), new Point(264, 255), new Point(273, 254), new Point(282, 253), new Point(291, 254), new Point(300, 257), new Point(308, 260)}
+            }
+    };
 
     /* Methods */
 
@@ -496,6 +520,7 @@ class Image {
 
     public void findFace(Context context){
         if(hasBitmap()) {
+            calculateAllGradients();
             ArrayList<Face> faces = new ArrayList<Face>();
 //            Face face = new Face();
 
@@ -1519,6 +1544,75 @@ class Image {
 
         /******************************************************************************************/
         //TODO NOSE CONTROL POINT
+        /******************************************************************************************/
+
+        //TODO Calculate Similarity according to gradient difference
+        //Calculate gradients
+        double[] mouthGradients = new double[16];
+        double[][] eyeGradients = new double[2][10];
+        double[][] eyebrowGradients = new double[2][6];
+        for(int i = 0; i < mouthControlPoints.length; i++) {
+            double gradient = 0.0;
+            if (i != mouthControlPoints.length - 1) {
+                gradient = (double)(mouthControlPoints[i + 1].y - mouthControlPoints[i].y) / (double)(mouthControlPoints[i + 1].x - mouthControlPoints[i].x);
+            } else {
+                gradient = (double)(mouthControlPoints[0].y - mouthControlPoints[i].y) / (double)(mouthControlPoints[0].x - mouthControlPoints[i].x);
+            }
+            mouthGradients[i] = gradient;
+        }
+
+        for(int pos = 0; pos < 2; pos++) {
+            for(int i = 0; i < eyesControlPoints[pos].length; i++) {
+                double gradient = 0.0;
+                if (i != eyesControlPoints[pos].length - 1) {
+                    gradient = (double)(eyesControlPoints[pos][i + 1].y - eyesControlPoints[pos][i].y) / (double)(eyesControlPoints[pos][i + 1].x - eyesControlPoints[pos][i].x);
+                } else {
+                    gradient = (double)(eyesControlPoints[pos][0].y - eyesControlPoints[pos][i].y) / (double)(eyesControlPoints[pos][0].x - eyesControlPoints[pos][i].x);
+                }
+                eyeGradients[pos][i] = gradient;
+            }
+        }
+
+        for(int pos = 0; pos < 2; pos++) {
+            for(int i = 0; i < eyebrowsControlPoints[pos].length - 1; i++) {
+                double gradient = 0.0;
+                if (i != eyebrowsControlPoints[pos].length - 1) {
+                    gradient = (double)(eyebrowsControlPoints[pos][i + 1].y - eyebrowsControlPoints[pos][i].y) / (double)(eyebrowsControlPoints[pos][i + 1].x - eyebrowsControlPoints[pos][i].x);
+                }
+                eyebrowGradients[pos][i] = gradient;
+            }
+        }
+
+        //Calculate distance
+        int minFaceID = -1;
+        double minDistance = Double.MAX_VALUE;
+        for(int faceID = 0; faceID < labels.length; faceID++) {
+            double mouthDistance = 0.0;
+            double eyesDistance = 0.0;
+            double eyebrowsDistance = 0.0;
+
+            for(int i = 0; i < mouthGradients.length; i++) {
+                mouthDistance += Math.abs(mouthGradients[i] - mouthTemplateGradients[faceID][i]);
+            }
+            for(int pos = 0; pos < 2; pos++) {
+                for(int i = 0; i < eyeGradients[pos].length; i++) {
+                    eyesDistance += Math.abs(eyeGradients[pos][i] - eyeTemplateGradients[faceID][pos][i]);
+                }
+            }
+            for(int pos = 0; pos < 2; pos++) {
+                for(int i = 0; i < eyebrowGradients[pos].length; i++) {
+                    eyebrowsDistance += Math.abs(eyebrowGradients[pos][i] - eyebrowTemplateGradients[faceID][pos][i]);
+                }
+            }
+
+            double total = mouthDistance * mouthScoreWeight + eyesDistance * eyesScoreWeight + eyebrowsDistance * eyebrowsScoreWeight;
+            if(total < minDistance) {
+                minDistance = total;
+                minFaceID = faceID;
+            }
+        }
+        Log.d("Face difference", Double.toString(minDistance));
+        result = labels[minFaceID];
         return result;
     }
 
@@ -1545,6 +1639,42 @@ class Image {
         }
 
 //        pixels[row * width + eyeBoundary[0][1].x] = Color.rgb(255,255,0);
+    }
 
+    void calculateAllGradients() {
+        for(int faceID = 0; faceID < labels.length; faceID++) {
+            //calculate mouth gradient
+            for(int i = 0; i < mouthCPTemplate[faceID].length; i++) {
+                double gradient = 0.0;
+                if (i != mouthCPTemplate[faceID].length - 1) {
+                    gradient = (double)(mouthCPTemplate[faceID][i + 1].y - mouthCPTemplate[faceID][i].y) / (double)(mouthCPTemplate[faceID][i + 1].x - mouthCPTemplate[faceID][i].x);
+                } else {
+                    gradient = (double)(mouthCPTemplate[faceID][0].y - mouthCPTemplate[faceID][i].y) / (double)(mouthCPTemplate[faceID][0].x - mouthCPTemplate[faceID][i].x);
+                }
+                mouthTemplateGradients[faceID][i] = gradient;
+            }
+
+            for(int pos = 0; pos < 2; pos++) {
+                for(int i = 0; i < eyesCPTemplate[faceID][pos].length; i++) {
+                    double gradient = 0.0;
+                    if (i != eyesCPTemplate[faceID][pos].length - 1) {
+                        gradient = (double)(eyesCPTemplate[faceID][pos][i + 1].y - eyesCPTemplate[faceID][pos][i].y) / (double)(eyesCPTemplate[faceID][pos][i + 1].x - eyesCPTemplate[faceID][pos][i].x);
+                    } else {
+                        gradient = (double)(eyesCPTemplate[faceID][pos][0].y - eyesCPTemplate[faceID][pos][i].y) / (double)(eyesCPTemplate[faceID][pos][0].x - eyesCPTemplate[faceID][pos][i].x);
+                    }
+                    eyeTemplateGradients[faceID][pos][i] = gradient;
+                }
+            }
+
+            for(int pos = 0; pos < 2; pos++) {
+                for(int i = 0; i < eyebrowsCPTemplate[faceID][pos].length - 1; i++) {
+                    double gradient = 0.0;
+                    if (i != eyebrowsCPTemplate[faceID][pos].length - 1) {
+                        gradient = (double)(eyebrowsCPTemplate[faceID][pos][i + 1].y - eyebrowsCPTemplate[faceID][pos][i].y) / (double)(eyebrowsCPTemplate[faceID][pos][i + 1].x - eyebrowsCPTemplate[faceID][pos][i].x);
+                    }
+                    eyebrowTemplateGradients[faceID][pos][i] = gradient;
+                }
+            }
+        }
     }
 }
