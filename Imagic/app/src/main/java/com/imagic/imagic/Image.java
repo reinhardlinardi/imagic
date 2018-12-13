@@ -1527,7 +1527,7 @@ class Image {
         for(int col = eyeLeftBoundary.x + stride; col < eyeRightBoundary.x; col += stride) {
             for(int row = eyebrowBoundary[1][1].y; row >= eyebrowBoundary[1][0].y; row--) {
                 int pixel = outlinePixels[row * width + col];
-                if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
+                if(Color.red(pixel) > blackWhiteThreshold && idx < 7) { //upper mouth boundary found
                     eyebrowsControlPoints[1][idx] = new Point(col, row);
                     idx++;
                     if(stridePlus == 0 && !found) {
