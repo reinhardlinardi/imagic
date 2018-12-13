@@ -1104,9 +1104,10 @@ class Image {
         Point mouthLeftBoundary = new Point(0,0);
         Point mouthRightBoundary = new Point(0, 0);
         int upperOffset = (int)(0.13 * (double)(mouthBoundary[1].y-mouthBoundary[0].y));
+        int bottomOffset = (int)(0.06 * (double)(mouthBoundary[1].y-mouthBoundary[0].y));
         boolean found = false;
         for(int col = mouthBoundary[0].x; col <= mouthBoundary[1].x; col++) {
-            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y; row++) {
+            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y - bottomOffset; row++) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //left mouth boundary found
                     mouthLeftBoundary = new Point(col, row);
@@ -1121,7 +1122,7 @@ class Image {
 
         found = false;
         for(int col = mouthBoundary[1].x; col >= mouthBoundary[0].x; col--) {
-            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y; row++) {
+            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y - bottomOffset; row++) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //right mouth boundary found
                     mouthRightBoundary = new Point(col, row);
@@ -1147,7 +1148,7 @@ class Image {
         int idx = 1;
         found = false;
         for(int col = mouthLeftBoundary.x + stride; col < mouthRightBoundary.x; col += stride) {
-            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y; row++) {
+            for(int row = mouthBoundary[0].y + upperOffset; row <= mouthBoundary[1].y - bottomOffset; row++) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
                     mouthControlPoints[idx] = new Point(col, row);
@@ -1172,7 +1173,7 @@ class Image {
             stride++;
         }
         for(int col = mouthLeftBoundary.x + stride; col < mouthRightBoundary.x; col += stride) {
-            for(int row = mouthBoundary[1].y; row >= mouthBoundary[0].y + upperOffset; row--) {
+            for(int row = mouthBoundary[1].y - bottomOffset; row >= mouthBoundary[0].y + upperOffset; row--) {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
                     mouthControlPoints[idx] = new Point(col, row);
@@ -1556,7 +1557,7 @@ class Image {
         sumOfColorValue = 0;
         countElmt = 0;
         upperOffset = (noseBoundary[1].y-noseBoundary[0].y)/2 + (noseBoundary[1].y-noseBoundary[0].y)/10;
-        int bottomOffset = (noseBoundary[1].y-noseBoundary[0].y)/10;
+        bottomOffset = (noseBoundary[1].y-noseBoundary[0].y)/10;
         for(int row = noseBoundary[0].y + upperOffset; row < noseBoundary[1].y - bottomOffset; row++) {
             for(int col = noseBoundary[0].x; col < noseBoundary[1].x; col++) {
                 int pixel = outlinePixels[row * width + col];
