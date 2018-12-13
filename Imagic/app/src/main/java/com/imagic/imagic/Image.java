@@ -82,28 +82,50 @@ class Image {
     double mouthScoreWeight = 1.0;
     double eyesScoreWeight = 1.0;
     double eyebrowsScoreWeight = 1.0;
+    double noseScoreWeight = 0.8;
 
-    String[] labels = {"Roland"};
-    double[][] mouthTemplateGradients = new double[1][16];
-    double[][][] eyeTemplateGradients = new double[1][2][10];
-    double[][][] eyebrowTemplateGradients = new double[1][2][6];
+    String[] labels = {"Roland", "Dad", "Mom"};
+    double[][] mouthTemplateGradients = new double[labels.length][16];
+    double[][][] eyeTemplateGradients = new double[labels.length][2][10];
+    double[][][] eyebrowTemplateGradients = new double[labels.length][2][6];
+    double[][] noseTemplateGradients = new double[labels.length][12];
     Point[][] mouthCPTemplate = {
-        {new Point(179, 371), new Point(192, 367), new Point(205, 366), new Point(218, 368), new Point(230, 368), new Point(242, 368), new Point(254, 373), new Point(266, 383), new Point(277, 369), new Point(266, 394), new Point(254, 410), new Point(242, 416), new Point(230, 416), new Point(218, 411), new Point(205, 393), new Point(192, 390)}
+        {new Point(179, 372), new Point(192, 372), new Point(205, 379), new Point(218, 372), new Point(230, 372), new Point(242, 374), new Point(254, 373), new Point(266, 383), new Point(277, 377), new Point(266, 394), new Point(254, 398), new Point(242, 406), new Point(230, 406), new Point(218, 400), new Point(205, 392), new Point(192, 389)},
+            {new Point(147, 334), new Point(155, 339), new Point(163, 338), new Point(171, 332), new Point(179, 336), new Point(186, 339), new Point(193, 339), new Point(200, 332), new Point(206, 338), new Point(200, 344), new Point(193, 344), new Point(186, 344), new Point(179, 355), new Point(171, 355), new Point(163, 348), new Point(155, 344)},
+            {new Point(154, 349), new Point(163, 342), new Point(171, 345), new Point(179, 343), new Point(187, 330), new Point(195, 343), new Point(203, 343), new Point(211, 341), new Point(219, 347), new Point(211, 357), new Point(203, 362), new Point(195, 362), new Point(187, 362), new Point(179, 361), new Point(171, 353), new Point(163, 351)},
     };
     Point[][][] eyesCPTemplate = {
             {
                     {new Point(168, 273), new Point(176, 271), new Point(184, 270), new Point(192, 270), new Point(200, 273), new Point(207, 281), new Point(200, 284), new Point(192, 286), new Point(184, 287), new Point(176, 287)},
                     {new Point(262, 280), new Point(270, 272), new Point(278, 269), new Point(285, 269), new Point(292, 270), new Point(298, 272), new Point(292, 287), new Point(285, 287), new Point(278, 286), new Point(270, 285)}
-            }
+            },
+            {
+                    {new Point(135, 268), new Point(140, 265), new Point(145, 267), new Point(150, 265), new Point(155, 267), new Point(159, 276), new Point(155, 276), new Point(150, 279), new Point(145, 279), new Point(140, 273)},
+                    {new Point(194, 275), new Point(200, 266), new Point(206, 265), new Point(211, 266), new Point(216, 269), new Point(220, 273), new Point(216, 278), new Point(211, 274), new Point(206, 280), new Point(200, 279)}
+            },
+            {
+                    {new Point(138, 264), new Point(145, 260), new Point(152, 259), new Point(159, 259), new Point(165, 260), new Point(170, 267), new Point(165, 272), new Point(159, 271), new Point(152, 271), new Point(145, 272)},
+                    {new Point(210, 268), new Point(217, 260), new Point(224, 260), new Point(231, 261), new Point(237, 264), new Point(242, 269), new Point(237, 271), new Point(231, 274), new Point(224, 273), new Point(217, 272)}
+            },
     };
     Point[][][] eyebrowsCPTemplate = {
             {
                     {new Point(158, 261), new Point(167, 257), new Point(176, 255), new Point(185, 253), new Point(194, 254), new Point(203, 254), new Point(211, 246)},
                     {new Point(255, 248), new Point(264, 255), new Point(273, 254), new Point(282, 253), new Point(291, 254), new Point(300, 257), new Point(308, 260)}
-            }
+            },
+            {
+                    {new Point(135, 261), new Point(140, 265), new Point(145, 264), new Point(150, 265), new Point(155, 264), new Point(159, 265), new Point(162, 258)},
+                    {new Point(194, 264), new Point(198, 263), new Point(202, 265), new Point(206, 265), new Point(209, 265), new Point(212, 262), new Point(214, 261)}
+            },
+            {
+                    {new Point(130, 249), new Point(137, 242), new Point(144, 253), new Point(151, 252), new Point(158, 253), new Point(165, 255), new Point(170, 254)},
+                    {new Point(210, 254), new Point(217, 254), new Point(224, 253), new Point(231, 251), new Point(238, 242), new Point(245, 248), new Point(250, 255)}
+            },
     };
     Point[][] noseCPTemplate = {
-            {new Point(170, 324), new Point(177, 318), new Point(184, 319), new Point(191, 320), new Point(198, 318), new Point(205, 318), new Point(210, 319), new Point(205, 326), new Point(198, 325), new Point(191, 326), new Point(184, 326), new Point(177, 326)}
+            {new Point(211, 339), new Point(219, 338), new Point(227, 341), new Point(235, 341), new Point(243, 339), new Point(250, 338), new Point(255, 338), new Point(250, 345), new Point(243, 344), new Point(235, 348), new Point(227, 348), new Point(219, 347)},
+            {new Point(162, 311), new Point(167, 311), new Point(172, 313), new Point(177, 313), new Point(182, 311), new Point(187, 319), new Point(191, 315), new Point(187, 321), new Point(182, 319), new Point(177, 321), new Point(172, 322), new Point(167, 320)},
+            {new Point(170, 324), new Point(177, 318), new Point(184, 319), new Point(191, 320), new Point(198, 318), new Point(205, 318), new Point(210, 319), new Point(205, 326), new Point(198, 325), new Point(191, 326), new Point(184, 326), new Point(177, 326)},
     };
 
     /* Methods */
@@ -1616,9 +1638,10 @@ class Image {
         for(int col = noseLeftBoundary.x + stride; col < noseRightBoundary.x; col += stride) {
             for(int row = noseBoundary[0].y + upperOffset; row < noseBoundary[1].y - bottomOffset; row++) {
                 int pixel = outlinePixels[row * width + col];
+//                Log.d("idx", Integer.toString(idx));
                 if(Color.red(pixel) > blackWhiteThreshold) { //upper nose boundary found
+//                    Log.d("coord nose", Integer.toString(row) + " " + Integer.toString(col));
                     noseControlPoints[idx] = new Point(col, row);
-                    idx++;
                     if(stridePlus == 0 && !found) {
                         found = true;
                         stride--;
@@ -1631,13 +1654,13 @@ class Image {
                         col <= noseLeftBoundary.x + 5 * stride/2 &&
                         col >= noseLeftBoundary.x + 7 * stride/2) {
                     noseControlPoints[idx] = new Point(col, noseLeftBoundary.y);
-                    idx++;
+                    break;
                 }
             }
             if(noseControlPoints[idx] == null) {
                 noseControlPoints[idx] = new Point(col, noseControlPoints[idx-1].y);
-                idx++;
             }
+            idx++;
         }
 
         //set lower control point
@@ -1653,7 +1676,6 @@ class Image {
                 int pixel = outlinePixels[row * width + col];
                 if(Color.red(pixel) > blackWhiteThreshold) { //upper mouth boundary found
                     noseControlPoints[idx] = new Point(col, row);
-                    idx--;
                     if(stridePlus == 0 && !found) {
                         found = true;
                         stride--;
@@ -1666,7 +1688,7 @@ class Image {
                         col <= noseLeftBoundary.x + 5 * stride/2 &&
                         col >= noseLeftBoundary.x + 7 * stride/2) {
                     noseControlPoints[idx] = new Point(col, noseLeftBoundary.y);
-                    idx--;
+                    break;
                 }
             }
             if(noseControlPoints[idx] == null) {
@@ -1675,8 +1697,8 @@ class Image {
                 }else {
                     noseControlPoints[idx] = new Point(col, noseControlPoints[idx+1].y);
                 }
-                idx--;
             }
+            idx--;
         }
 
         Log.d("Nose control points", Arrays.toString(noseControlPoints));
@@ -1688,6 +1710,7 @@ class Image {
         double[] mouthGradients = new double[16];
         double[][] eyeGradients = new double[2][10];
         double[][] eyebrowGradients = new double[2][6];
+        double[] noseGradients = new double[12];
         for(int i = 0; i < mouthControlPoints.length; i++) {
             double gradient = 0.0;
             if (i != mouthControlPoints.length - 1) {
@@ -1720,6 +1743,16 @@ class Image {
             }
         }
 
+        for(int i = 0; i < noseControlPoints.length; i++) {
+            double gradient = 0.0;
+            if (i != noseControlPoints.length - 1) {
+                gradient = (double)(noseControlPoints[i + 1].y - noseControlPoints[i].y) / (double)(noseControlPoints[i + 1].x - noseControlPoints[i].x);
+            } else {
+                gradient = (double)(noseControlPoints[0].y - noseControlPoints[i].y) / (double)(noseControlPoints[0].x - noseControlPoints[i].x);
+            }
+            noseGradients[i] = gradient;
+        }
+
         //Calculate distance
         int minFaceID = -1;
         double minDistance = Double.MAX_VALUE;
@@ -1727,6 +1760,7 @@ class Image {
             double mouthDistance = 0.0;
             double eyesDistance = 0.0;
             double eyebrowsDistance = 0.0;
+            double noseDistance = 0.0;
 
             for(int i = 0; i < mouthGradients.length; i++) {
                 mouthDistance += Math.abs(mouthGradients[i] - mouthTemplateGradients[faceID][i]);
@@ -1741,8 +1775,14 @@ class Image {
                     eyebrowsDistance += Math.abs(eyebrowGradients[pos][i] - eyebrowTemplateGradients[faceID][pos][i]);
                 }
             }
+            for(int i = 0; i < noseGradients.length; i++) {
+                noseDistance += Math.abs(noseGradients[i] - noseTemplateGradients[faceID][i]);
+            }
 
-            double total = mouthDistance * mouthScoreWeight + eyesDistance * eyesScoreWeight + eyebrowsDistance * eyebrowsScoreWeight;
+
+            double total = mouthDistance * mouthScoreWeight + eyesDistance * eyesScoreWeight + eyebrowsDistance * eyebrowsScoreWeight + noseDistance * noseScoreWeight;
+            Log.d("difference", labels[faceID] + " " + Double.toString(total));
+//            Log.d("nose diff", Double.toString(noseDistance));
             if(total < minDistance) {
                 minDistance = total;
                 minFaceID = faceID;
@@ -1816,15 +1856,15 @@ class Image {
                 }
             }
 
-//            for(int i = 0; i < mouthCPTemplate[faceID].length; i++) {
-//                double gradient = 0.0;
-//                if (i != mouthCPTemplate[faceID].length - 1) {
-//                    gradient = (double)(mouthCPTemplate[faceID][i + 1].y - mouthCPTemplate[faceID][i].y) / (double)(mouthCPTemplate[faceID][i + 1].x - mouthCPTemplate[faceID][i].x);
-//                } else {
-//                    gradient = (double)(mouthCPTemplate[faceID][0].y - mouthCPTemplate[faceID][i].y) / (double)(mouthCPTemplate[faceID][0].x - mouthCPTemplate[faceID][i].x);
-//                }
-//                mouthTemplateGradients[faceID][i] = gradient;
-//            }
+            for(int i = 0; i < noseCPTemplate[faceID].length; i++) {
+                double gradient = 0.0;
+                if (i != noseCPTemplate[faceID].length - 1) {
+                    gradient = (double)(noseCPTemplate[faceID][i + 1].y - noseCPTemplate[faceID][i].y) / (double)(noseCPTemplate[faceID][i + 1].x - noseCPTemplate[faceID][i].x);
+                } else {
+                    gradient = (double)(noseCPTemplate[faceID][0].y - noseCPTemplate[faceID][i].y) / (double)(noseCPTemplate[faceID][0].x - noseCPTemplate[faceID][i].x);
+                }
+                noseTemplateGradients[faceID][i] = gradient;
+            }
         }
     }
 }
