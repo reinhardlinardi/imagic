@@ -82,9 +82,9 @@ class Image {
     double mouthScoreWeight = 1.0;
     double eyesScoreWeight = 1.0;
     double eyebrowsScoreWeight = 1.0;
-    double noseScoreWeight = 0.2;
-
+    double noseScoreWeight = 0.1;
     String[] labels = {"Roland", "Dad", "Mom", "Suhendi"};
+//    String[] labels = {"Roland", "Dad", "Mom", "Suhendi", "Agus"};
     double[][] mouthTemplateGradients = new double[labels.length][16];
     double[][][] eyeTemplateGradients = new double[labels.length][2][10];
     double[][][] eyebrowTemplateGradients = new double[labels.length][2][6];
@@ -94,6 +94,7 @@ class Image {
             {new Point(147, 334), new Point(155, 339), new Point(163, 338), new Point(171, 332), new Point(179, 336), new Point(186, 339), new Point(193, 339), new Point(200, 332), new Point(206, 338), new Point(200, 344), new Point(193, 344), new Point(186, 344), new Point(179, 355), new Point(171, 355), new Point(163, 348), new Point(155, 344)},
             {new Point(154, 349), new Point(163, 342), new Point(171, 345), new Point(179, 343), new Point(187, 330), new Point(195, 343), new Point(203, 343), new Point(211, 341), new Point(219, 347), new Point(211, 357), new Point(203, 362), new Point(195, 362), new Point(187, 362), new Point(179, 361), new Point(171, 353), new Point(163, 351)},
             {new Point(71, 223), new Point(80, 220), new Point(89, 215), new Point(97, 219), new Point(105, 211), new Point(113, 213), new Point(121, 214), new Point(129, 218), new Point(136, 222), new Point(129, 227), new Point(121, 231), new Point(113, 227), new Point(105, 239), new Point(97, 234), new Point(89, 234), new Point(80, 228)},
+//            {new Point(161, 273), new Point(170, 279), new Point(178, 277), new Point(186, 275), new Point(194, 276), new Point(202, 273), new Point(210, 276), new Point(218, 276), new Point(226, 286), new Point(218, 287), new Point(210, 285), new Point(202, 287), new Point(194, 287), new Point(186, 286), new Point(178, 289), new Point(170, 288)},
     };
     Point[][][] eyesCPTemplate = {
             {
@@ -112,6 +113,10 @@ class Image {
                     {new Point(58, 141), new Point(64, 139), new Point(70, 139), new Point(76, 140), new Point(82, 142), new Point(87, 149), new Point(82, 143), new Point(76, 154), new Point(70, 153), new Point(64, 147)},
                     {new Point(123, 147), new Point(129, 142), new Point(135, 139), new Point(141, 139), new Point(147, 139), new Point(152, 141), new Point(147, 154), new Point(141, 154), new Point(135, 153), new Point(129, 151)}
             },
+//            {
+//                    {new Point(149, 203), new Point(154, 193), new Point(159, 193), new Point(164, 193), new Point(169, 205), new Point(173, 208), new Point(169, 211), new Point(164, 212), new Point(159, 212), new Point(154, 212)},
+//                    {new Point(221, 197), new Point(226, 197), new Point(231, 198), new Point(236, 198), new Point(241, 201), new Point(245, 203), new Point(241, 209), new Point(236, 209), new Point(231, 203), new Point(226, 212)}
+//            },
     };
     Point[][][] eyebrowsCPTemplate = {
             {
@@ -130,12 +135,17 @@ class Image {
                     {new Point(51, 134), new Point(57, 135), new Point(62, 133), new Point(67, 134), new Point(72, 132), new Point(77, 131), new Point(87, 127)},
                     {new Point(123, 131), new Point(129, 130), new Point(134, 132), new Point(139, 132), new Point(144, 131), new Point(149, 133), new Point(154, 133)}
             },
+//            {
+//                    {new Point(141, 191), new Point(148, 193), new Point(155, 193), new Point(161, 193), new Point(167, 193), new Point(173, 193), new Point(178, 193)},
+//                    {new Point(221, 192), new Point(228, 191), new Point(235, 192), new Point(242, 191), new Point(249, 193), new Point(256, 193), new Point(261, 190)}
+//            },
     };
     Point[][] noseCPTemplate = {
             {new Point(211, 339), new Point(219, 338), new Point(227, 341), new Point(235, 341), new Point(243, 339), new Point(250, 338), new Point(255, 338), new Point(250, 345), new Point(243, 344), new Point(235, 348), new Point(227, 348), new Point(219, 347)},
             {new Point(162, 311), new Point(167, 311), new Point(172, 313), new Point(177, 313), new Point(182, 311), new Point(187, 319), new Point(191, 315), new Point(187, 321), new Point(182, 319), new Point(177, 321), new Point(172, 322), new Point(167, 320)},
             {new Point(170, 324), new Point(177, 318), new Point(184, 319), new Point(191, 320), new Point(198, 318), new Point(205, 318), new Point(210, 319), new Point(205, 326), new Point(198, 325), new Point(191, 326), new Point(184, 326), new Point(177, 326)},
             {new Point(87, 192), new Point(93, 191), new Point(98, 193), new Point(103, 193), new Point(108, 196), new Point(113, 192), new Point(118, 201), new Point(113, 193), new Point(108, 196), new Point(103, 195), new Point(98, 195), new Point(93, 196)},
+//            {new Point(181, 252), new Point(188, 254), new Point(195, 251), new Point(201, 252), new Point(207, 252), new Point(213, 246), new Point(218, 247), new Point(213, 260), new Point(207, 258), new Point(201, 255), new Point(195, 252), new Point(188, 263)},
     };
 
     /* Methods */
@@ -1582,7 +1592,7 @@ class Image {
                     break;
                 }
             }
-            if(eyebrowsControlPoints[1][idx] == null) {
+            if(idx < 7 && eyebrowsControlPoints[1][idx] == null) {
                 eyebrowsControlPoints[1][idx] = new Point(col, eyebrowsControlPoints[1][idx-1].y);
             }
             idx++;
