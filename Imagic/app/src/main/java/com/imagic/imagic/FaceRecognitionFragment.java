@@ -38,6 +38,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
     private Button detectButton;
 
     Image image;
+    String[] faceIdentity = {""};
 
     @Override
     public void onAttach(Context context) {
@@ -228,7 +229,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
                 progressBar.setProgress(countProgress(1,2));
                 //HEY ROLAND
 //                faceDetectionTextView = something
-                image.findFace(getContext());
+                image.findFace(getContext(), faceIdentity);
                 progressBar.setProgress(countProgress(2,2));
             }
             return null;
@@ -255,6 +256,7 @@ public class FaceRecognitionFragment extends Fragment implements MainActivityLis
                 UI.enable(detectButton);
                 UI.show(faceDetectionIntroductoryText);
                 UI.show(faceDetectionTextView);
+                faceDetectionTextView.setText(faceIdentity[0]);
             }
         }
 
