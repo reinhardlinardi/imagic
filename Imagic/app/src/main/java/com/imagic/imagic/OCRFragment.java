@@ -46,6 +46,9 @@ public class OCRFragment extends Fragment implements MainActivityListener {
     private Spinner spinner;
     private Button analyzeButton;
 
+    private LinearLayout resultContainer;
+    private TextView resultTextView;
+
     // SeekBar percentage value
     private int thresholdValue;
 
@@ -105,6 +108,9 @@ public class OCRFragment extends Fragment implements MainActivityListener {
             analyzeButton = view.findViewById(R.id.ocrAnalyzeButton);
             analyzeButton.setOnClickListener(getAnalyzeButtonOnClickListener());
 
+            resultContainer = view.findViewById(R.id.ocrResultContainer);
+            resultTextView = view.findViewById(R.id.ocrResultTextView);
+
             transformedImageView = view.findViewById(R.id.ocrTransformedImageView);
             imageView = view.findViewById(R.id.ocrImageView);
             imageView.setOnClickListener(getImageViewOnClickListener());
@@ -148,6 +154,8 @@ public class OCRFragment extends Fragment implements MainActivityListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(isAttachedToMainActivity()) {
             if(activity.onImageIntentResult(requestCode, resultCode, data) && activity.hasImage()) {
+                UI.setInvisible(resultContainer);
+
                 ImageLoadAsyncTask imageLoadAsyncTask = new ImageLoadAsyncTask();
                 imageLoadAsyncTask.execute(true);
             }
@@ -253,10 +261,9 @@ public class OCRFragment extends Fragment implements MainActivityListener {
                     if(activity.hasImage()) {
                         image = new Image(getContext(), activity.getImage());
                         rgb = new RGBHistogram(activity.getRGBHistogram());
-                        /*
-                        ContrastEnhancementAsyncTask contrastEnhancementAsyncTask = new ContrastEnhancementAsyncTask();
-                        contrastEnhancementAsyncTask.execute();
-                        */
+
+                        OCRAsyncTask ocrAsyncTask = new OCRAsyncTask();
+                        ocrAsyncTask.execute();
                     }
                 }
             }
@@ -383,6 +390,107 @@ public class OCRFragment extends Fragment implements MainActivityListener {
 
                 if(!UI.isVisible(transformedImageView)) UI.show(transformedImageView);
                 if(!UI.isVisible(container)) UI.show(container);
+            }
+        }
+    }
+
+    // OCR async task
+    private class OCRAsyncTask extends AsyncTask<Void, Integer, Character> {
+        @Override
+        protected Character doInBackground(Void... voids) {
+            publishProgress(countProgress(1,3));
+
+            Character verdict = ' ';
+            int verdictInt;
+
+            try {
+                image.convertToBlackAndWhite(thresholdValue);
+                image.getBitmapMatrix();
+                String algorithm = ((OCRMethod) spinner.getSelectedItem()).method;
+
+                switch(algorithm) {
+                    case "Edge (Number)":
+                        ChainCode chainCode = new ChainCode();
+                        chainCode.getEdgeDetectionChainCode(image.bitmapMatrix);
+                        publishProgress(countProgress(2,3));
+
+                        verdictInt = chainCode.edgeDetectionOCR();
+                        verdict = (char)('0' + verdictInt);
+                        publishProgress(countProgress(3,3));
+                        break;
+                    case "Thinning":
+                        image.getSkeleton();
+                        publishProgress(countProgress(2,3));
+
+                        try {
+                            image.setBitmapFromMatrix();
+                        }
+                        catch(Exception e) {
+                            Debug.ex(e);
+                        }
+
+                        verdict = image.skeleton.getPrediction();
+                        publishProgress(countProgress(3,3));
+                        break;
+                    case "Thinning (Number)":
+                        image.getSkeleton();
+                        publishProgress(countProgress(2,3));
+
+                        try {
+                            image.setBitmapFromMatrix();
+                        }
+                        catch(Exception e) {
+                            Debug.ex(e);
+                        }
+
+                        verdictInt = image.skeleton.getNumberPrediction();
+                        verdict = (char) ('0' + verdictInt);
+                        publishProgress(countProgress(3,3));
+                        break;
+                }
+            }
+            catch(Exception e) {
+                Debug.ex(e);
+            }
+
+            return verdict;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if(isAttachedToMainActivity()) {
+                UI.setUnclickable(imageView);
+                UI.disable(resetButton);
+                UI.disable(applyButton);
+
+                UI.disable(thresholdSeekBar);
+                UI.disable(spinnerContainer);
+                UI.disable(analyzeButton);
+
+                progressBar.setProgress(0);
+                UI.show(progressBar);
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) { progressBar.setProgress(progress[0]); }
+
+        @Override
+        protected void onPostExecute(Character results) {
+            if(isAttachedToMainActivity()) {
+                UI.setImageView(getContext(), transformedImageView, image.bitmap);
+                UI.clearMemory(getContext());
+
+                resultTextView.setText(Character.toString(results));
+                if(!UI.isVisible(resultContainer)) UI.show(resultContainer);
+
+                UI.setClickable(imageView);
+                UI.enable(resetButton);
+                UI.enable(applyButton);
+
+                UI.enable(thresholdSeekBar);
+                UI.enable(spinnerContainer);
+                UI.enable(analyzeButton);
             }
         }
     }

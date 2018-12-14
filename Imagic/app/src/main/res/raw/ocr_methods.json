@@ -4,5 +4,8 @@
   },
   {
     "method" : "Thinning"
+  },
+  {
+    "method" : "Thinning (Number)"
   }
 ]
