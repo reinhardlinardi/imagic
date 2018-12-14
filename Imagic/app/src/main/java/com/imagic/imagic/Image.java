@@ -1,46 +1,16 @@
 package com.imagic.imagic;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.database.DatabaseErrorHandler;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.UserHandle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.Display;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -56,8 +26,20 @@ class Image {
     static final String MIME_TYPE = "image/*";
     private static final int LOLLIPOP_SDK_INT = 24;
 
+    private final int MATRIX_WHITE = 0;
+    private final int MATRIX_BLACK = 1;
+
+    private final int MATRIX_VERTEX_GREEN = 2;
+    private final int MATRIX_INTERSECTION_BLUE = 3;
+
     /* Custom kernel */
     double[][][] customKernel;
+
+    /* Matrix of bitmap */
+    int[][] bitmapMatrix;
+
+    /* Image skeleton */
+    Skeleton skeleton;
 
     /* Properties */
     Bitmap bitmap;
@@ -188,6 +170,66 @@ class Image {
 
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
+    }
+
+    // Get matrix of bitmap
+    void getBitmapMatrix() {
+        if(hasBitmap()) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int[width * height];
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            bitmapMatrix = new int[height][width];
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    int pixel = pixels[row * width + col];
+                    bitmapMatrix[row][col] = (pixel == BLACK)? 1 : 0;
+                }
+            }
+        }
+    }
+
+    // Set bitmap from matrix
+    void setBitmapFromMatrix() {
+        if(hasBitmap()) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            int[] pixels = new int [width * height];
+
+            for(int row = 0; row < height; row++) {
+                for(int col = 0; col < width; col++) {
+                    switch(skeleton.skeletonMatrix[row][col]) {
+                        case MATRIX_BLACK:
+                            pixels[row * width + col] = Color.rgb(0xFF,0xFF,0xFF);
+                            break;
+                        case MATRIX_WHITE:
+                            pixels[row * width + col] = Color.rgb(0,0,0);
+                            break;
+                        case MATRIX_VERTEX_GREEN:
+                            pixels[row * width + col] = Color.rgb(0x32,0xCD,0x32);
+                            break;
+                        case MATRIX_INTERSECTION_BLUE:
+                            pixels[row * width + col] = Color.rgb(0x00,0xFF,0xFF);
+                            break;
+                    }
+                }
+            }
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
+    }
+
+    // Get image skeleton
+    void getSkeleton() {
+        if(hasBitmap()) {
+            skeleton = new Skeleton(this.bitmapMatrix);
+            skeleton.postProcess();
         }
     }
 
